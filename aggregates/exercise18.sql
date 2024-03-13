@@ -1,21 +1,37 @@
-CREATE TABLE bookings (
-    bookid    integer                     NOT NULL,
-    facid     integer                     NOT NULL,
-    memid     integer                     NOT NULL,
-    starttime timestamp WITHOUT TIME ZONE NOT NULL,
-    slots     integer                     NOT NULL
+CREATE SCHEMA IF NOT EXISTS cd;
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET search_path = cd, pg_catalog;
+SET default_tablespace = '';
+SET default_with_oids = false;
+
+CREATE TABLE IF NOT EXISTS bookings (
+    bookid    integer   NOT NULL,
+    facid     integer   NOT NULL,
+    memid     integer   NOT NULL,
+    starttime timestamp NOT NULL,
+    slots     integer   NOT NULL,
+    CONSTRAINT bookings_pk PRIMARY KEY (bookid),
+    CONSTRAINT fk_bookings_facid FOREIGN KEY (facid) REFERENCES facilities(facid),
+    CONSTRAINT fk_bookings_memid FOREIGN KEY (memid) REFERENCES members(memid)
 );
 
-CREATE TABLE members (
-    memid         integer                     NOT NULL,
-    surname       character varying(200)      NOT NULL,
-    firstname     character varying(200)      NOT NULL,
-    address       character varying(300)      NOT NULL,
-    zipcode       integer                     NOT NULL,
-    telephone     character varying(20)       NOT NULL,
+CREATE TABLE IF NOT EXISTS members (
+    memid         integer                NOT NULL,
+    surname       character varying(200) NOT NULL,
+    firstname     character varying(200) NOT NULL,
+    address       character varying(300) NOT NULL,
+    zipcode       integer                NOT NULL,
+    telephone     character varying(20)  NOT NULL,
     recommendedby integer,
-    joindate      timestamp WITHOUT TIME ZONE NOT NULL
+    joindate      timestamp              NOT NULL,
+    CONSTRAINT members_pk PRIMARY KEY (memid),
+    CONSTRAINT fk_members_recommendedby FOREIGN KEY (recommendedby) REFERENCES members(memid) ON DELETE SET NULL
 );
+
 
 INSERT INTO bookings (bookid, facid, memid, starttime, slots)
 VALUES
@@ -4062,7 +4078,8 @@ VALUES
     (4040, 8, 21, '2012-09-30 18:30:00', 1),
     (4041, 8, 16, '2012-09-30 19:00:00', 1),
     (4042, 8, 29, '2012-09-30 19:30:00', 1),
-    (4043, 8, 5, '2013-01-01 15:30:00', 1);
+    (4043, 8, 5, '2013-01-01 15:30:00', 1)
+ON CONFLICT (bookid) DO NOTHING;
 
 INSERT INTO members (memid, surname, firstname, address, zipcode, telephone, recommendedby, joindate)
 VALUES
@@ -4104,7 +4121,8 @@ VALUES
      '2012-09-18 19:32:05'),
     (35, 'Hunt', 'John', '5 Bullington Lane, Boston', 54333, '(899) 720-6978', 30, '2012-09-19 11:32:45'),
     (36, 'Crumpet', 'Erica', 'Crimson Road, North Reading', 75655, '(811) 732-4816', 2, '2012-09-22 08:36:38'),
-    (37, 'Smith', 'Darren', '3 Funktown, Denzington, Boston', 66796, '(822) 577-3541', NULL, '2012-09-26 18:08:45');
+    (37, 'Smith', 'Darren', '3 Funktown, Denzington, Boston', 66796, '(822) 577-3541', NULL, '2012-09-26 18:08:45')
+ON CONFLICT (memid) DO NOTHING;
 
 
 SELECT firstname, surname, hours, rank
@@ -4114,8 +4132,8 @@ FROM
             m.firstname, m.surname, ROUND(SUM(b.slots * 0.5), -1) AS hours,
             RANK() OVER (ORDER BY ROUND(SUM(b.slots * 0.5), -1) DESC) AS rank
         FROM
-            members AS m
-            JOIN bookings AS b ON m.memid = b.memid
+            cd.members AS m
+            JOIN cd.bookings AS b ON m.memid = b.memid
         GROUP BY m.firstname, m.surname
     ) AS ranks
 ORDER BY

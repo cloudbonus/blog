@@ -1,9 +1,22 @@
-CREATE TABLE bookings (
-    bookid    integer                     NOT NULL,
-    facid     integer                     NOT NULL,
-    memid     integer                     NOT NULL,
-    starttime timestamp WITHOUT TIME ZONE NOT NULL,
-    slots     integer                     NOT NULL
+CREATE SCHEMA IF NOT EXISTS cd;
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET search_path = cd, pg_catalog;
+SET default_tablespace = '';
+SET default_with_oids = false;
+
+CREATE TABLE IF NOT EXISTS bookings (
+    bookid    integer   NOT NULL,
+    facid     integer   NOT NULL,
+    memid     integer   NOT NULL,
+    starttime timestamp NOT NULL,
+    slots     integer   NOT NULL,
+    CONSTRAINT bookings_pk PRIMARY KEY (bookid),
+    CONSTRAINT fk_bookings_facid FOREIGN KEY (facid) REFERENCES facilities(facid),
+    CONSTRAINT fk_bookings_memid FOREIGN KEY (memid) REFERENCES members(memid)
 );
 
 INSERT INTO bookings (bookid, facid, memid, starttime, slots)
@@ -4051,12 +4064,13 @@ VALUES
     (4040, 8, 21, '2012-09-30 18:30:00', 1),
     (4041, 8, 16, '2012-09-30 19:00:00', 1),
     (4042, 8, 29, '2012-09-30 19:30:00', 1),
-    (4043, 8, 5, '2013-01-01 15:30:00', 1);
+    (4043, 8, 5, '2013-01-01 15:30:00', 1)
+ON CONFLICT (bookid) DO NOTHING;
 
-SELECT bookings.facid, SUM(bookings.slots)
+SELECT facid, SUM(slots) as "Total slots"
 FROM
-    bookings
+    cd.bookings
 GROUP BY
-    bookings.facid
+    facid
 ORDER BY
-    bookings.facid;
+    facid;
