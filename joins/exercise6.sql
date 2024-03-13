@@ -1,31 +1,46 @@
-CREATE TABLE members (
-    memid         integer                     NOT NULL,
-    surname       character varying(200)      NOT NULL,
-    firstname     character varying(200)      NOT NULL,
-    address       character varying(300)      NOT NULL,
-    zipcode       integer                     NOT NULL,
-    telephone     character varying(20)       NOT NULL,
+CREATE SCHEMA IF NOT EXISTS cd;
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET search_path = cd, pg_catalog;
+SET default_tablespace = '';
+SET default_with_oids = false;
+
+CREATE TABLE IF NOT EXISTS members (
+    memid         integer                NOT NULL,
+    surname       character varying(200) NOT NULL,
+    firstname     character varying(200) NOT NULL,
+    address       character varying(300) NOT NULL,
+    zipcode       integer                NOT NULL,
+    telephone     character varying(20)  NOT NULL,
     recommendedby integer,
-    joindate      timestamp WITHOUT TIME ZONE NOT NULL
+    joindate      timestamp              NOT NULL,
+    CONSTRAINT members_pk PRIMARY KEY (memid),
+    CONSTRAINT fk_members_recommendedby FOREIGN KEY (recommendedby) REFERENCES members(memid) ON DELETE SET NULL
 );
 
-CREATE TABLE bookings (
-    bookid    integer                     NOT NULL,
-    facid     integer                     NOT NULL,
-    memid     integer                     NOT NULL,
-    starttime timestamp WITHOUT TIME ZONE NOT NULL,
-    slots     integer                     NOT NULL
+CREATE TABLE IF NOT EXISTS bookings (
+    bookid    integer   NOT NULL,
+    facid     integer   NOT NULL,
+    memid     integer   NOT NULL,
+    starttime timestamp NOT NULL,
+    slots     integer   NOT NULL,
+    CONSTRAINT bookings_pk PRIMARY KEY (bookid),
+    CONSTRAINT fk_bookings_facid FOREIGN KEY (facid) REFERENCES facilities(facid),
+    CONSTRAINT fk_bookings_memid FOREIGN KEY (memid) REFERENCES members(memid)
 );
 
-CREATE TABLE facilities (
+CREATE TABLE IF NOT EXISTS facilities (
     facid              integer                NOT NULL,
     name               character varying(100) NOT NULL,
     membercost         numeric                NOT NULL,
     guestcost          numeric                NOT NULL,
     initialoutlay      numeric                NOT NULL,
-    monthlymaintenance numeric                NOT NULL
+    monthlymaintenance numeric                NOT NULL,
+    CONSTRAINT facilities_pk PRIMARY KEY (facid)
 );
-
 
 INSERT INTO members (memid, surname, firstname, address, zipcode, telephone, recommendedby, joindate)
 VALUES
@@ -67,7 +82,8 @@ VALUES
      '2012-09-18 19:32:05'),
     (35, 'Hunt', 'John', '5 Bullington Lane, Boston', 54333, '(899) 720-6978', 30, '2012-09-19 11:32:45'),
     (36, 'Crumpet', 'Erica', 'Crimson Road, North Reading', 75655, '(811) 732-4816', 2, '2012-09-22 08:36:38'),
-    (37, 'Smith', 'Darren', '3 Funktown, Denzington, Boston', 66796, '(822) 577-3541', NULL, '2012-09-26 18:08:45');
+        (37, 'Smith', 'Darren', '3 Funktown, Denzington, Boston', 66796, '(822) 577-3541', NULL, '2012-09-26 18:08:45')
+ON CONFLICT (memid) DO NOTHING;
 
 INSERT INTO bookings (bookid, facid, memid, starttime, slots)
 VALUES
@@ -4114,7 +4130,8 @@ VALUES
     (4040, 8, 21, '2012-09-30 18:30:00', 1),
     (4041, 8, 16, '2012-09-30 19:00:00', 1),
     (4042, 8, 29, '2012-09-30 19:30:00', 1),
-    (4043, 8, 5, '2013-01-01 15:30:00', 1);
+    (4043, 8, 5, '2013-01-01 15:30:00', 1)
+ON CONFLICT (bookid) DO NOTHING;
 
 INSERT INTO facilities (facid, name, membercost, guestcost, initialoutlay, monthlymaintenance)
 VALUES
@@ -4126,18 +4143,19 @@ VALUES
     (5, 'Massage Room 2', 35, 80, 4000, 3000),
     (6, 'Squash Court', 3.5, 17.5, 5000, 80),
     (7, 'Snooker Table', 0, 5, 450, 15),
-    (8, 'Pool Table', 0, 5, 400, 15);
+    (8, 'Pool Table', 0, 5, 400, 15)
+ON CONFLICT (facid) DO NOTHING;
 
 SELECT
-    CONCAT(m.firstname, ' ', m.surname) AS member_name, f.name, CASE
+    CONCAT(m.firstname, ' ', m.surname) AS member, f.name AS facility, CASE
                                                                     WHEN m.memid = 0
                                                                         THEN f.guestcost * b.slots
                                                                     ELSE f.membercost * b.slots
                                                                 END AS cost
 FROM
-    members AS m
-    JOIN bookings AS b ON m.memid = b.memid
-    JOIN facilities AS f ON b.facid = f.facid
+    cd.members AS m
+    JOIN cd.bookings AS b ON m.memid = b.memid
+    JOIN cd.facilities AS f ON b.facid = f.facid
 WHERE
     date(b.starttime) = '2012-09-14' AND
     ((m.memid = 0 AND f.guestcost * b.slots > 30) OR (m.memid != 0 AND f.membercost * b.slots > 30))
