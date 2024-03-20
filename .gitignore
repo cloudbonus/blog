@@ -14,3 +14,9 @@ target/
 
 # Java Class Files
 *.class
+
+# Compose
+docker-compose.yaml
+
+# Jar
+liquibase/*.jar
