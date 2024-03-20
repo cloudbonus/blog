@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS blogging_platform.order (
     post_id    bigint      NOT NULL UNIQUE,
     user_id    bigint      NOT NULL,
     ordered_at timestamptz NOT NULL,
-    message    varchar(255),
-    status     varchar(50) NOT NULL
+    message    text,
+    status     text        NOT NULL
 );
 
 ALTER TABLE IF EXISTS blogging_platform.order

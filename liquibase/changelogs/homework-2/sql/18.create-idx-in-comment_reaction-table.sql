@@ -1,2 +1,1 @@
-DROP INDEX IF EXISTS idx_comment_reaction_user_id;
-CREATE INDEX idx_comment_reaction_user_id ON blogging_platform.comment_reaction(user_id);
+CREATE INDEX IF NOT EXISTS idx_comment_reaction_user_id ON blogging_platform.comment_reaction(user_id);

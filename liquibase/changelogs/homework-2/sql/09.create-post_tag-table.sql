@@ -2,9 +2,8 @@ CREATE TABLE IF NOT EXISTS blogging_platform.post_tag (
     post_id bigint,
     tag_id  bigint
 );
-
-ALTER TABLE IF EXISTS blogging_platform.post_tag
-ADD CONSTRAINT post_tag_pk PRIMARY KEY (post_id, tag_id);
+ALTER TABLE blogging_platform.post_tag
+ADD CONSTRAINT post_tag_unique UNIQUE (post_id, tag_id);
 
 ALTER TABLE IF EXISTS blogging_platform.post_tag
 ADD CONSTRAINT post_tag_post_fk FOREIGN KEY (post_id) REFERENCES blogging_platform.post(post_id) ON DELETE CASCADE;
