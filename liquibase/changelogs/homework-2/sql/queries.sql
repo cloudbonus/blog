@@ -8,7 +8,8 @@ FROM
 SELECT *
 FROM
     blogging_platform.user AS u
-    JOIN blogging_platform.post AS p ON u.user_id = p.user_id;
+    JOIN blogging_platform.user_role AS ul ON u.user_id = ul.user_id
+    JOIN blogging_platform.role AS r ON ul.role_id = r.role_id;
 
 -- post
 SELECT *
@@ -64,5 +65,5 @@ FROM
 
 SELECT *
 FROM
-    blogging_platform.user u
-    INNER JOIN blogging_platform.order o ON u.user_id = o.user_id;
+    blogging_platform.user AS u
+    JOIN blogging_platform.order AS o ON u.user_id = o.user_id;
