@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'org.liquibase.gradle' version '2.2.1'
+}
+
+group = 'com.github'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':di')
+    liquibaseRuntime group: 'org.liquibase', name: 'liquibase-core', version: '4.26.0'
+    liquibaseRuntime group: 'info.picocli', name: 'picocli', version: '4.7.5'
+    liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
+}
+
+File propsFile = new File("${project.rootDir}/main/src/main/migrations/db/changelog/liquibase.properties")
+Properties liquibaseProperties = new Properties()
+liquibaseProperties.load(new FileInputStream(propsFile))
+
+liquibase {
+    activities {
+        main {
+            changelogFile liquibaseProperties['changelogFile']
+            url liquibaseProperties ['url']
+            username liquibaseProperties ['username']
+            password liquibaseProperties ['password']
+        }
+    }
+}
+
+build.dependsOn update
