@@ -6,13 +6,18 @@ import com.github.framework.annotation.Value;
 import org.reflections.Reflections;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ApplicationContext {
     private static final InjectorImpl injector = new InjectorImpl();
@@ -32,8 +37,10 @@ public class ApplicationContext {
     }
 
     private static void loadProperties() {
-        try (var stream = ApplicationContext.class.getClassLoader().getResourceAsStream("application.properties")) {
-            properties.load(stream);
+        try (InputStream stream = ApplicationContext.class.getClassLoader().getResourceAsStream("application.properties")) {
+            if (stream != null) {
+                properties.load(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -127,10 +134,18 @@ public class ApplicationContext {
             if (field.isAnnotationPresent(Value.class)) {
                 Value valueAnnotation = field.getAnnotation(Value.class);
                 String propertyKey = valueAnnotation.value();
-                String propertyValue = properties.getProperty(propertyKey);
-                if (propertyValue != null) {
-                    field.setAccessible(true);
-                    field.set(instance, propertyValue);
+                Pattern r = Pattern.compile("\\$\\{(.+)\\}");
+                Matcher m = r.matcher(propertyKey);
+                if (m.find()) {
+                    String propertyValue = properties.getProperty(m.group(1));
+                    if (propertyValue != null) {
+                        field.setAccessible(true);
+                        field.set(instance, propertyValue);
+                    } else {
+                        throw new IllegalStateException("Property value not found for key: " + m.group(1));
+                    }
+                } else {
+                    throw new IllegalStateException("Property key not found in @Value annotation");
                 }
             }
         }

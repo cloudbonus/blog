@@ -7,6 +7,6 @@ public class Main {
     public static void main(String[] args) {
         ApplicationContext context = ApplicationContext.createApplicationContext();
         Controller controller = context.getBean(Controller.class);
-        controller.executeService();
+        controller.execute();
     }
 }

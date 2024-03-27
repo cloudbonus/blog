@@ -9,7 +9,7 @@ public class Controller {
     @Autowired
     private ServiceInterface service;
 
-    public void executeService() {
+    public void execute() {
         service.execute();
     }
 }
