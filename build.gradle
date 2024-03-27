@@ -5,3 +5,12 @@ repositories {
     mavenCentral()
 }
 
+build {
+    dependsOn ':di:build'
+    dependsOn ':di:publishMavenJavaPublicationToMavenLocal'
+    dependsOn ':main:build'
+    dependsOn ':main:publishMavenJavaPublicationToMavenLocal'
+}
+
+
+

@@ -1,10 +1,9 @@
 plugins {
     id 'java'
     id 'org.liquibase.gradle' version '2.2.1'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
 }
-
-group = 'com.github'
-version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -32,4 +31,29 @@ liquibase {
     }
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'com.github'
+            artifactId = 'blog'
+            version = '1.0'
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+jar {
+    manifest {
+        attributes['Implementation-Title'] = 'blog'
+        attributes['Implementation-Version'] = '1.0'
+        attributes['Main-Class'] = 'com.github.blog.Main'
+
+    }
+}
+
+
 build.dependsOn update
+publishMavenJavaPublicationToMavenLocal {}.mustRunAfter('build')

@@ -1,9 +1,7 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
-
-group = 'com.github'
-version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -11,5 +9,27 @@ repositories {
 
 dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.10.2'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.12'
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'com.github'
+            artifactId = 'framework'
+            version = '1.0'
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+jar {
+    manifest {
+        attributes['Implementation-Title'] = 'framework'
+        attributes['Implementation-Version'] = '1.0'
+    }
+}
+
+publishMavenJavaPublicationToMavenLocal {}.mustRunAfter('build')
