@@ -3,9 +3,12 @@ package com.github.blog.service;
 import com.github.blog.db.DatabaseInterface;
 import com.github.framework.annotation.Autowired;
 import com.github.framework.annotation.Component;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Component
 public class ServiceImpl implements ServiceInterface {
+    private static final Logger logger = LogManager.getLogger(ServiceImpl.class);
     private DatabaseInterface database;
 
     @Autowired
@@ -15,6 +18,6 @@ public class ServiceImpl implements ServiceInterface {
 
     @Override
     public void execute() {
-        System.out.println(database.execute());
+        logger.info(database.execute());
     }
 }

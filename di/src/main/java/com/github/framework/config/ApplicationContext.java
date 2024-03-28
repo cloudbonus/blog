@@ -4,7 +4,11 @@ import com.github.framework.annotation.Autowired;
 import com.github.framework.annotation.Component;
 import com.github.framework.annotation.Value;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,49 +16,86 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ApplicationContext {
-    private static final InjectorImpl injector = new InjectorImpl();
-    private static final Map<Class<?>, Object> container = new HashMap<>();
-    private static final Properties properties = new Properties();
+    private InjectorImpl injector;
+    private ConcurrentMap<Class<?>, Object> container;
+    private Properties properties;
+    private String basePackage;
+    private final String propertiesFilePath;
 
-    static {
-        loadProperties();
+    private ApplicationContext(Class<?> configurationClass, String propertiesFilePath) {
+        this.propertiesFilePath = propertiesFilePath;
+        initializeApplicationContext(configurationClass);
+    }
+
+    private ApplicationContext(Class<?> configurationClass) {
+        this.propertiesFilePath = "";
+        initializeApplicationContext(configurationClass);
+    }
+
+    private void initializeApplicationContext(Class<?> configurationClass) {
+        this.basePackage = configurationClass.getPackage().getName();
+        this.container = new ConcurrentHashMap<>();
+        this.injector = new InjectorImpl();
+        this.properties = new Properties();
+
         injectComponents();
     }
 
-    private ApplicationContext() {
+    public static ApplicationContext createApplicationContext(Class<?> configurationClass) {
+        return new ApplicationContext(configurationClass);
     }
 
-    public static ApplicationContext createApplicationContext() {
-        return new ApplicationContext();
+    public static ApplicationContext createApplicationContext(Class<?> configurationClass, String propertiesFilePath) {
+        return new ApplicationContext(configurationClass, propertiesFilePath);
     }
 
-    private static void loadProperties() {
-        try (InputStream stream = ApplicationContext.class.getClassLoader().getResourceAsStream("application.properties")) {
+    private void loadProperties() {
+        String filePath = this.propertiesFilePath.isEmpty() ? "application.properties" : this.propertiesFilePath;
+        try (InputStream stream = getInputStream(filePath)) {
             if (stream != null) {
                 properties.load(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            } else {
+                throw new RuntimeException("Could not load properties file.");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void injectComponents() {
-        Reflections reflections = new Reflections("com.github.blog");
+    private InputStream getInputStream(String filePath) throws IOException {
+        try {
+            return new FileInputStream(filePath);
+        } catch (IOException e) {
+            return ApplicationContext.class.getClassLoader().getResourceAsStream("application.properties");
+        }
+    }
+
+    private void injectComponents() {
+        Reflections reflections = new Reflections(
+                new ConfigurationBuilder()
+                        .setUrls(ClasspathHelper.forPackage(basePackage))
+                        .setScanners(Scanners.TypesAnnotated, Scanners.FieldsAnnotated));
+
         Set<Class<?>> classSet = reflections.getTypesAnnotatedWith(Component.class);
+        Set<Field> fieldSet = reflections.getFieldsAnnotatedWith(Value.class);
+
+        if (!fieldSet.isEmpty()) {
+            loadProperties();
+        }
 
         registerInjectables(classSet);
         injectComponentsIntoContainer(classSet);
     }
 
-    private static void registerInjectables(Set<Class<?>> classSet) {
+    private void registerInjectables(Set<Class<?>> classSet) {
         for (Class<?> clazz : classSet) {
             try {
                 Class<?>[] interfaces = clazz.getInterfaces();
@@ -71,7 +112,7 @@ public class ApplicationContext {
         }
     }
 
-    private static void injectComponentsIntoContainer(Set<Class<?>> classSet) {
+    private void injectComponentsIntoContainer(Set<Class<?>> classSet) {
         for (Class<?> clazz : classSet) {
             try {
                 container.put(clazz, inject(clazz));
@@ -81,9 +122,7 @@ public class ApplicationContext {
         }
     }
 
-
-    private static <T> T inject(Class<T> classToInjectTo) throws Exception {
-
+    private <T> T inject(Class<T> classToInjectTo) throws Exception {
         T instance = injectViaConstructor(classToInjectTo);
         injectViaSetters(instance, classToInjectTo);
         injectViaFields(instance, classToInjectTo);
@@ -91,7 +130,7 @@ public class ApplicationContext {
         return instance;
     }
 
-    private static <T> T injectViaConstructor(Class<T> classToInjectTo) throws Exception {
+    private <T> T injectViaConstructor(Class<T> classToInjectTo) throws Exception {
         T instance = null;
 
         for (Constructor<?> constructor : classToInjectTo.getConstructors()) {
@@ -103,7 +142,7 @@ public class ApplicationContext {
         return instance != null ? instance : classToInjectTo.getConstructor().newInstance();
     }
 
-    private static <T> T injectConstructor(Constructor<?> constructor, Class<T> classToInjectTo) throws Exception {
+    private <T> T injectConstructor(Constructor<?> constructor, Class<T> classToInjectTo) throws Exception {
         Class<?>[] parameterTypes = constructor.getParameterTypes();
         Object[] dependencies = new Object[parameterTypes.length];
 
@@ -117,15 +156,20 @@ public class ApplicationContext {
         return classToInjectTo.getConstructor(parameterTypes).newInstance(dependencies);
     }
 
-    private static <T> void injectViaSetters(T instance, Class<T> classToInjectTo) throws Exception {
+    private <T> void injectViaSetters(T instance, Class<T> classToInjectTo) throws Exception {
         for (Method method : classToInjectTo.getMethods()) {
-            if (method.isAnnotationPresent(Autowired.class) && method.getName().startsWith("set") && method.getParameterCount() == 1) {
-                method.invoke(instance, inject(injector.getInjectable(method.getParameterTypes()[0])));
+            if (method.isAnnotationPresent(Autowired.class)) {
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                Object[] dependencies = new Object[parameterTypes.length];
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    dependencies[i] = inject(injector.getInjectable(parameterTypes[i]));
+                }
+                method.invoke(instance, dependencies);
             }
         }
     }
 
-    private static <T> void injectViaFields(T instance, Class<T> classToInjectTo) throws Exception {
+    private <T> void injectViaFields(T instance, Class<T> classToInjectTo) throws Exception {
         for (Field field : classToInjectTo.getDeclaredFields()) {
             if (field.isAnnotationPresent(Autowired.class)) {
                 field.setAccessible(true);
@@ -142,7 +186,7 @@ public class ApplicationContext {
                         field.setAccessible(true);
                         field.set(instance, propertyValue);
                     } else {
-                        throw new IllegalStateException("Property value not found for key: " + m.group(1));
+                        throw new IllegalStateException("Property value not found for key " + m.group(1));
                     }
                 } else {
                     throw new IllegalStateException("Property key not found in @Value annotation");

@@ -56,5 +56,4 @@ jar {
     }
 }
 
-
 build.dependsOn update
