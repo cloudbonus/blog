@@ -84,4 +84,56 @@
     <changeSet id="homework-2-create-idx-in-order" author="Raman Haurylau">
         <sqlFile encoding="utf8" path="./sql/19.create-idx-in-order-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
+
+    <changeSet id="homework-3-replace-unique-constrain-to-primary-key-in-user_role" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/20.replace-unique-constrain-to-primary-key-in-user_role-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-3-replace-unique-constrain-to-primary-key-in-post_tag" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/21.replace-unique-constrain-to-primary-key-in-post_tag-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-user" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/22.rename-idx-in-user-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-user_details" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/23.rename-idx-in-user_details-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-role" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/24.rename-idx-in-role-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-user_role" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/25.rename-idx-in-user_role-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-post" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/26.rename-idx-in-post-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-post_reaction" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/27.rename-idx-in-post_reaction-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-tag" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/28.rename-idx-in-tag-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-post_tag" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/29.rename-idx-in-post_tag-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-comment" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/30.rename-idx-in-comment-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-comment_reaction" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/31.rename-idx-in-comment_reaction-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-3-rename-idx-in-order" author="Raman Haurylau">
+        <sqlFile encoding="utf8" path="./sql/32.rename-idx-in-order-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
 </databaseChangeLog> 
