@@ -7,6 +7,7 @@ public class InjectorImpl implements Injector {
 
     private final Map<Class<?>, Class<?>> injectables = new ConcurrentHashMap<>();
 
+    @Override
     public void registerInjectable(Class<?> baseClass, Class<?> subClass) {
         if (injectables.containsKey(baseClass)) {
             throw new RuntimeException("Multiple implementations found: " + baseClass.getName());
