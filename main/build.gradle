@@ -14,7 +14,7 @@ version = '1.0'
 
 dependencies {
     implementation project(':di')
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.23.1'
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.23.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
     liquibaseRuntime group: 'org.liquibase', name: 'liquibase-core', version: '4.26.0'
     liquibaseRuntime group: 'info.picocli', name: 'picocli', version: '4.7.5'
@@ -41,9 +41,6 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
         }
-    }
-    repositories {
-        mavenLocal()
     }
 }
 
