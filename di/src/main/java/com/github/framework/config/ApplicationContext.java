@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ApplicationContext {
-    private InjectorImpl injector;
+    private Injector injector;
     private Map<Class<?>, Object> container;
     private Properties properties;
     private String basePackage;
