@@ -16,16 +16,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ApplicationContext {
     private InjectorImpl injector;
-    private ConcurrentMap<Class<?>, Object> container;
+    private Map<Class<?>, Object> container;
     private Properties properties;
     private String basePackage;
     private final String propertiesFilePath;

@@ -1,11 +1,11 @@
 package com.github.framework.config;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class InjectorImpl implements Injector {
 
-    private final ConcurrentMap<Class<?>, Class<?>> injectables = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Class<?>> injectables = new ConcurrentHashMap<>();
 
     public void registerInjectable(Class<?> baseClass, Class<?> subClass) {
         if (injectables.containsKey(baseClass)) {
