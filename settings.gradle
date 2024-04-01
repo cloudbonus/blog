@@ -1,2 +1,0 @@
-rootProject.name = 'senla-course'
-include ':di', ':main'
