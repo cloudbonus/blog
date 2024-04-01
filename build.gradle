@@ -21,7 +21,7 @@ dependencies {
     liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
 }
 
-File propsFile = new File("${project.rootDir}/src/main/migrations/db/changelog/liquibase.properties")
+File propsFile = new File("${project.rootDir}/src/main/resources/db/changelog/liquibase.properties")
 Properties liquibaseProperties = new Properties()
 liquibaseProperties.load(new FileInputStream(propsFile))
 
