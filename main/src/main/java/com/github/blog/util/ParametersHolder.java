@@ -1,4 +1,4 @@
-package com.github.blog.db;
+package com.github.blog.util;
 
 import com.github.framework.annotation.Component;
 import com.github.framework.annotation.Value;

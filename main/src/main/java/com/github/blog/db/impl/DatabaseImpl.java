@@ -1,5 +1,7 @@
-package com.github.blog.db;
+package com.github.blog.db.impl;
 
+import com.github.blog.db.DatabaseInterface;
+import com.github.blog.util.ParametersHolder;
 import com.github.framework.annotation.Autowired;
 import com.github.framework.annotation.Component;
 

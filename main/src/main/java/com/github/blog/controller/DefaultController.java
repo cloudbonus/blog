@@ -5,7 +5,7 @@ import com.github.framework.annotation.Autowired;
 import com.github.framework.annotation.Component;
 
 @Component
-public class Controller {
+public class DefaultController {
     @Autowired
     private ServiceInterface service;
 
