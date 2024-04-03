@@ -1,6 +1,6 @@
 package com.github.blog.dao.impl;
 
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.TagDao;
 import com.github.blog.model.Tag;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +12,12 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class TagDao implements Dao<Tag> {
+public class TagDaoImpl implements TagDao {
     private final List<Tag> tags = new ArrayList<>();
 
     @Override
     public Optional<Tag> getById(int id) {
-        return tags.stream().filter(t -> t.getTagId() == id).findAny();
+        return tags.stream().filter(t -> t.getId() == id).findAny();
     }
 
     @Override
@@ -29,21 +29,23 @@ public class TagDao implements Dao<Tag> {
     public int save(Tag tag) {
         tags.add(tag);
         int index = tags.size();
-        tag.setTagId(index);
+        tag.setId(index);
         return index;
     }
 
     @Override
-    public boolean update(Tag tag) {
-        if (tags.stream().map(t -> t.getTagId() == tag.getTagId()).findAny().orElse(false)) {
-            tags.set(tag.getTagId() - 1, tag);
-            return true;
+    public Optional<Tag> update(Tag tag) {
+        for (int i = 0; i < tags.size(); i++) {
+            if (tags.get(i).getId() == tag.getId()) {
+                tags.set(i, tag);
+                return Optional.of(tag);
+            }
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override
     public boolean deleteById(int id) {
-        return tags.removeIf(t -> t.getTagId() == id);
+        return tags.removeIf(t -> t.getId() == id);
     }
 }

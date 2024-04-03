@@ -1,6 +1,6 @@
 package com.github.blog.dao.impl;
 
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.OrderDao;
 import com.github.blog.model.Order;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +12,12 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class OrderDao implements Dao<Order> {
+public class OrderDaoImpl implements OrderDao {
     private final List<Order> orders = new ArrayList<>();
 
     @Override
     public Optional<Order> getById(int id) {
-        return orders.stream().filter(o -> o.getOrderId() == id).findAny();
+        return orders.stream().filter(o -> o.getId() == id).findAny();
     }
 
     @Override
@@ -29,21 +29,23 @@ public class OrderDao implements Dao<Order> {
     public int save(Order order) {
         orders.add(order);
         int index = orders.size();
-        order.setOrderId(index);
+        order.setId(index);
         return index;
     }
 
     @Override
-    public boolean update(Order order) {
-        if (orders.stream().map(o -> o.getOrderId() == order.getOrderId()).findAny().orElse(false)) {
-            orders.set(order.getOrderId() - 1, order);
-            return true;
+    public Optional<Order> update(Order order) {
+        for (int i = 0; i < orders.size(); i++) {
+            if (orders.get(i).getId() == order.getId()) {
+                orders.set(i, order);
+                return Optional.of(order);
+            }
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override
     public boolean deleteById(int id) {
-        return orders.removeIf(o -> o.getOrderId() == id);
+        return orders.removeIf(o -> o.getId() == id);
     }
 }

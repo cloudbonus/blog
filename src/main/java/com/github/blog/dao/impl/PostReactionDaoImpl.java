@@ -1,6 +1,6 @@
 package com.github.blog.dao.impl;
 
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.PostReactionDao;
 import com.github.blog.model.PostReaction;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +12,12 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class PostReactionDao implements Dao<PostReaction> {
+public class PostReactionDaoImpl implements PostReactionDao {
     private final List<PostReaction> reactions = new ArrayList<>();
 
     @Override
     public Optional<PostReaction> getById(int id) {
-        return reactions.stream().filter(r -> r.getPostId() == id).findAny();
+        return reactions.stream().filter(r -> r.getId() == id).findAny();
     }
 
     @Override
@@ -29,22 +29,24 @@ public class PostReactionDao implements Dao<PostReaction> {
     public int save(PostReaction reaction) {
         reactions.add(reaction);
         int index = reactions.size();
-        reaction.setPostId(index);
+        reaction.setId(index);
         return index;
     }
 
     @Override
-    public boolean update(PostReaction reaction) {
-        if (reactions.stream().map(o -> o.getPostId() == reaction.getPostId()).findAny().orElse(false)) {
-            reactions.set(reaction.getPostId() - 1, reaction);
-            return true;
+    public Optional<PostReaction> update(PostReaction reaction) {
+        for (int i = 0; i < reactions.size(); i++) {
+            if (reactions.get(i).getId() == reaction.getId()) {
+                reactions.set(i, reaction);
+                return Optional.of(reaction);
+            }
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override
     public boolean deleteById(int id) {
-        return reactions.removeIf(r -> r.getPostId() == id);
+        return reactions.removeIf(r -> r.getId() == id);
     }
 }
 
