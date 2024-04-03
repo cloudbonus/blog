@@ -2,7 +2,6 @@ package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.Dao;
-import com.github.blog.dto.OrderDto;
 import com.github.blog.dto.PostDto;
 import com.github.blog.model.Post;
 import com.github.blog.service.Service;
@@ -62,9 +61,13 @@ public class PostService implements Service<Serializable> {
             throw new RuntimeException("Post not found");
         }
 
-        Post post = convertToObject(postDto);
-        post.setPostId(id);
-        return postDao.update(post);
+        Post updatedPost = convertToObject(postDto);
+        Post post = result.get();
+
+        updatedPost.setPostId(post.getPostId());
+        updatedPost.setPublishedAt(post.getPublishedAt());
+
+        return postDao.update(updatedPost);
     }
 
     @Override

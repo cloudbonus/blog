@@ -61,9 +61,13 @@ public class CommentService implements Service<Serializable> {
             throw new RuntimeException("Comment not found");
         }
 
-        Comment comment = convertToObject(commentDto);
-        comment.setCommentId(id);
-        return commentDao.update(comment);
+        Comment updatedComment = convertToObject(commentDto);
+        Comment comment = result.get();
+
+        updatedComment.setCommentId(comment.getCommentId());
+        updatedComment.setPublishedAt(comment.getPublishedAt());
+
+        return commentDao.update(updatedComment);
     }
 
     @Override

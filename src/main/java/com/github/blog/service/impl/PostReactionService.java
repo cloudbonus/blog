@@ -59,9 +59,12 @@ public class PostReactionService implements Service<Serializable> {
             throw new RuntimeException("PostReaction not found");
         }
 
-        PostReaction postReaction = convertToObject(postReactionDto);
-        postReaction.setPostId(id);
-        return postReactionDao.update(postReaction);
+        PostReaction updatedPostReaction= convertToObject(postReactionDto);
+        PostReaction postReaction = result.get();
+
+        updatedPostReaction.setPostId(postReaction.getPostId());
+
+        return postReactionDao.update(updatedPostReaction);
     }
 
     @Override

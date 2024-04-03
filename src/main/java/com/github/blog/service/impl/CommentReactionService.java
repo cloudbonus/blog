@@ -59,10 +59,12 @@ public class CommentReactionService implements Service<Serializable> {
             throw new RuntimeException("CommentReaction not found");
         }
 
-        CommentReaction commentReaction = convertToObject(commentReactionDto);
-        commentReaction.setCommentId(id);
+        CommentReaction updatedCommentReaction = convertToObject(commentReactionDto);
+        CommentReaction commentReaction = result.get();
 
-        return commentReactionDao.update(commentReaction);
+        updatedCommentReaction.setCommentId(commentReaction.getCommentId());
+
+        return commentReactionDao.update(updatedCommentReaction);
     }
 
     @Override

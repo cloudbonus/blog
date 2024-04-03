@@ -15,13 +15,6 @@ import java.util.Optional;
 public class OrderDao implements Dao<Order> {
     private final List<Order> orders = new ArrayList<>();
 
-//    {
-//        orders = new ArrayList<>();
-//        orders.add(new Order(++ORDER_COUNT, "posuere felis sed lacus morbi sem mauris laoreet ut rhoncus aliquet pulvinar", "complete", LocalDateTime.now(), 1, 1));
-//        orders.add(new Order(++ORDER_COUNT, "interdum venenatis turpis enim blandit mi in porttitor pede justo eu massa donec dapibus duis", "cancelled", LocalDateTime.now(), 2, 1));
-//        orders.add(new Order(++ORDER_COUNT, "nisl ut volutpat sapien arcu sed augue aliquam erat volutpat in congue etiam justo etiam pretium iaculis justo in", "pending", LocalDateTime.now(), 3, 2));
-//    }
-
     @Override
     public Optional<Order> getById(int id) {
         return orders.stream().filter(o -> o.getOrderId() == id).findAny();

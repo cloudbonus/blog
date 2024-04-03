@@ -15,13 +15,6 @@ import java.util.Optional;
 public class CommentDao implements Dao<Comment> {
     private final List<Comment> comments = new ArrayList<>();
 
-//    {
-//        comments = new ArrayList<>();
-//        comments.add(new Comment(++COMMENT_COUNT, "This is a great post!", LocalDateTime.now(), 1, 1));
-//        comments.add(new Comment(++COMMENT_COUNT, "Cringe", LocalDateTime.now(), 2, 1));
-//        comments.add(new Comment(++COMMENT_COUNT, "Interesting perspective", LocalDateTime.now(), 2, 2));
-//    }
-
     @Override
     public Optional<Comment> getById(int id) {
         return comments.stream().filter(c -> c.getCommentId() == id).findAny();

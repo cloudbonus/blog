@@ -59,9 +59,12 @@ public class RoleService implements Service<Serializable> {
             throw new RuntimeException("Role not found");
         }
 
-        Role role = convertToObject(roleDto);
-        role.setRoleId(id);
-        return roleDao.update(role);
+        Role updatedRole = convertToObject(roleDto);
+        Role role = result.get();
+
+        updatedRole.setRoleId(role.getRoleId());
+
+        return roleDao.update(updatedRole);
     }
 
     @Override

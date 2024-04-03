@@ -15,5 +15,6 @@ public class PostDto implements Serializable {
     private String title;
     private String content;
 
+    private UserDto user;
     private Set<TagDto> tags;
 }

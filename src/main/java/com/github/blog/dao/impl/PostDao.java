@@ -15,13 +15,6 @@ import java.util.Optional;
 public class PostDao implements Dao<Post> {
     private final List<Post> posts = new ArrayList<>();
 
-//    {
-//        posts = new ArrayList<>();
-//        posts.add(new Post(++POST_COUNT, "Mr", "Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue.", LocalDateTime.now(), 1));
-//        posts.add(new Post(++POST_COUNT, "Dr", "Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.", LocalDateTime.now(), 1));
-//        posts.add(new Post(++POST_COUNT, "Honorable", "Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.", LocalDateTime.now(), 2));
-//    }
-
     @Override
     public Optional<Post> getById(int id) {
         return posts.stream().filter(p -> p.getPostId() == id).findAny();

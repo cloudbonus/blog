@@ -14,12 +14,6 @@ import java.util.Optional;
 public class CommentReactionDao implements Dao<CommentReaction> {
     private final List<CommentReaction> reactions = new ArrayList<>();
 
-//    {
-//        reactions = new ArrayList<>();
-//        reactions.add(new CommentReaction(++REACTION_COUNT, "Like", 1, 1));
-//        reactions.add(new CommentReaction(++REACTION_COUNT, "Dislike", 2, 1));
-//    }
-
     @Override
     public Optional<CommentReaction> getById(int id) {
         return reactions.stream().filter(r -> r.getCommentId() == id).findAny();

@@ -14,13 +14,6 @@ import java.util.Optional;
 @Component
 public class PostReactionDao implements Dao<PostReaction> {
     private final List<PostReaction> reactions = new ArrayList<>();
-//
-//    {
-//        reactions = new ArrayList<>();
-//        reactions.add(new PostReaction(++POST_COUNT, "Like", 1, 2));
-//        reactions.add(new PostReaction(++POST_COUNT,"Dislike", 2, 2));
-//        reactions.add(new PostReaction(++POST_COUNT, "Wow", 3, 1));
-//    }
 
     @Override
     public Optional<PostReaction> getById(int id) {

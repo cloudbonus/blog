@@ -54,9 +54,12 @@ public class UserDetailsService implements Service<Serializable> {
             throw new RuntimeException("User Details not found");
         }
 
-        UserDetails userDetails = convertToObject(userDetailsDto);
-        userDetails.setUserId(id);
-        return userDetailsDao.update(userDetails);
+        UserDetails updatedUserDetails = convertToObject(userDetailsDto);
+        UserDetails userDetails = result.get();
+
+        updatedUserDetails.setUserId(userDetails.getUserId());
+
+        return userDetailsDao.update(updatedUserDetails);
     }
 
     public boolean delete(int id) {

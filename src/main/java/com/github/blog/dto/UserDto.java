@@ -2,7 +2,6 @@ package com.github.blog.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import lombok.Value;
 
 import java.io.Serializable;
 import java.util.Set;

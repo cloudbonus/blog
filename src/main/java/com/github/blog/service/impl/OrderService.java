@@ -61,9 +61,13 @@ public class OrderService implements Service<Serializable> {
             throw new RuntimeException("Order not found");
         }
 
-        Order order = convertToObject(orderDto);
-        order.setOrderId(id);
-        return orderDao.update(order);
+        Order updatedOrder = convertToObject(orderDto);
+        Order order = result.get();
+
+        updatedOrder.setOrderedAt(order.getOrderedAt());
+        updatedOrder.setOrderId(order.getOrderId());
+
+        return orderDao.update(updatedOrder);
     }
 
     @Override

@@ -65,9 +65,14 @@ public class UserService implements Service<Serializable> {
             throw new RuntimeException("User not found");
         }
 
-        User user = convertToObject(userDto);
-        user.setUserId(id);
-        return userDao.update(user);
+        User updatedUser = convertToObject(userDto);
+        User user = result.get();
+
+        updatedUser.setUserId(user.getUserId());
+        updatedUser.setCreatedAt(user.getCreatedAt());
+        updatedUser.setLastLogin(user.getLastLogin());
+
+        return userDao.update(updatedUser);
     }
 
     @Override

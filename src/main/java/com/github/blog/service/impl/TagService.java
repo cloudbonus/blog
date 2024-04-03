@@ -59,9 +59,12 @@ public class TagService implements Service<Serializable> {
             throw new RuntimeException("Tag not found");
         }
 
-        Tag tag = convertToObject(tagDto);
-        tag.setTagId(id);
-        return tagDao.update(tag);
+        Tag updatedTag = convertToObject(tagDto);
+        Tag tag = result.get();
+
+        updatedTag.setTagId(tag.getTagId());
+
+        return tagDao.update(updatedTag);
     }
 
     @Override
