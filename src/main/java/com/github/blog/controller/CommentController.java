@@ -1,21 +1,20 @@
-package com.github.blog.controller.impl;
+package com.github.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.controller.Controller;
-import com.github.blog.service.Service;
-import com.github.blog.service.impl.CommentService;
+import com.github.blog.dto.CommentDto;
+import com.github.blog.service.CommentService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
+
 /**
  * @author Raman Haurylau
  */
 @Component
-public class CommentController implements Controller<Serializable> {
-    private final Service<Serializable> commentService;
+public class CommentController {
+    private final CommentService commentService;
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -24,7 +23,7 @@ public class CommentController implements Controller<Serializable> {
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable commentDto) {
+    public int create(CommentDto commentDto) {
         return commentService.create(commentDto);
     }
 
@@ -33,11 +32,11 @@ public class CommentController implements Controller<Serializable> {
     }
 
     public String readAll() {
-        List<Serializable> comments = commentService.readAll();
+        List<CommentDto> comments = commentService.readAll();
         return convertToJsonArray(comments);
     }
 
-    public boolean update(int id, Serializable commentDto) {
+    public CommentDto update(int id, CommentDto commentDto) {
         return commentService.update(id, commentDto);
     }
 
@@ -46,12 +45,12 @@ public class CommentController implements Controller<Serializable> {
     }
 
     @SneakyThrows
-    private String convertToJson(Serializable commentDto) {
+    private String convertToJson(CommentDto commentDto) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(commentDto);
     }
 
     @SneakyThrows
-    private String convertToJsonArray(List<Serializable> comments) {
+    private String convertToJsonArray(List<CommentDto> comments) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(comments);
     }
 }

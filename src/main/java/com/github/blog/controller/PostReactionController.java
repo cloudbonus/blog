@@ -1,22 +1,20 @@
-package com.github.blog.controller.impl;
+package com.github.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.controller.Controller;
-import com.github.blog.service.impl.PostReactionService;
-import com.github.blog.service.Service;
+import com.github.blog.dto.PostReactionDto;
+import com.github.blog.service.PostReactionService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
 @Component
-public class PostReactionController implements Controller<Serializable> {
-    private final Service<Serializable> postReactionService;
+public class PostReactionController {
+    private final PostReactionService postReactionService;
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -25,7 +23,7 @@ public class PostReactionController implements Controller<Serializable> {
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable postReactionDto) {
+    public int create(PostReactionDto postReactionDto) {
         return postReactionService.create(postReactionDto);
     }
 
@@ -34,11 +32,11 @@ public class PostReactionController implements Controller<Serializable> {
     }
 
     public String readAll() {
-        List<Serializable> postReactions = postReactionService.readAll();
+        List<PostReactionDto> postReactions = postReactionService.readAll();
         return convertToJsonArray(postReactions);
     }
 
-    public boolean update(int id, Serializable postReactionDto) {
+    public PostReactionDto update(int id, PostReactionDto postReactionDto) {
         return postReactionService.update(id, postReactionDto);
     }
 
@@ -47,12 +45,12 @@ public class PostReactionController implements Controller<Serializable> {
     }
 
     @SneakyThrows
-    private String convertToJson(Serializable postReactionDto) {
+    private String convertToJson(PostReactionDto postReactionDto) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(postReactionDto);
     }
 
     @SneakyThrows
-    private String convertToJsonArray(List<Serializable> postReactions) {
+    private String convertToJsonArray(List<PostReactionDto> postReactions) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(postReactions);
     }
 }

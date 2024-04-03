@@ -1,22 +1,20 @@
-package com.github.blog.controller.impl;
+package com.github.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.controller.Controller;
-import com.github.blog.service.Service;
-import com.github.blog.service.impl.TagService;
+import com.github.blog.dto.TagDto;
+import com.github.blog.service.TagService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
 @Component
-public class TagController implements Controller<Serializable> {
-    private final Service<Serializable> tagService;
+public class TagController {
+    private final TagService tagService;
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -25,7 +23,7 @@ public class TagController implements Controller<Serializable> {
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable tagDto) {
+    public int create(TagDto tagDto) {
         return tagService.create(tagDto);
     }
 
@@ -34,11 +32,11 @@ public class TagController implements Controller<Serializable> {
     }
 
     public String readAll() {
-        List<Serializable> tags = tagService.readAll();
+        List<TagDto> tags = tagService.readAll();
         return convertToJsonArray(tags);
     }
 
-    public boolean update(int id, Serializable tagDto) {
+    public TagDto update(int id, TagDto tagDto) {
         return tagService.update(id, tagDto);
     }
 
@@ -47,12 +45,12 @@ public class TagController implements Controller<Serializable> {
     }
 
     @SneakyThrows
-    private String convertToJson(Serializable tagDto) {
+    private String convertToJson(TagDto tagDto) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tagDto);
     }
 
     @SneakyThrows
-    private String convertToJsonArray(List<Serializable> tags) {
+    private String convertToJsonArray(List<TagDto> tags) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tags);
     }
 }

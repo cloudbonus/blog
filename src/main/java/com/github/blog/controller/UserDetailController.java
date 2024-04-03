@@ -1,30 +1,29 @@
-package com.github.blog.controller.impl;
+package com.github.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.controller.Controller;
-import com.github.blog.service.Service;
-import com.github.blog.service.impl.UserDetailsService;
+import com.github.blog.dto.UserDetailsDto;
+import com.github.blog.service.UserDetailsService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
 @Component
-public class UserDetailController implements Controller<Serializable> {
-    private final Service<Serializable> userDetailsService;
+public class UserDetailController {
+    private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
+
     @Autowired
     public UserDetailController(UserDetailsService userDetailsService, ObjectMapper objectMapper) {
         this.userDetailsService = userDetailsService;
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable userDetails) {
+    public int create(UserDetailsDto userDetails) {
         return userDetailsService.create(userDetails);
     }
 
@@ -33,11 +32,11 @@ public class UserDetailController implements Controller<Serializable> {
     }
 
     public String readAll() {
-        List<Serializable> userDetailsDto = userDetailsService.readAll();
+        List<UserDetailsDto> userDetailsDto = userDetailsService.readAll();
         return convertToJsonArray(userDetailsDto);
     }
 
-    public boolean update(int id, Serializable userDetailsDto) {
+    public UserDetailsDto update(int id, UserDetailsDto userDetailsDto) {
         return userDetailsService.update(id, userDetailsDto);
     }
 
@@ -46,11 +45,12 @@ public class UserDetailController implements Controller<Serializable> {
     }
 
     @SneakyThrows
-    private String convertToJson(Serializable userDto) {
+    private String convertToJson(UserDetailsDto userDto) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userDto);
     }
+
     @SneakyThrows
-    private String convertToJsonArray(List<Serializable> users) {
+    private String convertToJsonArray(List<UserDetailsDto> users) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(users);
     }
 }

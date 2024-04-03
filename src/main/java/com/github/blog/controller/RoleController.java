@@ -1,22 +1,20 @@
-package com.github.blog.controller.impl;
+package com.github.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.controller.Controller;
-import com.github.blog.service.Service;
-import com.github.blog.service.impl.RoleService;
+import com.github.blog.dto.RoleDto;
+import com.github.blog.service.RoleService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
 @Component
-public class RoleController implements Controller<Serializable> {
-    private final Service<Serializable> roleService;
+public class RoleController {
+    private final RoleService roleService;
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -25,7 +23,7 @@ public class RoleController implements Controller<Serializable> {
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable roleDto) {
+    public int create(RoleDto roleDto) {
         return roleService.create(roleDto);
     }
 
@@ -34,11 +32,11 @@ public class RoleController implements Controller<Serializable> {
     }
 
     public String readAll() {
-        List<Serializable> roles = roleService.readAll();
+        List<RoleDto> roles = roleService.readAll();
         return convertToJsonArray(roles);
     }
 
-    public boolean update(int id, Serializable roleDto) {
+    public RoleDto update(int id, RoleDto roleDto) {
         return roleService.update(id, roleDto);
     }
 
@@ -47,12 +45,12 @@ public class RoleController implements Controller<Serializable> {
     }
 
     @SneakyThrows
-    private String convertToJson(Serializable roleDto) {
+    private String convertToJson(RoleDto roleDto) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(roleDto);
     }
 
     @SneakyThrows
-    private String convertToJsonArray(List<Serializable> roles) {
+    private String convertToJsonArray(List<RoleDto> roles) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(roles);
     }
 }

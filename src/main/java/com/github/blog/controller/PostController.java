@@ -1,22 +1,20 @@
-package com.github.blog.controller.impl;
+package com.github.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.controller.Controller;
-import com.github.blog.service.Service;
-import com.github.blog.service.impl.PostService;
+import com.github.blog.dto.PostDto;
+import com.github.blog.service.PostService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
 @Component
-public class PostController implements Controller<Serializable> {
-    private final Service<Serializable> postService;
+public class PostController {
+    private final PostService postService;
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -25,7 +23,7 @@ public class PostController implements Controller<Serializable> {
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable postDto) {
+    public int create(PostDto postDto) {
         return postService.create(postDto);
     }
 
@@ -34,11 +32,11 @@ public class PostController implements Controller<Serializable> {
     }
 
     public String readAll() {
-        List<Serializable> posts = postService.readAll();
+        List<PostDto> posts = postService.readAll();
         return convertToJsonArray(posts);
     }
 
-    public boolean update(int id, Serializable postDto) {
+    public PostDto update(int id, PostDto postDto) {
         return postService.update(id, postDto);
     }
 
@@ -47,12 +45,12 @@ public class PostController implements Controller<Serializable> {
     }
 
     @SneakyThrows
-    private String convertToJson(Serializable postDto) {
+    private String convertToJson(PostDto postDto) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(postDto);
     }
 
     @SneakyThrows
-    private String convertToJsonArray(List<Serializable> posts) {
+    private String convertToJsonArray(List<PostDto> posts) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(posts);
     }
 }

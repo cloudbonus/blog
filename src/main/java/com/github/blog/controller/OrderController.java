@@ -1,22 +1,20 @@
-package com.github.blog.controller.impl;
+package com.github.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.controller.Controller;
-import com.github.blog.service.Service;
-import com.github.blog.service.impl.OrderService;
+import com.github.blog.dto.OrderDto;
+import com.github.blog.service.OrderService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
 @Component
-public class OrderController implements Controller<Serializable> {
-    private final Service<Serializable> orderService;
+public class OrderController {
+    private final OrderService orderService;
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -25,7 +23,7 @@ public class OrderController implements Controller<Serializable> {
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable orderDto) {
+    public int create(OrderDto orderDto) {
         return orderService.create(orderDto);
     }
 
@@ -34,11 +32,11 @@ public class OrderController implements Controller<Serializable> {
     }
 
     public String readAll() {
-        List<Serializable> orders = orderService.readAll();
+        List<OrderDto> orders = orderService.readAll();
         return convertToJsonArray(orders);
     }
 
-    public boolean update(int id, Serializable orderDto) {
+    public OrderDto update(int id, OrderDto orderDto) {
         return orderService.update(id, orderDto);
     }
 
@@ -47,12 +45,12 @@ public class OrderController implements Controller<Serializable> {
     }
 
     @SneakyThrows
-    private String convertToJson(Serializable orderDto) {
+    private String convertToJson(OrderDto orderDto) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(orderDto);
     }
 
     @SneakyThrows
-    private String convertToJsonArray(List<Serializable> orders) {
+    private String convertToJsonArray(List<OrderDto> orders) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(orders);
     }
 }
