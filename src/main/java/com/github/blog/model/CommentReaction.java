@@ -11,7 +11,7 @@ public class CommentReaction {
     private String reactionType;
 
     @JsonIgnore
-    private int commentId;
+    private int id;
 
     private User user;
     private Comment comment;

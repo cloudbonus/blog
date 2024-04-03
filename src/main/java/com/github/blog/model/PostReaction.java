@@ -11,7 +11,7 @@ public class PostReaction {
     private String reactionType;
 
     @JsonIgnore
-    private int postId;
+    private int id;
 
     private Post post;
     private User user;

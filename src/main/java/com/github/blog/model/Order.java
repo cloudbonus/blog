@@ -1,5 +1,6 @@
 package com.github.blog.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,9 +10,11 @@ import java.time.LocalDateTime;
  */
 @Data
 public class Order {
-    private int orderId;
+    @JsonIgnore
+    private int id;
     private String message;
     private String status;
+    @JsonIgnore
     private LocalDateTime orderedAt;
 
     private User user;

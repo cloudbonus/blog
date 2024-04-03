@@ -15,7 +15,7 @@ public class UserDetails {
     private String companyName;
     private String jobTitle;
     @JsonIgnore
-    private int userId;
+    private int id;
 
     private User user;
 }

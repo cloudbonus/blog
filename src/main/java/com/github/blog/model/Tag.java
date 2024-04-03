@@ -1,5 +1,6 @@
 package com.github.blog.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -7,6 +8,7 @@ import lombok.Data;
  */
 @Data
 public class Tag {
-    private int tagId;
-    private String tagName;
+    @JsonIgnore
+    private int id;
+    private String name;
 }

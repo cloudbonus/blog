@@ -1,5 +1,6 @@
 package com.github.blog.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,11 +11,14 @@ import java.util.Set;
  */
 @Data
 public class User {
-    private int userId;
+    @JsonIgnore
+    private int id;
     private String login;
     private String password;
     private String email;
+    @JsonIgnore
     private LocalDateTime createdAt;
+    @JsonIgnore
     private LocalDateTime lastLogin;
 
     private Set<Role> roles;

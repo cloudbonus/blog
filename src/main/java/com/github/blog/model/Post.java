@@ -1,5 +1,6 @@
 package com.github.blog.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,9 +11,11 @@ import java.util.Set;
  */
 @Data
 public class Post {
-    private int postId;
+    @JsonIgnore
+    private int id;
     private String title;
     private String content;
+    @JsonIgnore
     private LocalDateTime publishedAt;
 
     private User user;
