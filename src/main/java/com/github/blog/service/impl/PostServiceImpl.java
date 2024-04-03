@@ -1,14 +1,13 @@
 package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.PostDao;
 import com.github.blog.dto.PostDto;
 import com.github.blog.model.Post;
-import com.github.blog.service.Service;
+import com.github.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,26 +16,26 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class PostService implements Service<Serializable> {
+public class PostServiceImpl implements PostService {
 
-    private final Dao<Post> postDao;
+    private final PostDao postDao;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public PostService(Dao<Post> postDao, ObjectMapper objectMapper) {
+    public PostServiceImpl(PostDao postDao, ObjectMapper objectMapper) {
         this.postDao = postDao;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public int create(Serializable postDto) {
+    public int create(PostDto postDto) {
         Post post = convertToObject(postDto);
         enrichPost(post);
         return postDao.save(post);
     }
 
     @Override
-    public Serializable readById(int id) {
+    public PostDto readById(int id) {
         Optional<Post> result = postDao.getById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("Post not found");
@@ -45,7 +44,7 @@ public class PostService implements Service<Serializable> {
     }
 
     @Override
-    public List<Serializable> readAll() {
+    public List<PostDto> readAll() {
         List<Post> posts = postDao.getAll();
         if (posts.isEmpty()) {
             throw new RuntimeException("Cannot find any posts");
@@ -54,7 +53,7 @@ public class PostService implements Service<Serializable> {
     }
 
     @Override
-    public boolean update(int id, Serializable postDto) {
+    public PostDto update(int id, PostDto postDto) {
         Optional<Post> result = postDao.getById(id);
 
         if (result.isEmpty()) {
@@ -64,10 +63,16 @@ public class PostService implements Service<Serializable> {
         Post updatedPost = convertToObject(postDto);
         Post post = result.get();
 
-        updatedPost.setPostId(post.getPostId());
+        updatedPost.setId(post.getId());
         updatedPost.setPublishedAt(post.getPublishedAt());
 
-        return postDao.update(updatedPost);
+        result = postDao.update(updatedPost);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Couldn't update post");
+        }
+
+        return convertToDto(result.get());
     }
 
     @Override
@@ -75,11 +80,11 @@ public class PostService implements Service<Serializable> {
         return postDao.deleteById(id);
     }
 
-    private Post convertToObject(Serializable postDto) {
+    private Post convertToObject(PostDto postDto) {
         return objectMapper.convertValue(postDto, Post.class);
     }
 
-    private Serializable convertToDto(Post post) {
+    private PostDto convertToDto(Post post) {
         return objectMapper.convertValue(post, PostDto.class);
     }
 

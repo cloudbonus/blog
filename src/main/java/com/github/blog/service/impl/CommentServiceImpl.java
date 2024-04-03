@@ -1,14 +1,13 @@
 package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.CommentDao;
 import com.github.blog.dto.CommentDto;
 import com.github.blog.model.Comment;
-import com.github.blog.service.Service;
+import com.github.blog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,26 +16,26 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class CommentService implements Service<Serializable> {
+public class CommentServiceImpl implements CommentService {
 
-    private final Dao<Comment> commentDao;
+    private final CommentDao commentDao;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CommentService(Dao<Comment> commentDao, ObjectMapper objectMapper) {
+    public CommentServiceImpl(CommentDao commentDao, ObjectMapper objectMapper) {
         this.commentDao = commentDao;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public int create(Serializable commentDto) {
+    public int create(CommentDto commentDto) {
         Comment comment = convertToObject(commentDto);
         enrichComment(comment);
         return commentDao.save(comment);
     }
 
     @Override
-    public Serializable readById(int id) {
+    public CommentDto readById(int id) {
         Optional<Comment> result = commentDao.getById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("Comment not found");
@@ -45,7 +44,7 @@ public class CommentService implements Service<Serializable> {
     }
 
     @Override
-    public List<Serializable> readAll() {
+    public List<CommentDto> readAll() {
         List<Comment> comments = commentDao.getAll();
         if (comments.isEmpty()) {
             throw new RuntimeException("Cannot find any comments");
@@ -54,7 +53,7 @@ public class CommentService implements Service<Serializable> {
     }
 
     @Override
-    public boolean update(int id, Serializable commentDto) {
+    public CommentDto update(int id, CommentDto commentDto) {
         Optional<Comment> result = commentDao.getById(id);
 
         if (result.isEmpty()) {
@@ -64,10 +63,16 @@ public class CommentService implements Service<Serializable> {
         Comment updatedComment = convertToObject(commentDto);
         Comment comment = result.get();
 
-        updatedComment.setCommentId(comment.getCommentId());
+        updatedComment.setId(comment.getId());
         updatedComment.setPublishedAt(comment.getPublishedAt());
 
-        return commentDao.update(updatedComment);
+        result = commentDao.update(updatedComment);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Couldn't update comment");
+        }
+
+        return convertToDto(result.get());
     }
 
     @Override
@@ -75,11 +80,11 @@ public class CommentService implements Service<Serializable> {
         return commentDao.deleteById(id);
     }
 
-    private Comment convertToObject(Serializable commentDto) {
+    private Comment convertToObject(CommentDto commentDto) {
         return objectMapper.convertValue(commentDto, Comment.class);
     }
 
-    private Serializable convertToDto(Comment comment) {
+    private CommentDto convertToDto(Comment comment) {
         return objectMapper.convertValue(comment, CommentDto.class);
     }
 

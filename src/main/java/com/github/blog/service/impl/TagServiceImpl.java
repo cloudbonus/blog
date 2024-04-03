@@ -1,14 +1,13 @@
 package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.TagDao;
 import com.github.blog.dto.TagDto;
 import com.github.blog.model.Tag;
-import com.github.blog.service.Service;
+import com.github.blog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,25 +15,25 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class TagService implements Service<Serializable> {
+public class TagServiceImpl implements TagService {
 
-    private final Dao<Tag> tagDao;
+    private final TagDao tagDao;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public TagService(Dao<Tag> tagDao, ObjectMapper objectMapper) {
+    public TagServiceImpl(TagDao tagDao, ObjectMapper objectMapper) {
         this.tagDao = tagDao;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public int create(Serializable tagDto) {
+    public int create(TagDto tagDto) {
         Tag tag = convertToObject(tagDto);
         return tagDao.save(tag);
     }
 
     @Override
-    public Serializable readById(int id) {
+    public TagDto readById(int id) {
         Optional<Tag> result = tagDao.getById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("Tag not found");
@@ -43,7 +42,7 @@ public class TagService implements Service<Serializable> {
     }
 
     @Override
-    public List<Serializable> readAll() {
+    public List<TagDto> readAll() {
         List<Tag> tags = tagDao.getAll();
         if (tags.isEmpty()) {
             throw new RuntimeException("Cannot find any tags");
@@ -52,7 +51,7 @@ public class TagService implements Service<Serializable> {
     }
 
     @Override
-    public boolean update(int id, Serializable tagDto) {
+    public TagDto update(int id, TagDto tagDto) {
         Optional<Tag> result = tagDao.getById(id);
 
         if (result.isEmpty()) {
@@ -62,9 +61,15 @@ public class TagService implements Service<Serializable> {
         Tag updatedTag = convertToObject(tagDto);
         Tag tag = result.get();
 
-        updatedTag.setTagId(tag.getTagId());
+        updatedTag.setId(tag.getId());
 
-        return tagDao.update(updatedTag);
+        result = tagDao.update(updatedTag);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Couldn't update tag");
+        }
+
+        return convertToDto(result.get());
     }
 
     @Override
@@ -72,11 +77,11 @@ public class TagService implements Service<Serializable> {
         return tagDao.deleteById(id);
     }
 
-    private Tag convertToObject(Serializable tagDto) {
+    private Tag convertToObject(TagDto tagDto) {
         return objectMapper.convertValue(tagDto, Tag.class);
     }
 
-    private Serializable convertToDto(Tag tag) {
+    private TagDto convertToDto(Tag tag) {
         return objectMapper.convertValue(tag, TagDto.class);
     }
 }

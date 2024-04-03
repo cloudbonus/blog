@@ -1,14 +1,13 @@
 package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.UserDetailsDao;
 import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.model.UserDetails;
-import com.github.blog.service.Service;
+import com.github.blog.service.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,22 +15,22 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class UserDetailsService implements Service<Serializable> {
-    private final Dao<UserDetails> userDetailsDao;
+public class UserDetailsServiceImpl implements UserDetailsService {
+    private final UserDetailsDao userDetailsDao;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public UserDetailsService(Dao<UserDetails> userDetailsDao, ObjectMapper objectMapper) {
+    public UserDetailsServiceImpl(UserDetailsDao userDetailsDao, ObjectMapper objectMapper) {
         this.userDetailsDao = userDetailsDao;
         this.objectMapper = objectMapper;
     }
 
-    public int create(Serializable userDetailsDto) {
+    public int create(UserDetailsDto userDetailsDto) {
         UserDetails userDetails = convertToObject(userDetailsDto);
         return userDetailsDao.save(userDetails);
     }
 
-    public Serializable readById(int id) {
+    public UserDetailsDto readById(int id) {
         Optional<UserDetails> result = userDetailsDao.getById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("User Details not found");
@@ -39,7 +38,7 @@ public class UserDetailsService implements Service<Serializable> {
         return convertToDto(result.get());
     }
 
-    public List<Serializable> readAll() {
+    public List<UserDetailsDto> readAll() {
         List<UserDetails> userDetails = userDetailsDao.getAll();
         if (userDetails.isEmpty()) {
             throw new RuntimeException("Cannot find any user details");
@@ -47,7 +46,7 @@ public class UserDetailsService implements Service<Serializable> {
         return userDetails.stream().map(this::convertToDto).toList();
     }
 
-    public boolean update(int id, Serializable userDetailsDto) {
+    public UserDetailsDto update(int id, UserDetailsDto userDetailsDto) {
         Optional<UserDetails> result = userDetailsDao.getById(id);
 
         if (result.isEmpty()) {
@@ -57,20 +56,26 @@ public class UserDetailsService implements Service<Serializable> {
         UserDetails updatedUserDetails = convertToObject(userDetailsDto);
         UserDetails userDetails = result.get();
 
-        updatedUserDetails.setUserId(userDetails.getUserId());
+        updatedUserDetails.setId(userDetails.getId());
 
-        return userDetailsDao.update(updatedUserDetails);
+        result = userDetailsDao.update(updatedUserDetails);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Couldn't update user details");
+        }
+
+        return convertToDto(result.get());
     }
 
     public boolean delete(int id) {
         return userDetailsDao.deleteById(id);
     }
 
-    private UserDetails convertToObject(Serializable userDetailsDto) {
+    private UserDetails convertToObject(UserDetailsDto userDetailsDto) {
         return objectMapper.convertValue(userDetailsDto, UserDetails.class);
     }
 
-    private Serializable convertToDto(UserDetails userDetails) {
+    private UserDetailsDto convertToDto(UserDetails userDetails) {
         return objectMapper.convertValue(userDetails, UserDetailsDto.class);
     }
 

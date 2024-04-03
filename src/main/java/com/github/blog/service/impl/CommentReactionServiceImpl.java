@@ -1,14 +1,13 @@
 package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.CommentReactionDao;
 import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.model.CommentReaction;
-import com.github.blog.service.Service;
+import com.github.blog.service.CommentReactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,25 +15,25 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class CommentReactionService implements Service<Serializable> {
+public class CommentReactionServiceImpl implements CommentReactionService {
 
-    private final Dao<CommentReaction> commentReactionDao;
+    private final CommentReactionDao commentReactionDao;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CommentReactionService(Dao<CommentReaction> commentReactionDao, ObjectMapper objectMapper) {
+    public CommentReactionServiceImpl(CommentReactionDao commentReactionDao, ObjectMapper objectMapper) {
         this.commentReactionDao = commentReactionDao;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public int create(Serializable commentReactionDto) {
+    public int create(CommentReactionDto commentReactionDto) {
         CommentReaction commentReaction = convertToObject(commentReactionDto);
         return commentReactionDao.save(commentReaction);
     }
 
     @Override
-    public Serializable readById(int id) {
+    public CommentReactionDto readById(int id) {
         Optional<CommentReaction> result = commentReactionDao.getById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("CommentReaction not found");
@@ -43,7 +42,7 @@ public class CommentReactionService implements Service<Serializable> {
     }
 
     @Override
-    public List<Serializable> readAll() {
+    public List<CommentReactionDto> readAll() {
         List<CommentReaction> commentReactions = commentReactionDao.getAll();
         if (commentReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any comment reactions");
@@ -52,7 +51,7 @@ public class CommentReactionService implements Service<Serializable> {
     }
 
     @Override
-    public boolean update(int id, Serializable commentReactionDto) {
+    public CommentReactionDto update(int id, CommentReactionDto commentReactionDto) {
         Optional<CommentReaction> result = commentReactionDao.getById(id);
 
         if (result.isEmpty()) {
@@ -62,9 +61,15 @@ public class CommentReactionService implements Service<Serializable> {
         CommentReaction updatedCommentReaction = convertToObject(commentReactionDto);
         CommentReaction commentReaction = result.get();
 
-        updatedCommentReaction.setCommentId(commentReaction.getCommentId());
+        updatedCommentReaction.setId(commentReaction.getId());
 
-        return commentReactionDao.update(updatedCommentReaction);
+        result = commentReactionDao.update(updatedCommentReaction);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Couldn't update comment reaction");
+        }
+
+        return convertToDto(result.get());
     }
 
     @Override
@@ -72,11 +77,11 @@ public class CommentReactionService implements Service<Serializable> {
         return commentReactionDao.deleteById(id);
     }
 
-    private CommentReaction convertToObject(Serializable commentReactionDto) {
+    private CommentReaction convertToObject(CommentReactionDto commentReactionDto) {
         return objectMapper.convertValue(commentReactionDto, CommentReaction.class);
     }
 
-    private Serializable convertToDto(CommentReaction commentReaction) {
+    private CommentReactionDto convertToDto(CommentReaction commentReaction) {
         return objectMapper.convertValue(commentReaction, CommentReactionDto.class);
     }
 }

@@ -1,14 +1,13 @@
 package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.PostReactionDao;
 import com.github.blog.dto.PostReactionDto;
 import com.github.blog.model.PostReaction;
-import com.github.blog.service.Service;
+import com.github.blog.service.PostReactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,25 +15,25 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class PostReactionService implements Service<Serializable> {
+public class PostReactionServiceImpl implements PostReactionService {
 
-    private final Dao<PostReaction> postReactionDao;
+    private final PostReactionDao postReactionDao;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public PostReactionService(Dao<PostReaction> postReactionDao, ObjectMapper objectMapper) {
+    public PostReactionServiceImpl(PostReactionDao postReactionDao, ObjectMapper objectMapper) {
         this.postReactionDao = postReactionDao;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public int create(Serializable postReactionDto) {
+    public int create(PostReactionDto postReactionDto) {
         PostReaction postReaction = convertToObject(postReactionDto);
         return postReactionDao.save(postReaction);
     }
 
     @Override
-    public Serializable readById(int id) {
+    public PostReactionDto readById(int id) {
         Optional<PostReaction> result = postReactionDao.getById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("PostReaction not found");
@@ -43,7 +42,7 @@ public class PostReactionService implements Service<Serializable> {
     }
 
     @Override
-    public List<Serializable> readAll() {
+    public List<PostReactionDto> readAll() {
         List<PostReaction> postReactions = postReactionDao.getAll();
         if (postReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any post reactions");
@@ -52,19 +51,25 @@ public class PostReactionService implements Service<Serializable> {
     }
 
     @Override
-    public boolean update(int id, Serializable postReactionDto) {
+    public PostReactionDto update(int id, PostReactionDto postReactionDto) {
         Optional<PostReaction> result = postReactionDao.getById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("PostReaction not found");
         }
 
-        PostReaction updatedPostReaction= convertToObject(postReactionDto);
+        PostReaction updatedPostReaction = convertToObject(postReactionDto);
         PostReaction postReaction = result.get();
 
-        updatedPostReaction.setPostId(postReaction.getPostId());
+        updatedPostReaction.setId(postReaction.getId());
 
-        return postReactionDao.update(updatedPostReaction);
+        result = postReactionDao.update(updatedPostReaction);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Couldn't update post reaction");
+        }
+
+        return convertToDto(result.get());
     }
 
     @Override
@@ -72,11 +77,11 @@ public class PostReactionService implements Service<Serializable> {
         return postReactionDao.deleteById(id);
     }
 
-    private PostReaction convertToObject(Serializable postReactionDto) {
+    private PostReaction convertToObject(PostReactionDto postReactionDto) {
         return objectMapper.convertValue(postReactionDto, PostReaction.class);
     }
 
-    private Serializable convertToDto(PostReaction postReaction) {
+    private PostReactionDto convertToDto(PostReaction postReaction) {
         return objectMapper.convertValue(postReaction, PostReactionDto.class);
     }
 }

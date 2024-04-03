@@ -1,14 +1,13 @@
 package com.github.blog.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.dao.Dao;
+import com.github.blog.dao.UserDao;
 import com.github.blog.dto.UserDto;
 import com.github.blog.model.User;
-import com.github.blog.service.Service;
+import com.github.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,27 +16,26 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Component
-public class UserService implements Service<Serializable> {
+public class UserServiceImpl implements UserService {
 
-    private final Dao<User> userDao;
+    private final UserDao userDao;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public UserService(Dao<User> userDao, ObjectMapper objectMapper) {
+    public UserServiceImpl(UserDao userDao, ObjectMapper objectMapper) {
         this.userDao = userDao;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public int create(Serializable userDto) {
+    public int create(UserDto userDto) {
         User user = convertToObject(userDto);
         enrichUser(user);
         return userDao.save(user);
     }
 
     @Override
-
-    public Serializable readById(int id) {
+    public UserDto readById(int id) {
         Optional<User> result = userDao.getById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("User not found");
@@ -47,8 +45,7 @@ public class UserService implements Service<Serializable> {
     }
 
     @Override
-
-    public List<Serializable> readAll() {
+    public List<UserDto> readAll() {
         List<User> users = userDao.getAll();
         if (users.isEmpty()) {
             throw new RuntimeException("Cannot find any users");
@@ -58,7 +55,7 @@ public class UserService implements Service<Serializable> {
     }
 
     @Override
-    public boolean update(int id, Serializable userDto) {
+    public UserDto update(int id, UserDto userDto) {
         Optional<User> result = userDao.getById(id);
 
         if (result.isEmpty()) {
@@ -68,11 +65,17 @@ public class UserService implements Service<Serializable> {
         User updatedUser = convertToObject(userDto);
         User user = result.get();
 
-        updatedUser.setUserId(user.getUserId());
+        updatedUser.setId(user.getId());
         updatedUser.setCreatedAt(user.getCreatedAt());
         updatedUser.setLastLogin(user.getLastLogin());
 
-        return userDao.update(updatedUser);
+        result = userDao.update(updatedUser);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Couldn't update user");
+        }
+
+        return convertToDto(result.get());
     }
 
     @Override
@@ -80,11 +83,11 @@ public class UserService implements Service<Serializable> {
         return userDao.deleteById(id);
     }
 
-    private User convertToObject(Serializable userDto) {
+    private User convertToObject(UserDto userDto) {
         return objectMapper.convertValue(userDto, User.class);
     }
 
-    private Serializable convertToDto(User user) {
+    private UserDto convertToDto(User user) {
         return objectMapper.convertValue(user, UserDto.class);
     }
 
