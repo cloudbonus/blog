@@ -2,13 +2,11 @@ package com.github.blog.dto;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
  * @author Raman Haurylau
  */
 @Data
-public class UserDetailsDto implements Serializable {
+public class UserDetailsDto {
     private String firstname;
     private String surname;
     private String universityName;
