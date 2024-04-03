@@ -2,19 +2,17 @@ package com.github.blog;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.github.blog.controller.Controller;
-import com.github.blog.controller.impl.*;
+import com.github.blog.controller.*;
 import com.github.blog.dto.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 
-import java.io.Serializable;
 import java.util.Set;
 
 @Configuration
-@PropertySource(value="classpath:application.properties", encoding="UTF-8")
+@PropertySource(value = "classpath:application.properties", encoding = "UTF-8")
 @ComponentScan("com.github.blog")
 public class Application {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -22,15 +20,15 @@ public class Application {
     public static void main(String[] args) {
         ApplicationContext context = new AnnotationConfigApplicationContext(Application.class);
 
-        Controller<Serializable> userDetailsController = context.getBean(UserDetailController.class);
-        Controller<Serializable> userController = context.getBean(UserController.class);
-        Controller<Serializable> commentController = context.getBean(CommentController.class);
-        Controller<Serializable> commentReactionController = context.getBean(CommentReactionController.class);
-        Controller<Serializable> orderController = context.getBean(OrderController.class);
-        Controller<Serializable> postController = context.getBean(PostController.class);
-        Controller<Serializable> postReactionController = context.getBean(PostReactionController.class);
-        Controller<Serializable> roleController = context.getBean(RoleController.class);
-        Controller<Serializable> tagController = context.getBean(TagController.class);
+        UserDetailController userDetailsController = context.getBean(UserDetailController.class);
+        UserController userController = context.getBean(UserController.class);
+        CommentController commentController = context.getBean(CommentController.class);
+        CommentReactionController commentReactionController = context.getBean(CommentReactionController.class);
+        OrderController orderController = context.getBean(OrderController.class);
+        PostController postController = context.getBean(PostController.class);
+        PostReactionController postReactionController = context.getBean(PostReactionController.class);
+        RoleController roleController = context.getBean(RoleController.class);
+        TagController tagController = context.getBean(TagController.class);
 
         //DTO's
         UserDto user1 = new UserDto();
@@ -60,10 +58,10 @@ public class Application {
         user2Details.setJobTitle("AI Researcher");
 
         RoleDto roleDto1 = new RoleDto();
-        roleDto1.setRoleName("admin");
+        roleDto1.setName("admin");
 
         RoleDto roleDto2 = new RoleDto();
-        roleDto2.setRoleName("user");
+        roleDto2.setName("user");
 
         Set<RoleDto> roles = Set.of(roleDto1, roleDto2);
         user1.setRoles(roles);
@@ -72,10 +70,10 @@ public class Application {
         user2Details.setUser(user2);
 
         TagDto tagDto1 = new TagDto();
-        tagDto1.setTagName("Java");
+        tagDto1.setName("Java");
 
         TagDto tagDto2 = new TagDto();
-        tagDto2.setTagName("Spring Boot");
+        tagDto2.setName("Spring Boot");
 
         Set<TagDto> tags = Set.of(tagDto1, tagDto2);
 
@@ -193,6 +191,7 @@ public class Application {
         commentDto1.setContent("new_content_1");
         commentController.update(1, commentDto1);
 
+
         postDto1.setContent("new_content_1");
         postController.update(1, postDto1);
 
@@ -205,10 +204,10 @@ public class Application {
         postReactionDto1.setReactionType("New_Like");
         postReactionController.update(1, postReactionDto1);
 
-        roleDto1.setRoleName("new_name_1");
+        roleDto1.setName("new_name_1");
         roleController.update(1, roleDto1);
 
-        tagDto1.setTagName("new_name_1");
+        tagDto1.setName("new_name_1");
         tagController.update(1, tagDto1);
 
         //READ;
