@@ -18,12 +18,6 @@ target/
 # Compose
 docker-compose.yaml
 
-# Jar
-liquibase/*.jar
-
 #Gradle
-/di/build/
-/main/build/
-
 /.gradle/
 /build/
