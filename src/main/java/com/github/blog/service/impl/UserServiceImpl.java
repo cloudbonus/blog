@@ -6,7 +6,7 @@ import com.github.blog.dto.UserDto;
 import com.github.blog.model.User;
 import com.github.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
@@ -28,15 +28,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int create(UserDto userDto) {
+    public UserDto create(UserDto userDto) {
         User user = convertToObject(userDto);
         enrichUser(user);
-        return userDao.save(user);
+        return convertToDto(userDao.create(user));
     }
 
     @Override
-    public UserDto readById(int id) {
-        Optional<User> result = userDao.getById(id);
+    public UserDto findById(int id) {
+        Optional<User> result = userDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("User not found");
         }
@@ -45,8 +45,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> readAll() {
-        List<User> users = userDao.getAll();
+    public List<UserDto> findAll() {
+        List<User> users = userDao.findAll();
         if (users.isEmpty()) {
             throw new RuntimeException("Cannot find any users");
         }
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(int id, UserDto userDto) {
-        Optional<User> result = userDao.getById(id);
+        Optional<User> result = userDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("User not found");
@@ -69,18 +69,17 @@ public class UserServiceImpl implements UserService {
         updatedUser.setCreatedAt(user.getCreatedAt());
         updatedUser.setLastLogin(user.getLastLogin());
 
-        result = userDao.update(updatedUser);
+        updatedUser = userDao.update(updatedUser);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update user");
-        }
-
-        return convertToDto(result.get());
+        return convertToDto(updatedUser);
     }
 
     @Override
-    public boolean delete(int id) {
-        return userDao.deleteById(id);
+    public int remove(int id) {
+        User user = userDao.remove(id);
+        if (user == null) {
+            return -1;
+        } else return user.getId();
     }
 
     private User convertToObject(UserDto userDto) {

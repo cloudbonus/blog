@@ -5,14 +5,14 @@ import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.service.CommentReactionService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class CommentReactionController {
     private final CommentReactionService commentReactionService;
     private final ObjectMapper objectMapper;
@@ -23,25 +23,28 @@ public class CommentReactionController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(CommentReactionDto commentReactionDto) {
-        return commentReactionService.create(commentReactionDto);
+    public String create(CommentReactionDto commentReactionDto) {
+        return convertToJson(commentReactionService.create(commentReactionDto));
     }
 
-    public String readById(int id) {
-        return convertToJson(commentReactionService.readById(id));
+    public String findById(int id) {
+        return convertToJson(commentReactionService.findById(id));
     }
 
-    public String readAll() {
-        List<CommentReactionDto> commentReactions = commentReactionService.readAll();
+    public String findAll() {
+        List<CommentReactionDto> commentReactions = commentReactionService.findAll();
         return convertToJsonArray(commentReactions);
     }
 
-    public CommentReactionDto update(int id, CommentReactionDto commentReactionDto) {
-        return commentReactionService.update(id, commentReactionDto);
+    public String update(int id, CommentReactionDto commentReactionDto) {
+        return convertToJson(commentReactionService.update(id, commentReactionDto));
     }
 
-    public boolean delete(int id) {
-        return commentReactionService.delete(id);
+    public String remove(int id) {
+        int result = commentReactionService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows

@@ -5,14 +5,14 @@ import com.github.blog.dto.PostDto;
 import com.github.blog.service.PostService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class PostController {
     private final PostService postService;
     private final ObjectMapper objectMapper;
@@ -23,25 +23,28 @@ public class PostController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(PostDto postDto) {
-        return postService.create(postDto);
+    public String create(PostDto postDto) {
+        return convertToJson(postService.create(postDto));
     }
 
-    public String readById(int id) {
-        return convertToJson(postService.readById(id));
+    public String findById(int id) {
+        return convertToJson(postService.findById(id));
     }
 
-    public String readAll() {
-        List<PostDto> posts = postService.readAll();
+    public String findAll() {
+        List<PostDto> posts = postService.findAll();
         return convertToJsonArray(posts);
     }
 
-    public PostDto update(int id, PostDto postDto) {
-        return postService.update(id, postDto);
+    public String update(int id, PostDto postDto) {
+        return convertToJson(postService.update(id, postDto));
     }
 
-    public boolean delete(int id) {
-        return postService.delete(id);
+    public String remove(int id) {
+        int result = postService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows

@@ -6,7 +6,7 @@ import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.model.UserDetails;
 import com.github.blog.service.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserDetailsDao userDetailsDao;
     private final ObjectMapper objectMapper;
@@ -25,21 +25,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.objectMapper = objectMapper;
     }
 
-    public int create(UserDetailsDto userDetailsDto) {
+    public UserDetailsDto create(UserDetailsDto userDetailsDto) {
         UserDetails userDetails = convertToObject(userDetailsDto);
-        return userDetailsDao.save(userDetails);
+        return convertToDto(userDetailsDao.create(userDetails));
     }
 
-    public UserDetailsDto readById(int id) {
-        Optional<UserDetails> result = userDetailsDao.getById(id);
+    public UserDetailsDto findById(int id) {
+        Optional<UserDetails> result = userDetailsDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("User Details not found");
         }
         return convertToDto(result.get());
     }
 
-    public List<UserDetailsDto> readAll() {
-        List<UserDetails> userDetails = userDetailsDao.getAll();
+    public List<UserDetailsDto> findAll() {
+        List<UserDetails> userDetails = userDetailsDao.findAll();
         if (userDetails.isEmpty()) {
             throw new RuntimeException("Cannot find any user details");
         }
@@ -47,7 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public UserDetailsDto update(int id, UserDetailsDto userDetailsDto) {
-        Optional<UserDetails> result = userDetailsDao.getById(id);
+        Optional<UserDetails> result = userDetailsDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("User Details not found");
@@ -58,17 +58,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         updatedUserDetails.setId(userDetails.getId());
 
-        result = userDetailsDao.update(updatedUserDetails);
+        updatedUserDetails = userDetailsDao.update(updatedUserDetails);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update user details");
-        }
-
-        return convertToDto(result.get());
+        return convertToDto(updatedUserDetails);
     }
 
-    public boolean delete(int id) {
-        return userDetailsDao.deleteById(id);
+    public int remove(int id) {
+        UserDetails userDetails = userDetailsDao.remove(id);
+        if (userDetails == null) {
+            return -1;
+        } else return userDetails.getId();
     }
 
     private UserDetails convertToObject(UserDetailsDto userDetailsDto) {

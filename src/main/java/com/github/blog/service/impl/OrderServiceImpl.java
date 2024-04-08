@@ -6,7 +6,7 @@ import com.github.blog.dto.OrderDto;
 import com.github.blog.model.Order;
 import com.github.blog.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
 public class OrderServiceImpl implements OrderService {
 
     private final OrderDao orderDao;
@@ -28,15 +28,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public int create(OrderDto orderDto) {
+    public OrderDto create(OrderDto orderDto) {
         Order order = convertToObject(orderDto);
         enrichOrder(order);
-        return orderDao.save(order);
+        return convertToDto(orderDao.create(order));
     }
 
     @Override
-    public OrderDto readById(int id) {
-        Optional<Order> result = orderDao.getById(id);
+    public OrderDto findById(int id) {
+        Optional<Order> result = orderDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("Order not found");
         }
@@ -44,8 +44,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> readAll() {
-        List<Order> orders = orderDao.getAll();
+    public List<OrderDto> findAll() {
+        List<Order> orders = orderDao.findAll();
         if (orders.isEmpty()) {
             throw new RuntimeException("Cannot find any orders");
         }
@@ -54,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto update(int id, OrderDto orderDto) {
-        Optional<Order> result = orderDao.getById(id);
+        Optional<Order> result = orderDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("Order not found");
@@ -66,18 +66,17 @@ public class OrderServiceImpl implements OrderService {
         updatedOrder.setOrderedAt(order.getOrderedAt());
         updatedOrder.setId(order.getId());
 
-        result = orderDao.update(updatedOrder);
+        updatedOrder = orderDao.update(updatedOrder);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update order");
-        }
-
-        return convertToDto(result.get());
+        return convertToDto(updatedOrder);
     }
 
     @Override
-    public boolean delete(int id) {
-        return orderDao.deleteById(id);
+    public int remove(int id) {
+        Order order = orderDao.remove(id);
+        if (order == null) {
+            return -1;
+        } else return order.getId();
     }
 
     private Order convertToObject(OrderDto orderDto) {

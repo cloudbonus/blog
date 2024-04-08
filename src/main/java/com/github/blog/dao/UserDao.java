@@ -5,5 +5,5 @@ import com.github.blog.model.User;
 /**
  * @author Raman Haurylau
  */
-public interface UserDao extends CrudDao<User> {
+public interface UserDao extends CrudDao<User, Integer> {
 }

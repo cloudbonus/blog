@@ -6,7 +6,7 @@ import com.github.blog.dto.TagDto;
 import com.github.blog.model.Tag;
 import com.github.blog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
 public class TagServiceImpl implements TagService {
 
     private final TagDao tagDao;
@@ -27,14 +27,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public int create(TagDto tagDto) {
+    public TagDto create(TagDto tagDto) {
         Tag tag = convertToObject(tagDto);
-        return tagDao.save(tag);
+        return convertToDto(tagDao.create(tag));
     }
 
     @Override
-    public TagDto readById(int id) {
-        Optional<Tag> result = tagDao.getById(id);
+    public TagDto findById(int id) {
+        Optional<Tag> result = tagDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("Tag not found");
         }
@@ -42,8 +42,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagDto> readAll() {
-        List<Tag> tags = tagDao.getAll();
+    public List<TagDto> findAll() {
+        List<Tag> tags = tagDao.findAll();
         if (tags.isEmpty()) {
             throw new RuntimeException("Cannot find any tags");
         }
@@ -52,7 +52,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagDto update(int id, TagDto tagDto) {
-        Optional<Tag> result = tagDao.getById(id);
+        Optional<Tag> result = tagDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("Tag not found");
@@ -63,18 +63,17 @@ public class TagServiceImpl implements TagService {
 
         updatedTag.setId(tag.getId());
 
-        result = tagDao.update(updatedTag);
+        updatedTag = tagDao.update(updatedTag);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update tag");
-        }
-
-        return convertToDto(result.get());
+        return convertToDto(updatedTag);
     }
 
     @Override
-    public boolean delete(int id) {
-        return tagDao.deleteById(id);
+    public int remove(int id) {
+        Tag tag = tagDao.remove(id);
+        if (tag == null) {
+            return -1;
+        } else return tag.getId();
     }
 
     private Tag convertToObject(TagDto tagDto) {

@@ -5,5 +5,5 @@ import com.github.blog.model.Tag;
 /**
  * @author Raman Haurylau
  */
-public interface TagDao extends CrudDao<Tag> {
+public interface TagDao extends CrudDao<Tag, Integer> {
 }

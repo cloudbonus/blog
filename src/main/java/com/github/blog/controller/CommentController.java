@@ -5,14 +5,14 @@ import com.github.blog.dto.CommentDto;
 import com.github.blog.service.CommentService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class CommentController {
     private final CommentService commentService;
     private final ObjectMapper objectMapper;
@@ -23,25 +23,28 @@ public class CommentController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(CommentDto commentDto) {
-        return commentService.create(commentDto);
+    public String create(CommentDto commentDto) {
+        return convertToJson(commentService.create(commentDto));
     }
 
-    public String readById(int id) {
-        return convertToJson(commentService.readById(id));
+    public String findById(int id) {
+        return convertToJson(commentService.findById(id));
     }
 
-    public String readAll() {
-        List<CommentDto> comments = commentService.readAll();
+    public String findAll() {
+        List<CommentDto> comments = commentService.findAll();
         return convertToJsonArray(comments);
     }
 
-    public CommentDto update(int id, CommentDto commentDto) {
-        return commentService.update(id, commentDto);
+    public String update(int id, CommentDto commentDto) {
+        return convertToJson(commentService.update(id, commentDto));
     }
 
-    public boolean delete(int id) {
-        return commentService.delete(id);
+    public String remove(int id) {
+        int result = commentService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows

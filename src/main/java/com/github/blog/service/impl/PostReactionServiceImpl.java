@@ -6,7 +6,7 @@ import com.github.blog.dto.PostReactionDto;
 import com.github.blog.model.PostReaction;
 import com.github.blog.service.PostReactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
 public class PostReactionServiceImpl implements PostReactionService {
 
     private final PostReactionDao postReactionDao;
@@ -27,14 +27,14 @@ public class PostReactionServiceImpl implements PostReactionService {
     }
 
     @Override
-    public int create(PostReactionDto postReactionDto) {
+    public PostReactionDto create(PostReactionDto postReactionDto) {
         PostReaction postReaction = convertToObject(postReactionDto);
-        return postReactionDao.save(postReaction);
+        return convertToDto(postReactionDao.create(postReaction));
     }
 
     @Override
-    public PostReactionDto readById(int id) {
-        Optional<PostReaction> result = postReactionDao.getById(id);
+    public PostReactionDto findById(int id) {
+        Optional<PostReaction> result = postReactionDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("PostReaction not found");
         }
@@ -42,8 +42,8 @@ public class PostReactionServiceImpl implements PostReactionService {
     }
 
     @Override
-    public List<PostReactionDto> readAll() {
-        List<PostReaction> postReactions = postReactionDao.getAll();
+    public List<PostReactionDto> findAll() {
+        List<PostReaction> postReactions = postReactionDao.findAll();
         if (postReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any post reactions");
         }
@@ -52,7 +52,7 @@ public class PostReactionServiceImpl implements PostReactionService {
 
     @Override
     public PostReactionDto update(int id, PostReactionDto postReactionDto) {
-        Optional<PostReaction> result = postReactionDao.getById(id);
+        Optional<PostReaction> result = postReactionDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("PostReaction not found");
@@ -63,18 +63,17 @@ public class PostReactionServiceImpl implements PostReactionService {
 
         updatedPostReaction.setId(postReaction.getId());
 
-        result = postReactionDao.update(updatedPostReaction);
+        updatedPostReaction = postReactionDao.update(updatedPostReaction);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update post reaction");
-        }
-
-        return convertToDto(result.get());
+        return convertToDto(updatedPostReaction);
     }
 
     @Override
-    public boolean delete(int id) {
-        return postReactionDao.deleteById(id);
+    public int remove(int id) {
+        PostReaction postReaction = postReactionDao.remove(id);
+        if (postReaction == null) {
+            return -1;
+        } else return postReaction.getId();
     }
 
     private PostReaction convertToObject(PostReactionDto postReactionDto) {

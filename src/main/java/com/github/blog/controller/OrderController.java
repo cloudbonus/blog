@@ -5,14 +5,14 @@ import com.github.blog.dto.OrderDto;
 import com.github.blog.service.OrderService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class OrderController {
     private final OrderService orderService;
     private final ObjectMapper objectMapper;
@@ -23,16 +23,16 @@ public class OrderController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(OrderDto orderDto) {
-        return orderService.create(orderDto);
+    public String create(OrderDto orderDto) {
+        return convertToJson(orderService.create(orderDto));
     }
 
-    public String readById(int id) {
-        return convertToJson(orderService.readById(id));
+    public String findById(int id) {
+        return convertToJson(orderService.findById(id));
     }
 
-    public String readAll() {
-        List<OrderDto> orders = orderService.readAll();
+    public String findAll() {
+        List<OrderDto> orders = orderService.findAll();
         return convertToJsonArray(orders);
     }
 
@@ -40,8 +40,11 @@ public class OrderController {
         return orderService.update(id, orderDto);
     }
 
-    public boolean delete(int id) {
-        return orderService.delete(id);
+    public String remove(int id) {
+        int result = orderService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows

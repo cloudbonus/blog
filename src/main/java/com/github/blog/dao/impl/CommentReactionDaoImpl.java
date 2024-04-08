@@ -2,51 +2,64 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.CommentReactionDao;
 import com.github.blog.model.CommentReaction;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Repository
 public class CommentReactionDaoImpl implements CommentReactionDao {
-    private final List<CommentReaction> reactions = new ArrayList<>();
+    private static final List<CommentReaction> COMMENT_REACTIONS = new CopyOnWriteArrayList<>();
 
     @Override
-    public Optional<CommentReaction> getById(int id) {
-        return reactions.stream().filter(r -> r.getId() == id).findAny();
+    public Optional<CommentReaction> findById(Integer id) {
+        return COMMENT_REACTIONS.stream().filter(r -> r.getId() == id).findAny();
     }
 
     @Override
-    public List<CommentReaction> getAll() {
-        return reactions;
+    public List<CommentReaction> findAll() {
+        return COMMENT_REACTIONS;
     }
 
     @Override
-    public int save(CommentReaction reaction) {
-        reactions.add(reaction);
-        int index = reactions.size();
+    public CommentReaction create(CommentReaction reaction) {
+        COMMENT_REACTIONS.add(reaction);
+        int index = COMMENT_REACTIONS.size();
         reaction.setId(index);
-        return index;
+        return reaction;
     }
 
     @Override
-    public Optional<CommentReaction> update(CommentReaction reaction) {
-        for (int i = 0; i < reactions.size(); i++) {
-            if (reactions.get(i).getId() == reaction.getId()) {
-                reactions.set(i, reaction);
-                return Optional.of(reaction);
+    public CommentReaction update(CommentReaction reaction) {
+        for (int i = 0; i < COMMENT_REACTIONS.size(); i++) {
+            if (COMMENT_REACTIONS.get(i).getId() == reaction.getId()) {
+                COMMENT_REACTIONS.set(i, reaction);
+                return reaction;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public boolean deleteById(int id) {
-        return reactions.removeIf(r -> r.getId() == id);
+    public CommentReaction remove(Integer id) {
+        CommentReaction commentReactionToRemove = null;
+
+        for (CommentReaction r : COMMENT_REACTIONS) {
+            if (r.getId() == id) {
+                commentReactionToRemove = r;
+                break;
+            }
+        }
+
+        if (commentReactionToRemove != null) {
+            COMMENT_REACTIONS.remove(commentReactionToRemove);
+        }
+
+        return commentReactionToRemove;
     }
 }
 

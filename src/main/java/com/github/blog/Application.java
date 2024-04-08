@@ -1,18 +1,15 @@
 package com.github.blog;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.blog.controller.*;
 import com.github.blog.dto.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Set;
 
-@Configuration
-@PropertySource(value = "classpath:application.properties", encoding = "UTF-8")
 @ComponentScan("com.github.blog")
 public class Application {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -160,26 +157,26 @@ public class Application {
         //Testing CRUD operations
 
         //READ
-        LOGGER.info(userController.readAll());
-        LOGGER.info(userDetailsController.readAll());
-        LOGGER.info(commentController.readAll());
-        LOGGER.info(postController.readAll());
-        LOGGER.info(orderController.readAll());
-        LOGGER.info(commentReactionController.readAll());
-        LOGGER.info(postReactionController.readAll());
-        LOGGER.info(roleController.readAll());
-        LOGGER.info(tagController.readAll());
+        LOGGER.info(userController.findAll());
+        LOGGER.info(userDetailsController.findAll());
+        LOGGER.info(commentController.findAll());
+        LOGGER.info(postController.findAll());
+        LOGGER.info(orderController.findAll());
+        LOGGER.info(commentReactionController.findAll());
+        LOGGER.info(postReactionController.findAll());
+        LOGGER.info(roleController.findAll());
+        LOGGER.info(tagController.findAll());
 
         //DELETE
-        userController.delete(2);
-        userDetailsController.delete(2);
-        commentController.delete(2);
-        postController.delete(2);
-        orderController.delete(2);
-        commentReactionController.delete(2);
-        postReactionController.delete(2);
-        roleController.delete(2);
-        tagController.delete(2);
+        userController.remove(2);
+        userDetailsController.remove(2);
+        commentController.remove(2);
+        postController.remove(2);
+        orderController.remove(2);
+        commentReactionController.remove(2);
+        postReactionController.remove(2);
+        roleController.remove(2);
+        tagController.remove(2);
 
         //UPDATE
         user1.setLogin("new_login_1");
@@ -211,22 +208,14 @@ public class Application {
         tagController.update(1, tagDto1);
 
         //READ;
-        LOGGER.info(userController.readAll());
-        LOGGER.info(userDetailsController.readAll());
-        LOGGER.info(commentController.readAll());
-        LOGGER.info(postController.readAll());
-        LOGGER.info(orderController.readAll());
-        LOGGER.info(commentReactionController.readAll());
-        LOGGER.info(postReactionController.readAll());
-        LOGGER.info(roleController.readAll());
-        LOGGER.info(tagController.readAll());
+        LOGGER.info(userController.findAll());
+        LOGGER.info(userDetailsController.findAll());
+        LOGGER.info(commentController.findAll());
+        LOGGER.info(postController.findAll());
+        LOGGER.info(orderController.findAll());
+        LOGGER.info(commentReactionController.findAll());
+        LOGGER.info(postReactionController.findAll());
+        LOGGER.info(roleController.findAll());
+        LOGGER.info(tagController.findAll());
     }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        return objectMapper;
-    }
-
 }

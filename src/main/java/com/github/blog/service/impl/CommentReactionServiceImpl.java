@@ -6,7 +6,7 @@ import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.service.CommentReactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
 public class CommentReactionServiceImpl implements CommentReactionService {
 
     private final CommentReactionDao commentReactionDao;
@@ -27,14 +27,14 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     }
 
     @Override
-    public int create(CommentReactionDto commentReactionDto) {
+    public CommentReactionDto create(CommentReactionDto commentReactionDto) {
         CommentReaction commentReaction = convertToObject(commentReactionDto);
-        return commentReactionDao.save(commentReaction);
+        return convertToDto(commentReactionDao.create(commentReaction));
     }
 
     @Override
-    public CommentReactionDto readById(int id) {
-        Optional<CommentReaction> result = commentReactionDao.getById(id);
+    public CommentReactionDto findById(int id) {
+        Optional<CommentReaction> result = commentReactionDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("CommentReaction not found");
         }
@@ -42,8 +42,8 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     }
 
     @Override
-    public List<CommentReactionDto> readAll() {
-        List<CommentReaction> commentReactions = commentReactionDao.getAll();
+    public List<CommentReactionDto> findAll() {
+        List<CommentReaction> commentReactions = commentReactionDao.findAll();
         if (commentReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any comment reactions");
         }
@@ -52,7 +52,7 @@ public class CommentReactionServiceImpl implements CommentReactionService {
 
     @Override
     public CommentReactionDto update(int id, CommentReactionDto commentReactionDto) {
-        Optional<CommentReaction> result = commentReactionDao.getById(id);
+        Optional<CommentReaction> result = commentReactionDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("CommentReaction not found");
@@ -63,18 +63,17 @@ public class CommentReactionServiceImpl implements CommentReactionService {
 
         updatedCommentReaction.setId(commentReaction.getId());
 
-        result = commentReactionDao.update(updatedCommentReaction);
+        updatedCommentReaction = commentReactionDao.update(updatedCommentReaction);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update comment reaction");
-        }
-
-        return convertToDto(result.get());
+        return convertToDto(updatedCommentReaction);
     }
 
     @Override
-    public boolean delete(int id) {
-        return commentReactionDao.deleteById(id);
+    public int remove(int id) {
+        CommentReaction commentReaction = commentReactionDao.remove(id);
+        if (commentReaction == null) {
+            return -1;
+        } else return commentReaction.getId();
     }
 
     private CommentReaction convertToObject(CommentReactionDto commentReactionDto) {

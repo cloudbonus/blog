@@ -6,13 +6,13 @@ import java.util.List;
  * @author Raman Haurylau
  */
 public interface CrudService<T> {
-    int create(T t);
+    T create(T t);
 
-    T readById(int id);
+    T findById(int id);
 
-    List<T> readAll();
+    List<T> findAll();
 
     T update(int id, T t);
 
-    boolean delete(int id);
+    int remove(int id);
 }

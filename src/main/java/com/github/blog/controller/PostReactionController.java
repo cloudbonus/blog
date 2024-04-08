@@ -5,14 +5,14 @@ import com.github.blog.dto.PostReactionDto;
 import com.github.blog.service.PostReactionService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class PostReactionController {
     private final PostReactionService postReactionService;
     private final ObjectMapper objectMapper;
@@ -23,25 +23,28 @@ public class PostReactionController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(PostReactionDto postReactionDto) {
-        return postReactionService.create(postReactionDto);
+    public String create(PostReactionDto postReactionDto) {
+        return convertToJson(postReactionService.create(postReactionDto));
     }
 
-    public String readById(int id) {
-        return convertToJson(postReactionService.readById(id));
+    public String findById(int id) {
+        return convertToJson(postReactionService.findById(id));
     }
 
-    public String readAll() {
-        List<PostReactionDto> postReactions = postReactionService.readAll();
+    public String findAll() {
+        List<PostReactionDto> postReactions = postReactionService.findAll();
         return convertToJsonArray(postReactions);
     }
 
-    public PostReactionDto update(int id, PostReactionDto postReactionDto) {
-        return postReactionService.update(id, postReactionDto);
+    public String update(int id, PostReactionDto postReactionDto) {
+        return convertToJson(postReactionService.update(id, postReactionDto));
     }
 
-    public boolean delete(int id) {
-        return postReactionService.delete(id);
+    public String remove(int id) {
+        int result = postReactionService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows

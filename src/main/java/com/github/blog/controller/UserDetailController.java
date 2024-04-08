@@ -5,14 +5,14 @@ import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.service.UserDetailsService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class UserDetailController {
     private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
@@ -23,25 +23,28 @@ public class UserDetailController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(UserDetailsDto userDetails) {
-        return userDetailsService.create(userDetails);
+    public String create(UserDetailsDto userDetails) {
+        return convertToJson(userDetailsService.create(userDetails));
     }
 
-    public String readById(int id) {
-        return convertToJson(userDetailsService.readById(id));
+    public String findById(int id) {
+        return convertToJson(userDetailsService.findById(id));
     }
 
-    public String readAll() {
-        List<UserDetailsDto> userDetailsDto = userDetailsService.readAll();
+    public String findAll() {
+        List<UserDetailsDto> userDetailsDto = userDetailsService.findAll();
         return convertToJsonArray(userDetailsDto);
     }
 
-    public UserDetailsDto update(int id, UserDetailsDto userDetailsDto) {
-        return userDetailsService.update(id, userDetailsDto);
+    public String update(int id, UserDetailsDto userDetailsDto) {
+        return convertToJson(userDetailsService.update(id, userDetailsDto));
     }
 
-    public boolean delete(int id) {
-        return userDetailsService.delete(id);
+    public String remove(int id) {
+        int result = userDetailsService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows

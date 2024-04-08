@@ -2,50 +2,63 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDao;
 import com.github.blog.model.User;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Repository
 public class UserDaoImpl implements UserDao {
-    private final List<User> users = new ArrayList<>();
+    private static final List<User> USERS = new CopyOnWriteArrayList<>();
 
     @Override
-    public Optional<User> getById(int id) {
-        return users.stream().filter(u -> u.getId() == id).findAny();
+    public Optional<User> findById(Integer id) {
+        return USERS.stream().filter(u -> u.getId() == id).findAny();
     }
 
     @Override
-    public List<User> getAll() {
-        return users;
+    public List<User> findAll() {
+        return USERS;
     }
 
     @Override
-    public int save(User user) {
-        users.add(user);
-        int index = users.size();
+    public User create(User user) {
+        USERS.add(user);
+        int index = USERS.size();
         user.setId(index);
-        return index;
+        return user;
     }
 
     @Override
-    public Optional<User> update(User user) {
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getId() == user.getId()) {
-                users.set(i, user);
-                return Optional.of(user);
+    public User update(User user) {
+        for (int i = 0; i < USERS.size(); i++) {
+            if (USERS.get(i).getId() == user.getId()) {
+                USERS.set(i, user);
+                return user;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public boolean deleteById(int id) {
-        return users.removeIf(u -> u.getId() == id);
+    public User remove(Integer id) {
+        User userToRemove = null;
+
+        for (User u : USERS) {
+            if (u.getId() == id) {
+                userToRemove = u;
+                break;
+            }
+        }
+
+        if (userToRemove != null) {
+            USERS.remove(userToRemove);
+        }
+
+        return userToRemove;
     }
 }

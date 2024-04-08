@@ -5,14 +5,14 @@ import com.github.blog.dto.RoleDto;
 import com.github.blog.service.RoleService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class RoleController {
     private final RoleService roleService;
     private final ObjectMapper objectMapper;
@@ -23,25 +23,28 @@ public class RoleController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(RoleDto roleDto) {
-        return roleService.create(roleDto);
+    public String create(RoleDto roleDto) {
+        return convertToJson(roleService.create(roleDto));
     }
 
-    public String readById(int id) {
-        return convertToJson(roleService.readById(id));
+    public String findById(int id) {
+        return convertToJson(roleService.findById(id));
     }
 
-    public String readAll() {
-        List<RoleDto> roles = roleService.readAll();
+    public String findAll() {
+        List<RoleDto> roles = roleService.findAll();
         return convertToJsonArray(roles);
     }
 
-    public RoleDto update(int id, RoleDto roleDto) {
-        return roleService.update(id, roleDto);
+    public String update(int id, RoleDto roleDto) {
+        return convertToJson(roleService.update(id, roleDto));
     }
 
-    public boolean delete(int id) {
-        return roleService.delete(id);
+    public String remove(int id) {
+        int result = roleService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows

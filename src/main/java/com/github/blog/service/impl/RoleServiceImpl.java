@@ -6,7 +6,7 @@ import com.github.blog.dto.RoleDto;
 import com.github.blog.model.Role;
 import com.github.blog.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
 public class RoleServiceImpl implements RoleService {
 
     private final RoleDao roleDao;
@@ -27,14 +27,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public int create(RoleDto roleDto) {
+    public RoleDto create(RoleDto roleDto) {
         Role role = convertToObject(roleDto);
-        return roleDao.save(role);
+        return convertToDto(roleDao.create(role));
     }
 
     @Override
-    public RoleDto readById(int id) {
-        Optional<Role> result = roleDao.getById(id);
+    public RoleDto findById(int id) {
+        Optional<Role> result = roleDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("Role not found");
         }
@@ -42,8 +42,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleDto> readAll() {
-        List<Role> roles = roleDao.getAll();
+    public List<RoleDto> findAll() {
+        List<Role> roles = roleDao.findAll();
         if (roles.isEmpty()) {
             throw new RuntimeException("Cannot find any roles");
         }
@@ -52,7 +52,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleDto update(int id, RoleDto roleDto) {
-        Optional<Role> result = roleDao.getById(id);
+        Optional<Role> result = roleDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("Role not found");
@@ -63,18 +63,17 @@ public class RoleServiceImpl implements RoleService {
 
         updatedRole.setId(role.getId());
 
-        result = roleDao.update(updatedRole);
+        updatedRole = roleDao.update(updatedRole);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update role");
-        }
-
-        return convertToDto(result.get());
+        return convertToDto(updatedRole);
     }
 
     @Override
-    public boolean delete(int id) {
-        return roleDao.deleteById(id);
+    public int remove(int id) {
+        Role role = roleDao.remove(id);
+        if (role == null) {
+            return -1;
+        } else return role.getId();
     }
 
     private Role convertToObject(RoleDto roleDto) {

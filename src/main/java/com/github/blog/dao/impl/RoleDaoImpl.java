@@ -2,51 +2,64 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.model.Role;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Repository
 public class RoleDaoImpl implements RoleDao {
-    private final List<Role> roles = new ArrayList<>();
+    private static final List<Role> ROLES = new CopyOnWriteArrayList<>();
 
     @Override
-    public Optional<Role> getById(int id) {
-        return roles.stream().filter(r -> r.getId() == id).findAny();
+    public Optional<Role> findById(Integer id) {
+        return ROLES.stream().filter(r -> r.getId() == id).findAny();
     }
 
     @Override
-    public List<Role> getAll() {
-        return roles;
+    public List<Role> findAll() {
+        return ROLES;
     }
 
     @Override
-    public int save(Role role) {
-        roles.add(role);
-        int index = roles.size();
+    public Role create(Role role) {
+        ROLES.add(role);
+        int index = ROLES.size();
         role.setId(index);
-        return index;
+        return role;
     }
 
     @Override
-    public Optional<Role> update(Role role) {
-        for (int i = 0; i < roles.size(); i++) {
-            if (roles.get(i).getId() == role.getId()) {
-                roles.set(i, role);
-                return Optional.of(role);
+    public Role update(Role role) {
+        for (int i = 0; i < ROLES.size(); i++) {
+            if (ROLES.get(i).getId() == role.getId()) {
+                ROLES.set(i, role);
+                return role;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public boolean deleteById(int id) {
-        return roles.removeIf(r -> r.getId() == id);
+    public Role remove(Integer id) {
+        Role roleToRemove = null;
+
+        for (Role r : ROLES) {
+            if (r.getId() == id) {
+                roleToRemove = r;
+                break;
+            }
+        }
+
+        if (roleToRemove != null) {
+            ROLES.remove(roleToRemove);
+        }
+
+        return roleToRemove;
     }
 }
 

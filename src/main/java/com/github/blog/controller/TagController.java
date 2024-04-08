@@ -5,14 +5,14 @@ import com.github.blog.dto.TagDto;
 import com.github.blog.service.TagService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
 public class TagController {
     private final TagService tagService;
     private final ObjectMapper objectMapper;
@@ -23,25 +23,28 @@ public class TagController {
         this.objectMapper = objectMapper;
     }
 
-    public int create(TagDto tagDto) {
-        return tagService.create(tagDto);
+    public String create(TagDto tagDto) {
+        return convertToJson(tagService.create(tagDto));
     }
 
-    public String readById(int id) {
-        return convertToJson(tagService.readById(id));
+    public String findById(int id) {
+        return convertToJson(tagService.findById(id));
     }
 
-    public String readAll() {
-        List<TagDto> tags = tagService.readAll();
+    public String findAll() {
+        List<TagDto> tags = tagService.findAll();
         return convertToJsonArray(tags);
     }
 
-    public TagDto update(int id, TagDto tagDto) {
-        return tagService.update(id, tagDto);
+    public String update(int id, TagDto tagDto) {
+        return convertToJson(tagService.update(id, tagDto));
     }
 
-    public boolean delete(int id) {
-        return tagService.delete(id);
+    public String remove(int id) {
+        int result = tagService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 
     @SneakyThrows
