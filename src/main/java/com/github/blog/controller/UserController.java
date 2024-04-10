@@ -36,6 +36,11 @@ public class UserController {
         return convertToJsonArray(users);
     }
 
+    public String findAllByUniversity(String university) {
+        List<UserDto> users = userService.findAllByUniversity(university);
+        return convertToJsonArray(users);
+    }
+
     public String update(int id, UserDto userDto) {
         return convertToJson(userService.update(id, userDto));
     }

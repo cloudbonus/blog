@@ -13,12 +13,12 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
-public class UserDetailController {
+public class UserDetailsController {
     private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public UserDetailController(UserDetailsService userDetailsService, ObjectMapper objectMapper) {
+    public UserDetailsController(UserDetailsService userDetailsService, ObjectMapper objectMapper) {
         this.userDetailsService = userDetailsService;
         this.objectMapper = objectMapper;
     }

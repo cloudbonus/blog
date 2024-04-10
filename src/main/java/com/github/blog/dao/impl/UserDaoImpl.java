@@ -2,63 +2,200 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDao;
 import com.github.blog.model.User;
+import com.github.blog.model.UserDetails;
+import com.github.blog.util.DefaultConnectionHolder;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
+
 @Repository
+@AllArgsConstructor
 public class UserDaoImpl implements UserDao {
-    private static final List<User> USERS = new CopyOnWriteArrayList<>();
+
+    public final DefaultConnectionHolder connectionHolder;
+
+    private User extractUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setId((int) rs.getLong("user_id"));
+        user.setLogin(rs.getString("login"));
+        user.setPassword(rs.getString("password"));
+        user.setEmail(rs.getString("email"));
+        user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        user.setLastLogin(rs.getTimestamp("last_login").toLocalDateTime());
+        return user;
+    }
 
     @Override
     public Optional<User> findById(Integer id) {
-        return USERS.stream().filter(u -> u.getId() == id).findAny();
+        String findByIdQuery = "SELECT * FROM blogging_platform.user WHERE user_id = ?";
+        try {
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(findByIdQuery);
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return Optional.of(extractUser(rs));
+            }
+            ps.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return Optional.empty();
     }
 
     @Override
     public List<User> findAll() {
-        return USERS;
+        List<User> users = new ArrayList<>();
+        String findAllQuery = "SELECT * FROM blogging_platform.user";
+        try {
+            Connection conn = connectionHolder.getConnection();
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(findAllQuery);
+            while (rs.next()) {
+                users.add(extractUser(rs));
+            }
+            st.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
+    }
+
+
+    @Override
+    public List<User> findAllByRole(String roleName) {
+        List<User> users = new ArrayList<>();
+        String findAllByRoleQuery = "SELECT u.* FROM blogging_platform.user u JOIN blogging_platform.user_role ur ON u.user_id = ur.user_id JOIN blogging_platform.role r ON ur.role_id = r.role_id WHERE r.role_name = ?";
+        try {
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(findAllByRoleQuery);
+            ps.setString(1, roleName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                users.add(extractUser(rs));
+            }
+            ps.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
+    }
+
+    public Optional<User> findByLoginAndPassword(UserDetails userDetails) {
+        String findByLoginAndPasswordQuery = "SELECT * FROM blogging_platform.user WHERE login = ? AND password = ?";
+        try {
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(findByLoginAndPasswordQuery);
+            ps.setString(1, userDetails.getUser().getLogin());
+            ps.setString(2, userDetails.getUser().getPassword());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return Optional.of(extractUser(rs));
+            }
+            ps.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<User> findAllByUniversity(String university) {
+        List<User> users = new ArrayList<>();
+        String findAllByUniversityQuery = "SELECT u.* FROM blogging_platform.user u JOIN blogging_platform.user_details ud ON u.user_id = ud.user_id WHERE ud.university_name = ?";
+        try {
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(findAllByUniversityQuery);
+            ps.setString(1, university);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                users.add(extractUser(rs));
+            }
+            ps.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
     }
 
     @Override
     public User create(User user) {
-        USERS.add(user);
-        int index = USERS.size();
-        user.setId(index);
+        String createQuery = "INSERT INTO blogging_platform.user (login, password, email, created_at, last_login) VALUES (?, ?, ?, ?, ?)";
+        try {
+            Connection con = connectionHolder.getConnection();
+            PreparedStatement ps = con.prepareStatement(createQuery, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, user.getLogin());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getEmail());
+            ps.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setTimestamp(5, Timestamp.valueOf(user.getLastLogin()));
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                user.setId((int) rs.getLong(1));
+            }
+            ps.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return user;
     }
 
     @Override
     public User update(User user) {
-        for (int i = 0; i < USERS.size(); i++) {
-            if (USERS.get(i).getId() == user.getId()) {
-                USERS.set(i, user);
-                return user;
+        String updateQuery = "UPDATE blogging_platform.user SET login = ?, password = ?, email = ?, created_at = ?, last_login = ? WHERE user_id = ?";
+        try {
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(updateQuery);
+            ps.setString(1, user.getLogin());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getEmail());
+            ps.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setTimestamp(5, Timestamp.valueOf(user.getLastLogin()));
+            ps.setLong(6, user.getId());
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating user failed, no rows affected.");
             }
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return null;
+        return user;
     }
 
     @Override
     public User remove(Integer id) {
-        User userToRemove = null;
-
-        for (User u : USERS) {
-            if (u.getId() == id) {
-                userToRemove = u;
-                break;
+        User userToRemove = findById(id).orElse(null);
+        String removeQuery = "DELETE FROM blogging_platform.user WHERE user_id = ?";
+        if (userToRemove != null) {
+            try {
+                Connection conn = connectionHolder.getConnection();
+                PreparedStatement ps = conn.prepareStatement(removeQuery);
+                ps.setLong(1, id);
+                int affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Deleting user failed, no rows affected.");
+                }
+                ps.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
-
-        if (userToRemove != null) {
-            USERS.remove(userToRemove);
-        }
-
         return userToRemove;
     }
 }

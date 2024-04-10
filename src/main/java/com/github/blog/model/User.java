@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -21,5 +21,5 @@ public class User {
     @JsonIgnore
     private LocalDateTime lastLogin;
 
-    private Set<Role> roles;
+    private List<Role> roles;
 }
