@@ -1,13 +1,11 @@
 package com.github.blog.util;
 
-import com.github.blog.annotation.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,84 +20,32 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @AllArgsConstructor
 public class DefaultConnectionHolder implements DisposableBean {
-    //    private final DataSource dataSource;
-//    private final ThreadLocal<Connection> connections = new ThreadLocal<>();
-//
-//    public DefaultConnectionHolder(DataSource dataSource) {
-//        this.dataSource = dataSource;
-//    }
-//
-//    public Connection getConnection() throws SQLException {
-//        Connection con = connections.get();
-//        if (con != null) {
-//            if (con.isClosed()) {
-//                if (isTransaction()) {
-//                    throw new SQLException("Cannot reopen a closed connection within a transaction.");
-//                } else {
-//                    con = dataSource.getConnection();
-//                    connections.set(con);
-//                }
-//            }
-//        } else {
-//            con = dataSource.getConnection();
-//            connections.set(con);
-//        }
-//
-//        return con;
-//    }
-//
-//    public void closeConnection() throws SQLException {
-//        Connection con = connections.get();
-//        if (con != null) {
-//            con.close();
-//            connections.remove();
-//        }
-//    }
-//
-//    @Override
-//    public void destroy() throws SQLException {
-//        log.info("Closing all connection");
-//        Connection con = connections.get();
-//        while (con != null) {
-//            closeConnection();
-//            con = connections.get();
-//        }
-//    }
-//
-//    private boolean isTransaction() {
-//        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-//        for (StackTraceElement element : stackTraceElements) {
-//            try {
-//                Class<?> clazz = Class.forName(element.getClassName());
-//                for (Method method : clazz.getMethods()) {
-//                    if (method.getName().equals(element.getMethodName()) && method.isAnnotationPresent(Transaction.class)) {
-//                        log.info("find transactional method: {}", method.getName());
-//                        return true;
-//                    }
-//                }
-//            } catch (ClassNotFoundException e) {
-//                log.error("Error while checking transaction stack trace");
-//            }
-//        }
-//        return false;
-//    }
-//
+    private static final int MAX_POOL_SIZE = 4;
     private final DataSource dataSource;
     private final Map<Thread, List<Connection>> connections = new ConcurrentHashMap<>();
-
 
     public synchronized Connection getConnection() throws SQLException {
         Thread currentThread = Thread.currentThread();
         if (connections.containsKey(currentThread)) {
             List<Connection> connectionList = connections.get(currentThread);
             for (Connection connection : connectionList) {
-                if (!connection.isClosed() && !connection.getAutoCommit()) {
-                    return connection;
+                if (!connection.isClosed()) {
+                    if (!connection.getAutoCommit()) {
+                        return connection;
+                    } else {
+                        connection.close();
+                        connection = dataSource.getConnection();
+                        return connection;
+                    }
                 }
             }
-            Connection connection = dataSource.getConnection();
-            connectionList.add(connection);
-            return connection;
+            if (connectionList.size() < MAX_POOL_SIZE) {
+                Connection connection = dataSource.getConnection();
+                connectionList.add(connection);
+                return connection;
+            } else {
+                throw new SQLException("Maximum pool size reached");
+            }
         } else {
             Connection connection = dataSource.getConnection();
             List<Connection> connectionList = new ArrayList<>();
@@ -124,6 +70,7 @@ public class DefaultConnectionHolder implements DisposableBean {
 
     @Override
     public void destroy() throws SQLException {
+        log.info("Closing all connection");
         for (List<Connection> connectionList : connections.values()) {
             for (Connection connection : connectionList) {
                 if (connection != null && !connection.isClosed()) {
@@ -134,4 +81,5 @@ public class DefaultConnectionHolder implements DisposableBean {
         connections.clear();
     }
 }
+
 

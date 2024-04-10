@@ -55,16 +55,15 @@ public class Application {
         user1Details.setUser(user1);
         user2Details.setUser(user2);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
 
         executorService.submit(() -> {
             userController.create(user1);
+        });
+
+        executorService.submit(() -> {
             userController.create(user2);
-
-            userDetailsController.create(user1Details);
-            userDetailsController.create(user2Details);
-
-            log.info(userController.findAllByUniversity("MIT"));
         });
 
         executorService.shutdown();
@@ -76,6 +75,28 @@ public class Application {
         } catch (InterruptedException e) {
             executorService.shutdownNow();
         }
+
+        executorService = Executors.newFixedThreadPool(4);
+
+        executorService.submit(() -> {
+            userDetailsController.create(user1Details);
+        });
+
+        executorService.submit(() -> {
+            userDetailsController.create(user2Details);
+        });
+
+        executorService.shutdown();
+
+        try {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
+
+        log.info(userController.findAllByUniversity("MIT"));
 
         context.close();
     }
