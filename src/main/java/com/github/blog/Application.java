@@ -7,7 +7,6 @@ import com.github.blog.dto.UserDto;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.AbstractApplicationContext;
 
 import java.util.concurrent.ExecutorService;
@@ -16,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 @Log4j2
 @ComponentScan("com.github.blog")
-@PropertySource(value = "classpath:application.properties", encoding = "UTF-8")
 public class Application {
 
     public static void main(String[] args) {
@@ -55,15 +53,47 @@ public class Application {
         user1Details.setUser(user1);
         user2Details.setUser(user2);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        executorService.execute(() -> userController.create(user1));
+
+        executorService.execute(() -> userController.create(user2));
+
+        executorService.shutdown();
+
+        try {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
+
+        executorService = Executors.newFixedThreadPool(2);
 
 
-        executorService.submit(() -> {
-            userController.create(user1);
-        });
+        executorService.execute(() -> userDetailsController.create(user1Details));
 
-        executorService.submit(() -> {
-            userController.create(user2);
+        executorService.execute(() -> userDetailsController.create(user2Details));
+
+        executorService.shutdown();
+
+        try {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
+
+        executorService = Executors.newFixedThreadPool(2);
+
+
+        executorService.execute(() -> log.info(userController.findAllByUniversity(user2Details)));
+
+        executorService.execute(() -> {
+            log.info(userController.findAllByUniversity(user2Details));
+            log.info(userController.findAllByRole("ROLE_USER"));
         });
 
         executorService.shutdown();
@@ -76,27 +106,7 @@ public class Application {
             executorService.shutdownNow();
         }
 
-        executorService = Executors.newFixedThreadPool(4);
-
-        executorService.submit(() -> {
-            userDetailsController.create(user1Details);
-        });
-
-        executorService.submit(() -> {
-            userDetailsController.create(user2Details);
-        });
-
-        executorService.shutdown();
-
-        try {
-            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-        }
-
-        log.info(userController.findAllByUniversity("MIT"));
+        log.info(userController.findAllByUniversity(user2Details));
 
         context.close();
     }
