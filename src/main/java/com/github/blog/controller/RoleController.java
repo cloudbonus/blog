@@ -1,10 +1,9 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.RoleDto;
 import com.github.blog.service.RoleService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -13,31 +12,26 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
+@AllArgsConstructor
 public class RoleController {
     private final RoleService roleService;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public RoleController(RoleService roleService, ObjectMapper objectMapper) {
-        this.roleService = roleService;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     public String create(RoleDto roleDto) {
-        return convertToJson(roleService.create(roleDto));
+        return mapper.convertToJson(roleService.create(roleDto));
     }
 
     public String findById(int id) {
-        return convertToJson(roleService.findById(id));
+        return mapper.convertToJson(roleService.findById(id));
     }
 
     public String findAll() {
         List<RoleDto> roles = roleService.findAll();
-        return convertToJsonArray(roles);
+        return mapper.convertToJson(roles);
     }
 
     public String update(int id, RoleDto roleDto) {
-        return convertToJson(roleService.update(id, roleDto));
+        return mapper.convertToJson(roleService.update(id, roleDto));
     }
 
     public String remove(int id) {
@@ -47,14 +41,5 @@ public class RoleController {
         else return "Could not remove";
     }
 
-    @SneakyThrows
-    private String convertToJson(RoleDto roleDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(roleDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<RoleDto> roles) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(roles);
-    }
 }
 

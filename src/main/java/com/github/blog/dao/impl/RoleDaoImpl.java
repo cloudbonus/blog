@@ -2,7 +2,8 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.model.Role;
-import com.github.blog.util.DefaultConnectionHolder;
+import com.github.blog.util.ConnectionHolder;
+import com.github.blog.util.impl.ResultSetFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -21,14 +22,7 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class RoleDaoImpl implements RoleDao {
-    public final DefaultConnectionHolder connectionHolder;
-
-    private Role extractRole(ResultSet rs) throws SQLException {
-        Role role = new Role();
-        role.setId((int) rs.getLong("role_id"));
-        role.setName("role_name");
-        return role;
-    }
+    public final ConnectionHolder connectionHolder;
 
     @Override
     public Optional<Role> findById(Integer id) {
@@ -39,7 +33,7 @@ public class RoleDaoImpl implements RoleDao {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(extractRole(rs));
+                return Optional.of(ResultSetFactory.createRole(rs));
             }
             ps.close();
             rs.close();
@@ -58,7 +52,7 @@ public class RoleDaoImpl implements RoleDao {
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(extractRole(rs));
+                return Optional.of(ResultSetFactory.createRole(rs));
             }
             ps.close();
             rs.close();
@@ -77,7 +71,7 @@ public class RoleDaoImpl implements RoleDao {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(findAllQuery);
             while (rs.next()) {
-                roles.add(extractRole(rs));
+                roles.add(ResultSetFactory.createRole(rs));
             }
             st.close();
             rs.close();

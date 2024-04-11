@@ -2,7 +2,8 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDetailsDao;
 import com.github.blog.model.UserDetails;
-import com.github.blog.util.DefaultConnectionHolder;
+import com.github.blog.util.ConnectionHolder;
+import com.github.blog.util.impl.ResultSetFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,19 +20,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDetailsDaoImpl implements UserDetailsDao {
 
-    public final DefaultConnectionHolder connectionHolder;
-
-    private UserDetails extractUserDetails(ResultSet rs) throws SQLException {
-        UserDetails userDetails = new UserDetails();
-        userDetails.setId((int) rs.getLong("user_id"));
-        userDetails.setFirstname(rs.getString("firstname"));
-        userDetails.setSurname(rs.getString("surname"));
-        userDetails.setCompanyName(rs.getString("company_name"));
-        userDetails.setJobTitle(rs.getString("job_title"));
-        userDetails.setMajorName(rs.getString("major_name"));
-        userDetails.setUniversityName(rs.getString("university_name"));
-        return userDetails;
-    }
+    public final ConnectionHolder connectionHolder;
 
     @Override
     public Optional<UserDetails> findById(Integer id) {
@@ -42,7 +31,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(extractUserDetails(rs));
+                return Optional.of(ResultSetFactory.createUserDetails(rs));
             }
             ps.close();
             rs.close();
@@ -61,7 +50,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(findAllQuery);
             while (rs.next()) {
-                userDetails.add(extractUserDetails(rs));
+                userDetails.add(ResultSetFactory.createUserDetails(rs));
             }
             st.close();
             rs.close();

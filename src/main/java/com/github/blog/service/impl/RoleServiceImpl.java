@@ -1,11 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dto.RoleDto;
 import com.github.blog.model.Role;
 import com.github.blog.service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,21 +15,16 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Service
+@AllArgsConstructor
 public class RoleServiceImpl implements RoleService {
 
     private final RoleDao roleDao;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public RoleServiceImpl(RoleDao roleDao, ObjectMapper objectMapper) {
-        this.roleDao = roleDao;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     @Override
     public RoleDto create(RoleDto roleDto) {
-        Role role = convertToObject(roleDto);
-        return convertToDto(roleDao.create(role));
+        Role role = mapper.map(roleDto, Role.class);
+        return mapper.map(roleDao.create(role), RoleDto.class);
     }
 
     @Override
@@ -38,7 +33,7 @@ public class RoleServiceImpl implements RoleService {
         if (result.isEmpty()) {
             throw new RuntimeException("Role not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), RoleDto.class);
     }
 
     @Override
@@ -47,7 +42,7 @@ public class RoleServiceImpl implements RoleService {
         if (roles.isEmpty()) {
             throw new RuntimeException("Cannot find any roles");
         }
-        return roles.stream().map(this::convertToDto).toList();
+        return roles.stream().map(r -> mapper.map(r, RoleDto.class)).toList();
     }
 
     @Override
@@ -58,14 +53,14 @@ public class RoleServiceImpl implements RoleService {
             throw new RuntimeException("Role not found");
         }
 
-        Role updatedRole = convertToObject(roleDto);
+        Role updatedRole = mapper.map(roleDto, Role.class);
         Role role = result.get();
 
         updatedRole.setId(role.getId());
 
         updatedRole = roleDao.update(updatedRole);
 
-        return convertToDto(updatedRole);
+        return mapper.map(updatedRole, RoleDto.class);
     }
 
     @Override
@@ -74,13 +69,5 @@ public class RoleServiceImpl implements RoleService {
         if (role == null) {
             return -1;
         } else return role.getId();
-    }
-
-    private Role convertToObject(RoleDto roleDto) {
-        return objectMapper.convertValue(roleDto, Role.class);
-    }
-
-    private RoleDto convertToDto(Role role) {
-        return objectMapper.convertValue(role, RoleDto.class);
     }
 }

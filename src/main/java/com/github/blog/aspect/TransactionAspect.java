@@ -1,6 +1,6 @@
-package com.github.blog.aspects;
+package com.github.blog.aspect;
 
-import com.github.blog.util.DefaultConnectionHolder;
+import com.github.blog.util.ConnectionHolder;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -18,22 +18,23 @@ import java.sql.Connection;
 @Component
 @AllArgsConstructor
 public class TransactionAspect {
-    private final DefaultConnectionHolder connectionHolder;
+    private final ConnectionHolder connectionHolder;
 
     @Around("@annotation(com.github.blog.annotation.Transaction)")
     public Object handleTransaction(ProceedingJoinPoint pjp) throws Throwable {
-        Connection con = connectionHolder.getConnection();
+        Connection conn = connectionHolder.getConnection();
         Object output = null;
         try {
             log.info("Enter transaction");
-            con.setAutoCommit(false);
+            conn.setAutoCommit(false);
             output = pjp.proceed();
-            con.commit();
+            conn.commit();
             log.info("Commit transaction");
         } catch (RuntimeException e) {
             log.info("Rollback transaction");
-            con.rollback();
+            conn.rollback();
         } finally {
+
             connectionHolder.closeConnections();
         }
         return output;

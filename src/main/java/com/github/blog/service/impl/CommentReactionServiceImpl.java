@@ -1,11 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.CommentReactionDao;
 import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.service.CommentReactionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,21 +15,17 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Service
+@AllArgsConstructor
 public class CommentReactionServiceImpl implements CommentReactionService {
 
     private final CommentReactionDao commentReactionDao;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public CommentReactionServiceImpl(CommentReactionDao commentReactionDao, ObjectMapper objectMapper) {
-        this.commentReactionDao = commentReactionDao;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     @Override
     public CommentReactionDto create(CommentReactionDto commentReactionDto) {
-        CommentReaction commentReaction = convertToObject(commentReactionDto);
-        return convertToDto(commentReactionDao.create(commentReaction));
+        CommentReaction commentReaction = mapper.map(commentReactionDto, CommentReaction.class);
+
+        return mapper.map(commentReactionDao.create(commentReaction), CommentReactionDto.class);
     }
 
     @Override
@@ -38,7 +34,7 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         if (result.isEmpty()) {
             throw new RuntimeException("CommentReaction not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), CommentReactionDto.class);
     }
 
     @Override
@@ -47,7 +43,7 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         if (commentReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any comment reactions");
         }
-        return commentReactions.stream().map(this::convertToDto).toList();
+        return commentReactions.stream().map(c -> mapper.map(c, CommentReactionDto.class)).toList();
     }
 
     @Override
@@ -58,14 +54,14 @@ public class CommentReactionServiceImpl implements CommentReactionService {
             throw new RuntimeException("CommentReaction not found");
         }
 
-        CommentReaction updatedCommentReaction = convertToObject(commentReactionDto);
+        CommentReaction updatedCommentReaction = mapper.map(commentReactionDto, CommentReaction.class);
         CommentReaction commentReaction = result.get();
 
         updatedCommentReaction.setId(commentReaction.getId());
 
         updatedCommentReaction = commentReactionDao.update(updatedCommentReaction);
 
-        return convertToDto(updatedCommentReaction);
+        return mapper.map(updatedCommentReaction, CommentReactionDto.class);
     }
 
     @Override
@@ -74,14 +70,6 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         if (commentReaction == null) {
             return -1;
         } else return commentReaction.getId();
-    }
-
-    private CommentReaction convertToObject(CommentReactionDto commentReactionDto) {
-        return objectMapper.convertValue(commentReactionDto, CommentReaction.class);
-    }
-
-    private CommentReactionDto convertToDto(CommentReaction commentReaction) {
-        return objectMapper.convertValue(commentReaction, CommentReactionDto.class);
     }
 }
 

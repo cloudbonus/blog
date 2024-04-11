@@ -3,7 +3,8 @@ package com.github.blog.dao.impl;
 import com.github.blog.dao.UserDao;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetails;
-import com.github.blog.util.DefaultConnectionHolder;
+import com.github.blog.util.ConnectionHolder;
+import com.github.blog.util.impl.ResultSetFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -25,18 +26,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDaoImpl implements UserDao {
 
-    public final DefaultConnectionHolder connectionHolder;
-
-    private User extractUser(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setId((int) rs.getLong("user_id"));
-        user.setLogin(rs.getString("login"));
-        user.setPassword(rs.getString("password"));
-        user.setEmail(rs.getString("email"));
-        user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        user.setLastLogin(rs.getTimestamp("last_login").toLocalDateTime());
-        return user;
-    }
+    public final ConnectionHolder connectionHolder;
 
     @Override
     public Optional<User> findById(Integer id) {
@@ -47,7 +37,7 @@ public class UserDaoImpl implements UserDao {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(extractUser(rs));
+                return Optional.of(ResultSetFactory.createUser(rs));
             }
             ps.close();
             rs.close();
@@ -66,7 +56,7 @@ public class UserDaoImpl implements UserDao {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(findAllQuery);
             while (rs.next()) {
-                users.add(extractUser(rs));
+                users.add(ResultSetFactory.createUser(rs));
             }
             st.close();
             rs.close();
@@ -87,7 +77,7 @@ public class UserDaoImpl implements UserDao {
             ps.setString(1, roleName);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                users.add(extractUser(rs));
+                users.add(ResultSetFactory.createUser(rs));
             }
             ps.close();
             rs.close();
@@ -106,7 +96,7 @@ public class UserDaoImpl implements UserDao {
             ps.setString(2, userDetails.getUser().getPassword());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(extractUser(rs));
+                return Optional.of(ResultSetFactory.createUser(rs));
             }
             ps.close();
             rs.close();
@@ -126,7 +116,7 @@ public class UserDaoImpl implements UserDao {
             ps.setString(1, university);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                users.add(extractUser(rs));
+                users.add(ResultSetFactory.createUser(rs));
             }
             ps.close();
             rs.close();

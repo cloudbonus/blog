@@ -1,10 +1,9 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.OrderDto;
 import com.github.blog.service.OrderService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -13,27 +12,22 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
+@AllArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public OrderController(OrderService orderService, ObjectMapper objectMapper) {
-        this.orderService = orderService;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     public String create(OrderDto orderDto) {
-        return convertToJson(orderService.create(orderDto));
+        return mapper.convertToJson(orderService.create(orderDto));
     }
 
     public String findById(int id) {
-        return convertToJson(orderService.findById(id));
+        return mapper.convertToJson(orderService.findById(id));
     }
 
     public String findAll() {
         List<OrderDto> orders = orderService.findAll();
-        return convertToJsonArray(orders);
+        return mapper.convertToJson(orders);
     }
 
     public OrderDto update(int id, OrderDto orderDto) {
@@ -47,14 +41,5 @@ public class OrderController {
         else return "Could not remove";
     }
 
-    @SneakyThrows
-    private String convertToJson(OrderDto orderDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(orderDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<OrderDto> orders) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(orders);
-    }
 }
 

@@ -1,15 +1,17 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.annotation.Transaction;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dao.UserRoleDao;
+import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.dto.UserDto;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
+import com.github.blog.model.UserDetails;
 import com.github.blog.model.UserRole;
 import com.github.blog.service.UserService;
+import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +30,12 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final RoleDao roleDao;
     private final UserRoleDao userRoleDao;
-    private final ObjectMapper objectMapper;
+    private final DefaultMapper mapper;
 
     @Override
     @Transaction
     public UserDto create(UserDto userDto) {
-        User user = convertToObject(userDto);
+        User user = mapper.map(userDto, User.class);
 
         Optional<Role> result = roleDao.findByName("ROLE_USER");
 
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
         userRoleDao.create(userRole);
 
-        return convertToDto(user);
+        return mapper.map(user, UserDto.class);
     }
 
     @Override
@@ -70,13 +72,21 @@ public class UserServiceImpl implements UserService {
 
         enrichUser(user);
 
-        return convertToDto(user);
+        return mapper.map(user, UserDto.class);
     }
 
     @Override
-    public List<UserDto> findAllByUniversity(String university) {
-        List<User> users = userDao.findAllByUniversity(university);
-        return users.stream().map(this::convertToDto).toList();
+    public List<UserDto> findAllByUniversity(UserDetailsDto userDetailsDto) {
+        UserDetails userDetails = mapper.map(userDetailsDto, UserDetails.class);
+
+        List<User> users = userDao.findAllByUniversity(userDetails.getUniversityName());
+        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
+    }
+
+    @Override
+    public List<UserDto> findAllByRole(String role) {
+        List<User> users = userDao.findAllByRole(role);
+        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
     }
 
     @Override
@@ -86,7 +96,7 @@ public class UserServiceImpl implements UserService {
         if (users.isEmpty()) {
             throw new RuntimeException("Cannot find any users");
         }
-        return users.stream().map(this::convertToDto).toList();
+        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
     }
 
     @Override
@@ -97,7 +107,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found");
         }
 
-        User updatedUser = convertToObject(userDto);
+        User updatedUser = mapper.map(userDto, User.class);
         User user = result.get();
 
         updatedUser.setId(user.getId());
@@ -106,7 +116,7 @@ public class UserServiceImpl implements UserService {
 
         updatedUser = userDao.update(updatedUser);
 
-        return convertToDto(updatedUser);
+        return mapper.map(updatedUser, UserDto.class);
     }
 
     @Override
@@ -115,14 +125,6 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             return -1;
         } else return user.getId();
-    }
-
-    private User convertToObject(UserDto userDto) {
-        return objectMapper.convertValue(userDto, User.class);
-    }
-
-    private UserDto convertToDto(User user) {
-        return objectMapper.convertValue(user, UserDto.class);
     }
 
     private void enrichUser(User user) {

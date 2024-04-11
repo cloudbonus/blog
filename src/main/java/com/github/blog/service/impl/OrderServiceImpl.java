@@ -1,11 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.OrderDao;
 import com.github.blog.dto.OrderDto;
 import com.github.blog.model.Order;
 import com.github.blog.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,22 +16,17 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Service
+@AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderDao orderDao;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public OrderServiceImpl(OrderDao orderDao, ObjectMapper objectMapper) {
-        this.orderDao = orderDao;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     @Override
     public OrderDto create(OrderDto orderDto) {
-        Order order = convertToObject(orderDto);
+        Order order = mapper.map(orderDto, Order.class);
         enrichOrder(order);
-        return convertToDto(orderDao.create(order));
+        return mapper.map(orderDao.create(order), OrderDto.class);
     }
 
     @Override
@@ -40,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
         if (result.isEmpty()) {
             throw new RuntimeException("Order not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), OrderDto.class);
     }
 
     @Override
@@ -49,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
         if (orders.isEmpty()) {
             throw new RuntimeException("Cannot find any orders");
         }
-        return orders.stream().map(this::convertToDto).toList();
+        return orders.stream().map(o -> mapper.map(o, OrderDto.class)).toList();
     }
 
     @Override
@@ -60,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Order not found");
         }
 
-        Order updatedOrder = convertToObject(orderDto);
+        Order updatedOrder = mapper.map(orderDto, Order.class);
         Order order = result.get();
 
         updatedOrder.setOrderedAt(order.getOrderedAt());
@@ -68,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
 
         updatedOrder = orderDao.update(updatedOrder);
 
-        return convertToDto(updatedOrder);
+        return mapper.map(updatedOrder, OrderDto.class);
     }
 
     @Override
@@ -77,14 +72,6 @@ public class OrderServiceImpl implements OrderService {
         if (order == null) {
             return -1;
         } else return order.getId();
-    }
-
-    private Order convertToObject(OrderDto orderDto) {
-        return objectMapper.convertValue(orderDto, Order.class);
-    }
-
-    private OrderDto convertToDto(Order order) {
-        return objectMapper.convertValue(order, OrderDto.class);
     }
 
     private void enrichOrder(Order order) {

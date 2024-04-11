@@ -1,10 +1,9 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.service.CommentReactionService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -13,31 +12,26 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
+@AllArgsConstructor
 public class CommentReactionController {
     private final CommentReactionService commentReactionService;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public CommentReactionController(CommentReactionService commentReactionService, ObjectMapper objectMapper) {
-        this.commentReactionService = commentReactionService;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     public String create(CommentReactionDto commentReactionDto) {
-        return convertToJson(commentReactionService.create(commentReactionDto));
+        return mapper.convertToJson(commentReactionService.create(commentReactionDto));
     }
 
     public String findById(int id) {
-        return convertToJson(commentReactionService.findById(id));
+        return mapper.convertToJson(commentReactionService.findById(id));
     }
 
     public String findAll() {
         List<CommentReactionDto> commentReactions = commentReactionService.findAll();
-        return convertToJsonArray(commentReactions);
+        return mapper.convertToJson(commentReactions);
     }
 
     public String update(int id, CommentReactionDto commentReactionDto) {
-        return convertToJson(commentReactionService.update(id, commentReactionDto));
+        return mapper.convertToJson(commentReactionService.update(id, commentReactionDto));
     }
 
     public String remove(int id) {
@@ -45,16 +39,6 @@ public class CommentReactionController {
         if (result > 0)
             return String.format("Removed Successfully %d", result);
         else return "Could not remove";
-    }
-
-    @SneakyThrows
-    private String convertToJson(CommentReactionDto commentReactionDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(commentReactionDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<CommentReactionDto> commentReactions) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(commentReactions);
     }
 }
 

@@ -2,7 +2,7 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserRoleDao;
 import com.github.blog.model.UserRole;
-import com.github.blog.util.DefaultConnectionHolder;
+import com.github.blog.util.ConnectionHolder;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +16,7 @@ import java.sql.SQLException;
 @Repository
 @AllArgsConstructor
 public class UserRoleImpl implements UserRoleDao {
-    public final DefaultConnectionHolder connectionHolder;
+    public final ConnectionHolder connectionHolder;
 
     @Override
     public UserRole create(UserRole userRole) {

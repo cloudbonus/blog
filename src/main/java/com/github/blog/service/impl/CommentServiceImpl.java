@@ -1,11 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.CommentDao;
 import com.github.blog.dto.CommentDto;
 import com.github.blog.model.Comment;
 import com.github.blog.service.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,22 +16,18 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Service
+@AllArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;
-    private final ObjectMapper objectMapper;
+    private final DefaultMapper mapper;
 
-    @Autowired
-    public CommentServiceImpl(CommentDao commentDao, ObjectMapper objectMapper) {
-        this.commentDao = commentDao;
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public CommentDto create(CommentDto commentDto) {
-        Comment comment = convertToObject(commentDto);
+        Comment comment = mapper.map(commentDto, Comment.class);
         enrichComment(comment);
-        return convertToDto(commentDao.create(comment));
+        return mapper.map(commentDao.create(comment), CommentDto.class);
     }
 
     @Override
@@ -40,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
         if (result.isEmpty()) {
             throw new RuntimeException("Comment not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), CommentDto.class);
     }
 
     @Override
@@ -49,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
         if (comments.isEmpty()) {
             throw new RuntimeException("Cannot find any comments");
         }
-        return comments.stream().map(this::convertToDto).toList();
+        return comments.stream().map(c -> mapper.map(c, CommentDto.class)).toList();
     }
 
     @Override
@@ -60,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
             throw new RuntimeException("Comment not found");
         }
 
-        Comment updatedComment = convertToObject(commentDto);
+        Comment updatedComment = mapper.map(commentDto, Comment.class);
         Comment comment = result.get();
 
         updatedComment.setId(comment.getId());
@@ -68,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
 
         updatedComment = commentDao.update(updatedComment);
 
-        return convertToDto(updatedComment);
+        return mapper.map(updatedComment, CommentDto.class);
     }
 
     @Override
@@ -77,14 +73,6 @@ public class CommentServiceImpl implements CommentService {
         if (comment == null) {
             return -1;
         } else return comment.getId();
-    }
-
-    private Comment convertToObject(CommentDto commentDto) {
-        return objectMapper.convertValue(commentDto, Comment.class);
-    }
-
-    private CommentDto convertToDto(Comment comment) {
-        return objectMapper.convertValue(comment, CommentDto.class);
     }
 
     private void enrichComment(Comment comment) {

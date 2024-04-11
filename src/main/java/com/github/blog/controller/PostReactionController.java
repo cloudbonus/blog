@@ -1,10 +1,9 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.PostReactionDto;
 import com.github.blog.service.PostReactionService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -13,31 +12,26 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
+@AllArgsConstructor
 public class PostReactionController {
     private final PostReactionService postReactionService;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public PostReactionController(PostReactionService postReactionService, ObjectMapper objectMapper) {
-        this.postReactionService = postReactionService;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     public String create(PostReactionDto postReactionDto) {
-        return convertToJson(postReactionService.create(postReactionDto));
+        return mapper.convertToJson(postReactionService.create(postReactionDto));
     }
 
     public String findById(int id) {
-        return convertToJson(postReactionService.findById(id));
+        return mapper.convertToJson(postReactionService.findById(id));
     }
 
     public String findAll() {
         List<PostReactionDto> postReactions = postReactionService.findAll();
-        return convertToJsonArray(postReactions);
+        return mapper.convertToJson(postReactions);
     }
 
     public String update(int id, PostReactionDto postReactionDto) {
-        return convertToJson(postReactionService.update(id, postReactionDto));
+        return mapper.convertToJson(postReactionService.update(id, postReactionDto));
     }
 
     public String remove(int id) {
@@ -47,13 +41,4 @@ public class PostReactionController {
         else return "Could not remove";
     }
 
-    @SneakyThrows
-    private String convertToJson(PostReactionDto postReactionDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(postReactionDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<PostReactionDto> postReactions) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(postReactions);
-    }
 }

@@ -1,11 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.PostReactionDao;
 import com.github.blog.dto.PostReactionDto;
 import com.github.blog.model.PostReaction;
 import com.github.blog.service.PostReactionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,21 +15,16 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Service
+@AllArgsConstructor
 public class PostReactionServiceImpl implements PostReactionService {
 
     private final PostReactionDao postReactionDao;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public PostReactionServiceImpl(PostReactionDao postReactionDao, ObjectMapper objectMapper) {
-        this.postReactionDao = postReactionDao;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     @Override
     public PostReactionDto create(PostReactionDto postReactionDto) {
-        PostReaction postReaction = convertToObject(postReactionDto);
-        return convertToDto(postReactionDao.create(postReaction));
+        PostReaction postReaction = mapper.map(postReactionDto, PostReaction.class);
+        return mapper.map(postReactionDao.create(postReaction), PostReactionDto.class);
     }
 
     @Override
@@ -38,7 +33,7 @@ public class PostReactionServiceImpl implements PostReactionService {
         if (result.isEmpty()) {
             throw new RuntimeException("PostReaction not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), PostReactionDto.class);
     }
 
     @Override
@@ -47,7 +42,7 @@ public class PostReactionServiceImpl implements PostReactionService {
         if (postReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any post reactions");
         }
-        return postReactions.stream().map(this::convertToDto).toList();
+        return postReactions.stream().map(p -> mapper.map(p, PostReactionDto.class)).toList();
     }
 
     @Override
@@ -58,14 +53,14 @@ public class PostReactionServiceImpl implements PostReactionService {
             throw new RuntimeException("PostReaction not found");
         }
 
-        PostReaction updatedPostReaction = convertToObject(postReactionDto);
+        PostReaction updatedPostReaction = mapper.map(postReactionDto, PostReaction.class);
         PostReaction postReaction = result.get();
 
         updatedPostReaction.setId(postReaction.getId());
 
         updatedPostReaction = postReactionDao.update(updatedPostReaction);
 
-        return convertToDto(updatedPostReaction);
+        return mapper.map(updatedPostReaction, PostReactionDto.class);
     }
 
     @Override
@@ -74,13 +69,5 @@ public class PostReactionServiceImpl implements PostReactionService {
         if (postReaction == null) {
             return -1;
         } else return postReaction.getId();
-    }
-
-    private PostReaction convertToObject(PostReactionDto postReactionDto) {
-        return objectMapper.convertValue(postReactionDto, PostReaction.class);
-    }
-
-    private PostReactionDto convertToDto(PostReaction postReaction) {
-        return objectMapper.convertValue(postReaction, PostReactionDto.class);
     }
 }

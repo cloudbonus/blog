@@ -1,11 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.TagDao;
 import com.github.blog.dto.TagDto;
 import com.github.blog.model.Tag;
 import com.github.blog.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,21 +15,16 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Service
+@AllArgsConstructor
 public class TagServiceImpl implements TagService {
 
     private final TagDao tagDao;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public TagServiceImpl(TagDao tagDao, ObjectMapper objectMapper) {
-        this.tagDao = tagDao;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     @Override
     public TagDto create(TagDto tagDto) {
-        Tag tag = convertToObject(tagDto);
-        return convertToDto(tagDao.create(tag));
+        Tag tag = mapper.map(tagDto, Tag.class);
+        return mapper.map(tagDao.create(tag), TagDto.class);
     }
 
     @Override
@@ -38,7 +33,7 @@ public class TagServiceImpl implements TagService {
         if (result.isEmpty()) {
             throw new RuntimeException("Tag not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), TagDto.class);
     }
 
     @Override
@@ -47,7 +42,7 @@ public class TagServiceImpl implements TagService {
         if (tags.isEmpty()) {
             throw new RuntimeException("Cannot find any tags");
         }
-        return tags.stream().map(this::convertToDto).toList();
+        return tags.stream().map(t -> mapper.map(t, TagDto.class)).toList();
     }
 
     @Override
@@ -58,14 +53,14 @@ public class TagServiceImpl implements TagService {
             throw new RuntimeException("Tag not found");
         }
 
-        Tag updatedTag = convertToObject(tagDto);
+        Tag updatedTag = mapper.map(tagDto, Tag.class);
         Tag tag = result.get();
 
         updatedTag.setId(tag.getId());
 
         updatedTag = tagDao.update(updatedTag);
 
-        return convertToDto(updatedTag);
+        return mapper.map(updatedTag, TagDto.class);
     }
 
     @Override
@@ -74,13 +69,5 @@ public class TagServiceImpl implements TagService {
         if (tag == null) {
             return -1;
         } else return tag.getId();
-    }
-
-    private Tag convertToObject(TagDto tagDto) {
-        return objectMapper.convertValue(tagDto, Tag.class);
-    }
-
-    private TagDto convertToDto(Tag tag) {
-        return objectMapper.convertValue(tag, TagDto.class);
     }
 }

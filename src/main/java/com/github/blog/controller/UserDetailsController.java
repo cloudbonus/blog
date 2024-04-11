@@ -1,10 +1,9 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.service.UserDetailsService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -13,31 +12,26 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
+@AllArgsConstructor
 public class UserDetailsController {
     private final UserDetailsService userDetailsService;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public UserDetailsController(UserDetailsService userDetailsService, ObjectMapper objectMapper) {
-        this.userDetailsService = userDetailsService;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     public String create(UserDetailsDto userDetails) {
-        return convertToJson(userDetailsService.create(userDetails));
+        return mapper.convertToJson(userDetailsService.create(userDetails));
     }
 
     public String findById(int id) {
-        return convertToJson(userDetailsService.findById(id));
+        return mapper.convertToJson(userDetailsService.findById(id));
     }
 
     public String findAll() {
         List<UserDetailsDto> userDetailsDto = userDetailsService.findAll();
-        return convertToJsonArray(userDetailsDto);
+        return mapper.convertToJson(userDetailsDto);
     }
 
     public String update(int id, UserDetailsDto userDetailsDto) {
-        return convertToJson(userDetailsService.update(id, userDetailsDto));
+        return mapper.convertToJson(userDetailsService.update(id, userDetailsDto));
     }
 
     public String remove(int id) {
@@ -47,13 +41,4 @@ public class UserDetailsController {
         else return "Could not remove";
     }
 
-    @SneakyThrows
-    private String convertToJson(UserDetailsDto userDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<UserDetailsDto> users) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(users);
-    }
 }

@@ -1,10 +1,9 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.TagDto;
 import com.github.blog.service.TagService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.blog.util.DefaultMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -13,31 +12,26 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
+@AllArgsConstructor
 public class TagController {
     private final TagService tagService;
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public TagController(TagService tagService, ObjectMapper objectMapper) {
-        this.tagService = tagService;
-        this.objectMapper = objectMapper;
-    }
+    private final DefaultMapper mapper;
 
     public String create(TagDto tagDto) {
-        return convertToJson(tagService.create(tagDto));
+        return mapper.convertToJson(tagService.create(tagDto));
     }
 
     public String findById(int id) {
-        return convertToJson(tagService.findById(id));
+        return mapper.convertToJson(tagService.findById(id));
     }
 
     public String findAll() {
         List<TagDto> tags = tagService.findAll();
-        return convertToJsonArray(tags);
+        return mapper.convertToJson(tags);
     }
 
     public String update(int id, TagDto tagDto) {
-        return convertToJson(tagService.update(id, tagDto));
+        return mapper.convertToJson(tagService.update(id, tagDto));
     }
 
     public String remove(int id) {
@@ -47,13 +41,4 @@ public class TagController {
         else return "Could not remove";
     }
 
-    @SneakyThrows
-    private String convertToJson(TagDto tagDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tagDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<TagDto> tags) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tags);
-    }
 }
