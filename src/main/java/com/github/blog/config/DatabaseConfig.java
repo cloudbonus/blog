@@ -1,11 +1,11 @@
 package com.github.blog.config;
 
+import com.github.blog.util.impl.DefaultDataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -16,25 +16,16 @@ import javax.sql.DataSource;
 @RequiredArgsConstructor
 public class DatabaseConfig {
 
-    private final Environment env;
-
     @Bean
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
-        dataSource.setDriverClassName(env.getRequiredProperty("spring.datasource.driver-class-name"));
-        dataSource.setUsername(env.getProperty("spring.datasource.username"));
-        dataSource.setPassword(env.getProperty("spring.datasource.password"));
-        dataSource.setUrl(env.getProperty("spring.datasource.url"));
-
-        return dataSource;
+        return new DefaultDataSource();
     }
 
     @Bean
-    public SpringLiquibase liquibase() {
+    public SpringLiquibase liquibase(@Value("${com.github.blog.changelogFile}") String changelogFile) {
         SpringLiquibase liquibase = new SpringLiquibase();
 
-        liquibase.setChangeLog(env.getProperty("com.github.blog.changelogFile"));
+        liquibase.setChangeLog(changelogFile);
         liquibase.setDataSource(dataSource());
         return liquibase;
     }
