@@ -4,10 +4,10 @@ import com.github.blog.annotation.Transaction;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dao.UserDetailsDao;
 import com.github.blog.dto.UserDetailsDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetails;
 import com.github.blog.service.UserDetailsService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ import java.util.Optional;
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserDetailsDao userDetailsDao;
     private final UserDao userDao;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     @Override
     @Transaction

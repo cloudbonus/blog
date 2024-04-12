@@ -2,9 +2,9 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dto.RoleDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Role;
 import com.github.blog.service.RoleService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleDao roleDao;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     @Override
     public RoleDto create(RoleDto roleDto) {

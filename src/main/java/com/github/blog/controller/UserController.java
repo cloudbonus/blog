@@ -2,8 +2,8 @@ package com.github.blog.controller;
 
 import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.dto.UserDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.service.UserService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     public String create(UserDto userDto) {
         return mapper.convertToJson(userService.create(userDto));

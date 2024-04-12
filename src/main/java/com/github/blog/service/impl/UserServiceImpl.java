@@ -6,12 +6,12 @@ import com.github.blog.dao.UserDao;
 import com.github.blog.dao.UserRoleDao;
 import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.dto.UserDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetails;
 import com.github.blog.model.UserRole;
 import com.github.blog.service.UserService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final RoleDao roleDao;
     private final UserRoleDao userRoleDao;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     @Override
     @Transaction

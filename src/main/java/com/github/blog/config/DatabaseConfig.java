@@ -1,8 +1,8 @@
 package com.github.blog.config;
 
-import com.github.blog.util.impl.DefaultDataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.RequiredArgsConstructor;
+import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +16,21 @@ import javax.sql.DataSource;
 @RequiredArgsConstructor
 public class DatabaseConfig {
 
+    @Value("${spring.datasource.url}")
+    private String url;
+    @Value("${spring.datasource.username}")
+    private String username;
+    @Value("${spring.datasource.password}")
+    private String password;
+
     @Bean
     public DataSource dataSource() {
-        return new DefaultDataSource();
+        PGSimpleDataSource dataSource = new PGSimpleDataSource();
+
+        dataSource.setUrl(url);
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
+        return dataSource;
     }
 
     @Bean

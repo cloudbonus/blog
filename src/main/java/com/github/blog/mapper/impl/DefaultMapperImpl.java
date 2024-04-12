@@ -1,7 +1,7 @@
-package com.github.blog.util.impl;
+package com.github.blog.mapper.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.util.DefaultMapper;
+import com.github.blog.mapper.Mapper;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @AllArgsConstructor
 @Component
-public class DefaultMapperImpl implements DefaultMapper {
+public class DefaultMapperImpl implements Mapper {
     private final ObjectMapper objectMapper;
 
     @Override

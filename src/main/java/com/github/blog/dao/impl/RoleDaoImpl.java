@@ -1,9 +1,9 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.RoleDao;
+import com.github.blog.mapper.RoleRowMapper;
 import com.github.blog.model.Role;
 import com.github.blog.util.ConnectionHolder;
-import com.github.blog.util.impl.ResultSetFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -22,7 +22,8 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class RoleDaoImpl implements RoleDao {
-    public final ConnectionHolder connectionHolder;
+    private final RoleRowMapper mapper;
+    private final ConnectionHolder connectionHolder;
 
     @Override
     public Optional<Role> findById(Integer id) {
@@ -33,10 +34,11 @@ public class RoleDaoImpl implements RoleDao {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(ResultSetFactory.createRole(rs));
+                return Optional.of(mapper.mapRow(rs, rs.getRow()));
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -52,10 +54,11 @@ public class RoleDaoImpl implements RoleDao {
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(ResultSetFactory.createRole(rs));
+                return Optional.of(mapper.mapRow(rs, rs.getRow()));
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -71,10 +74,11 @@ public class RoleDaoImpl implements RoleDao {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(findAllQuery);
             while (rs.next()) {
-                roles.add(ResultSetFactory.createRole(rs));
+                roles.add(mapper.mapRow(rs, rs.getRow()));
             }
             st.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -85,8 +89,8 @@ public class RoleDaoImpl implements RoleDao {
     public Role create(Role role) {
         String createQuery = "INSERT INTO blogging_platform.role (role_name) VALUES (?)";
         try {
-            Connection con = connectionHolder.getConnection();
-            PreparedStatement ps = con.prepareStatement(createQuery, Statement.RETURN_GENERATED_KEYS);
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(createQuery, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, role.getName());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
@@ -95,6 +99,7 @@ public class RoleDaoImpl implements RoleDao {
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -114,6 +119,7 @@ public class RoleDaoImpl implements RoleDao {
                 throw new SQLException("Updating role failed, no rows affected.");
             }
             ps.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -134,6 +140,7 @@ public class RoleDaoImpl implements RoleDao {
                     throw new SQLException("Deleting role failed, no rows affected.");
                 }
                 ps.close();
+                connectionHolder.releaseConnection(conn);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

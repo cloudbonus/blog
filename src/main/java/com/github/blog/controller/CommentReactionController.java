@@ -1,8 +1,8 @@
 package com.github.blog.controller;
 
 import com.github.blog.dto.CommentReactionDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.service.CommentReactionService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentReactionController {
     private final CommentReactionService commentReactionService;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     public String create(CommentReactionDto commentReactionDto) {
         return mapper.convertToJson(commentReactionService.create(commentReactionDto));

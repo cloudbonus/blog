@@ -1,9 +1,9 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDetailsDao;
+import com.github.blog.mapper.UserDetailsRowMapper;
 import com.github.blog.model.UserDetails;
 import com.github.blog.util.ConnectionHolder;
-import com.github.blog.util.impl.ResultSetFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +20,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDetailsDaoImpl implements UserDetailsDao {
 
-    public final ConnectionHolder connectionHolder;
+    private final UserDetailsRowMapper mapper;
+    private final ConnectionHolder connectionHolder;
 
     @Override
     public Optional<UserDetails> findById(Integer id) {
@@ -31,10 +32,11 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(ResultSetFactory.createUserDetails(rs));
+                return Optional.of(mapper.mapRow(rs, rs.getRow()));
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -50,10 +52,11 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(findAllQuery);
             while (rs.next()) {
-                userDetails.add(ResultSetFactory.createUserDetails(rs));
+                userDetails.add(mapper.mapRow(rs, rs.getRow()));
             }
             st.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -78,6 +81,9 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             if (rs.next()) {
                 userDetails.setId((int) rs.getLong(1));
             }
+            ps.close();
+            rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -101,6 +107,8 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             if (affectedRows == 0) {
                 throw new SQLException("Updating userDetails failed, no rows affected.");
             }
+            ps.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -121,6 +129,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
                     throw new SQLException("Deleting userDetails failed, no rows affected.");
                 }
                 ps.close();
+                connectionHolder.releaseConnection(conn);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

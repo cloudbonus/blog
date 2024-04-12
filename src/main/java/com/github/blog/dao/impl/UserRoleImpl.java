@@ -16,18 +16,19 @@ import java.sql.SQLException;
 @Repository
 @AllArgsConstructor
 public class UserRoleImpl implements UserRoleDao {
-    public final ConnectionHolder connectionHolder;
+    private final ConnectionHolder connectionHolder;
 
     @Override
     public UserRole create(UserRole userRole) {
         String createQuery = "INSERT INTO blogging_platform.user_role (user_id, role_id) VALUES (?, ?)";
         try {
-            Connection con = connectionHolder.getConnection();
-            PreparedStatement ps = con.prepareStatement(createQuery);
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(createQuery);
             ps.setLong(1, userRole.getUserId());
             ps.setLong(2, userRole.getRoleId());
             ps.executeUpdate();
             ps.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

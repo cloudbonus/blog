@@ -1,8 +1,8 @@
 package com.github.blog.controller;
 
 import com.github.blog.dto.TagDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.service.TagService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TagController {
     private final TagService tagService;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     public String create(TagDto tagDto) {
         return mapper.convertToJson(tagService.create(tagDto));

@@ -2,9 +2,9 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostDao;
 import com.github.blog.dto.PostDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Post;
 import com.github.blog.service.PostService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostDao postDao;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     @Override
     public PostDto create(PostDto postDto) {

@@ -2,9 +2,9 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.CommentReactionDao;
 import com.github.blog.dto.CommentReactionDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.service.CommentReactionService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class CommentReactionServiceImpl implements CommentReactionService {
 
     private final CommentReactionDao commentReactionDao;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     @Override
     public CommentReactionDto create(CommentReactionDto commentReactionDto) {

@@ -1,10 +1,10 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDao;
+import com.github.blog.mapper.UserRowMapper;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetails;
 import com.github.blog.util.ConnectionHolder;
-import com.github.blog.util.impl.ResultSetFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +26,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDaoImpl implements UserDao {
 
-    public final ConnectionHolder connectionHolder;
+    private final UserRowMapper mapper;
+    private final ConnectionHolder connectionHolder;
 
     @Override
     public Optional<User> findById(Integer id) {
@@ -37,10 +38,11 @@ public class UserDaoImpl implements UserDao {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(ResultSetFactory.createUser(rs));
+                return Optional.of(mapper.mapRow(rs, rs.getRow()));
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -56,10 +58,11 @@ public class UserDaoImpl implements UserDao {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(findAllQuery);
             while (rs.next()) {
-                users.add(ResultSetFactory.createUser(rs));
+                users.add(mapper.mapRow(rs, rs.getRow()));
             }
             st.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -77,10 +80,11 @@ public class UserDaoImpl implements UserDao {
             ps.setString(1, roleName);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                users.add(ResultSetFactory.createUser(rs));
+                users.add(mapper.mapRow(rs, rs.getRow()));
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -96,10 +100,11 @@ public class UserDaoImpl implements UserDao {
             ps.setString(2, userDetails.getUser().getPassword());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(ResultSetFactory.createUser(rs));
+                return Optional.of(mapper.mapRow(rs, rs.getRow()));
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -116,10 +121,11 @@ public class UserDaoImpl implements UserDao {
             ps.setString(1, university);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                users.add(ResultSetFactory.createUser(rs));
+                users.add(mapper.mapRow(rs, rs.getRow()));
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -130,8 +136,8 @@ public class UserDaoImpl implements UserDao {
     public User create(User user) {
         String createQuery = "INSERT INTO blogging_platform.user (login, password, email, created_at, last_login) VALUES (?, ?, ?, ?, ?)";
         try {
-            Connection con = connectionHolder.getConnection();
-            PreparedStatement ps = con.prepareStatement(createQuery, Statement.RETURN_GENERATED_KEYS);
+            Connection conn = connectionHolder.getConnection();
+            PreparedStatement ps = conn.prepareStatement(createQuery, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getLogin());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getEmail());
@@ -144,6 +150,7 @@ public class UserDaoImpl implements UserDao {
             }
             ps.close();
             rs.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -167,6 +174,7 @@ public class UserDaoImpl implements UserDao {
                 throw new SQLException("Updating user failed, no rows affected.");
             }
             ps.close();
+            connectionHolder.releaseConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -187,6 +195,7 @@ public class UserDaoImpl implements UserDao {
                     throw new SQLException("Deleting user failed, no rows affected.");
                 }
                 ps.close();
+                connectionHolder.releaseConnection(conn);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

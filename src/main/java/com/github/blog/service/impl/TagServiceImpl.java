@@ -2,9 +2,9 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.TagDao;
 import com.github.blog.dto.TagDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Tag;
 import com.github.blog.service.TagService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class TagServiceImpl implements TagService {
 
     private final TagDao tagDao;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     @Override
     public TagDto create(TagDto tagDto) {

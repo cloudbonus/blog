@@ -2,9 +2,9 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostReactionDao;
 import com.github.blog.dto.PostReactionDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.PostReaction;
 import com.github.blog.service.PostReactionService;
-import com.github.blog.util.DefaultMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class PostReactionServiceImpl implements PostReactionService {
 
     private final PostReactionDao postReactionDao;
-    private final DefaultMapper mapper;
+    private final Mapper mapper;
 
     @Override
     public PostReactionDto create(PostReactionDto postReactionDto) {
