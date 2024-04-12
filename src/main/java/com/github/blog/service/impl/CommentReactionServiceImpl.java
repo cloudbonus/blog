@@ -1,12 +1,12 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.CommentReactionDao;
 import com.github.blog.dto.CommentReactionDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.service.CommentReactionService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,75 +14,62 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
+@AllArgsConstructor
 public class CommentReactionServiceImpl implements CommentReactionService {
 
     private final CommentReactionDao commentReactionDao;
-    private final ObjectMapper objectMapper;
+    private final Mapper mapper;
 
-    @Autowired
-    public CommentReactionServiceImpl(CommentReactionDao commentReactionDao, ObjectMapper objectMapper) {
-        this.commentReactionDao = commentReactionDao;
-        this.objectMapper = objectMapper;
+    @Override
+    public CommentReactionDto create(CommentReactionDto commentReactionDto) {
+        CommentReaction commentReaction = mapper.map(commentReactionDto, CommentReaction.class);
+
+        return mapper.map(commentReactionDao.create(commentReaction), CommentReactionDto.class);
     }
 
     @Override
-    public int create(CommentReactionDto commentReactionDto) {
-        CommentReaction commentReaction = convertToObject(commentReactionDto);
-        return commentReactionDao.save(commentReaction);
-    }
-
-    @Override
-    public CommentReactionDto readById(int id) {
-        Optional<CommentReaction> result = commentReactionDao.getById(id);
+    public CommentReactionDto findById(int id) {
+        Optional<CommentReaction> result = commentReactionDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("CommentReaction not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), CommentReactionDto.class);
     }
 
     @Override
-    public List<CommentReactionDto> readAll() {
-        List<CommentReaction> commentReactions = commentReactionDao.getAll();
+    public List<CommentReactionDto> findAll() {
+        List<CommentReaction> commentReactions = commentReactionDao.findAll();
         if (commentReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any comment reactions");
         }
-        return commentReactions.stream().map(this::convertToDto).toList();
+        return commentReactions.stream().map(c -> mapper.map(c, CommentReactionDto.class)).toList();
     }
 
     @Override
     public CommentReactionDto update(int id, CommentReactionDto commentReactionDto) {
-        Optional<CommentReaction> result = commentReactionDao.getById(id);
+        Optional<CommentReaction> result = commentReactionDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("CommentReaction not found");
         }
 
-        CommentReaction updatedCommentReaction = convertToObject(commentReactionDto);
+        CommentReaction updatedCommentReaction = mapper.map(commentReactionDto, CommentReaction.class);
         CommentReaction commentReaction = result.get();
 
         updatedCommentReaction.setId(commentReaction.getId());
 
-        result = commentReactionDao.update(updatedCommentReaction);
+        updatedCommentReaction = commentReactionDao.update(updatedCommentReaction);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update comment reaction");
-        }
-
-        return convertToDto(result.get());
+        return mapper.map(updatedCommentReaction, CommentReactionDto.class);
     }
 
     @Override
-    public boolean delete(int id) {
-        return commentReactionDao.deleteById(id);
-    }
-
-    private CommentReaction convertToObject(CommentReactionDto commentReactionDto) {
-        return objectMapper.convertValue(commentReactionDto, CommentReaction.class);
-    }
-
-    private CommentReactionDto convertToDto(CommentReaction commentReaction) {
-        return objectMapper.convertValue(commentReaction, CommentReactionDto.class);
+    public int remove(int id) {
+        CommentReaction commentReaction = commentReactionDao.remove(id);
+        if (commentReaction == null) {
+            return -1;
+        } else return commentReaction.getId();
     }
 }
 

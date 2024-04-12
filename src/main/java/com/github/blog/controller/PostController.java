@@ -1,56 +1,43 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.PostDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.service.PostService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
+@AllArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final ObjectMapper objectMapper;
+    private final Mapper mapper;
 
-    @Autowired
-    public PostController(PostService postService, ObjectMapper objectMapper) {
-        this.postService = postService;
-        this.objectMapper = objectMapper;
+    public String create(PostDto postDto) {
+        return mapper.convertToJson(postService.create(postDto));
     }
 
-    public int create(PostDto postDto) {
-        return postService.create(postDto);
+    public String findById(int id) {
+        return mapper.convertToJson(postService.findById(id));
     }
 
-    public String readById(int id) {
-        return convertToJson(postService.readById(id));
+    public String findAll() {
+        List<PostDto> posts = postService.findAll();
+        return mapper.convertToJson(posts);
     }
 
-    public String readAll() {
-        List<PostDto> posts = postService.readAll();
-        return convertToJsonArray(posts);
+    public String update(int id, PostDto postDto) {
+        return mapper.convertToJson(postService.update(id, postDto));
     }
 
-    public PostDto update(int id, PostDto postDto) {
-        return postService.update(id, postDto);
-    }
-
-    public boolean delete(int id) {
-        return postService.delete(id);
-    }
-
-    @SneakyThrows
-    private String convertToJson(PostDto postDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(postDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<PostDto> posts) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(posts);
+    public String remove(int id) {
+        int result = postService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 }

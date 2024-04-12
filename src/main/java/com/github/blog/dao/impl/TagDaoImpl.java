@@ -2,50 +2,63 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.TagDao;
 import com.github.blog.model.Tag;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Repository
 public class TagDaoImpl implements TagDao {
-    private final List<Tag> tags = new ArrayList<>();
+    private static final List<Tag> TAGS = new CopyOnWriteArrayList<>();
 
     @Override
-    public Optional<Tag> getById(int id) {
-        return tags.stream().filter(t -> t.getId() == id).findAny();
+    public Optional<Tag> findById(Integer id) {
+        return TAGS.stream().filter(t -> t.getId() == id).findAny();
     }
 
     @Override
-    public List<Tag> getAll() {
-        return tags;
+    public List<Tag> findAll() {
+        return TAGS;
     }
 
     @Override
-    public int save(Tag tag) {
-        tags.add(tag);
-        int index = tags.size();
+    public Tag create(Tag tag) {
+        TAGS.add(tag);
+        int index = TAGS.size();
         tag.setId(index);
-        return index;
+        return tag;
     }
 
     @Override
-    public Optional<Tag> update(Tag tag) {
-        for (int i = 0; i < tags.size(); i++) {
-            if (tags.get(i).getId() == tag.getId()) {
-                tags.set(i, tag);
-                return Optional.of(tag);
+    public Tag update(Tag tag) {
+        for (int i = 0; i < TAGS.size(); i++) {
+            if (TAGS.get(i).getId() == tag.getId()) {
+                TAGS.set(i, tag);
+                return tag;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public boolean deleteById(int id) {
-        return tags.removeIf(t -> t.getId() == id);
+    public Tag remove(Integer id) {
+        Tag tagToRemove = null;
+
+        for (Tag t : TAGS) {
+            if (t.getId() == id) {
+                tagToRemove = t;
+                break;
+            }
+        }
+
+        if (tagToRemove != null) {
+            TAGS.remove(tagToRemove);
+        }
+
+        return tagToRemove;
     }
 }

@@ -1,12 +1,15 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.blog.annotation.Transaction;
+import com.github.blog.dao.UserDao;
 import com.github.blog.dao.UserDetailsDao;
 import com.github.blog.dto.UserDetailsDto;
+import com.github.blog.mapper.Mapper;
+import com.github.blog.model.User;
 import com.github.blog.model.UserDetails;
 import com.github.blog.service.UserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,69 +17,71 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
+@AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserDetailsDao userDetailsDao;
-    private final ObjectMapper objectMapper;
+    private final UserDao userDao;
+    private final Mapper mapper;
 
-    @Autowired
-    public UserDetailsServiceImpl(UserDetailsDao userDetailsDao, ObjectMapper objectMapper) {
-        this.userDetailsDao = userDetailsDao;
-        this.objectMapper = objectMapper;
+    @Override
+    @Transaction
+    public UserDetailsDto create(UserDetailsDto userDetailsDto) {
+        UserDetails userDetails = mapper.map(userDetailsDto, UserDetails.class);
+
+        Optional<User> result = userDao.findByLoginAndPassword(userDetails);
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        User userForUserDetails = result.get();
+        userDetails.setId(userForUserDetails.getId());
+
+        userDetails = userDetailsDao.create(userDetails);
+        return mapper.map(userDetails, UserDetailsDto.class);
     }
 
-    public int create(UserDetailsDto userDetailsDto) {
-        UserDetails userDetails = convertToObject(userDetailsDto);
-        return userDetailsDao.save(userDetails);
-    }
-
-    public UserDetailsDto readById(int id) {
-        Optional<UserDetails> result = userDetailsDao.getById(id);
+    @Override
+    public UserDetailsDto findById(int id) {
+        Optional<UserDetails> result = userDetailsDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("User Details not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), UserDetailsDto.class);
     }
 
-    public List<UserDetailsDto> readAll() {
-        List<UserDetails> userDetails = userDetailsDao.getAll();
+    @Override
+    public List<UserDetailsDto> findAll() {
+        List<UserDetails> userDetails = userDetailsDao.findAll();
         if (userDetails.isEmpty()) {
             throw new RuntimeException("Cannot find any user details");
         }
-        return userDetails.stream().map(this::convertToDto).toList();
+        return userDetails.stream().map(u -> mapper.map(u, UserDetailsDto.class)).toList();
     }
 
+    @Override
     public UserDetailsDto update(int id, UserDetailsDto userDetailsDto) {
-        Optional<UserDetails> result = userDetailsDao.getById(id);
+        Optional<UserDetails> result = userDetailsDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("User Details not found");
         }
 
-        UserDetails updatedUserDetails = convertToObject(userDetailsDto);
+        UserDetails updatedUserDetails = mapper.map(userDetailsDto, UserDetails.class);
         UserDetails userDetails = result.get();
 
         updatedUserDetails.setId(userDetails.getId());
 
-        result = userDetailsDao.update(updatedUserDetails);
+        updatedUserDetails = userDetailsDao.update(updatedUserDetails);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update user details");
-        }
-
-        return convertToDto(result.get());
+        return mapper.map(updatedUserDetails, UserDetailsDto.class);
     }
 
-    public boolean delete(int id) {
-        return userDetailsDao.deleteById(id);
+    @Override
+    public int remove(int id) {
+        UserDetails userDetails = userDetailsDao.remove(id);
+        if (userDetails == null) {
+            return -1;
+        } else return userDetails.getId();
     }
-
-    private UserDetails convertToObject(UserDetailsDto userDetailsDto) {
-        return objectMapper.convertValue(userDetailsDto, UserDetails.class);
-    }
-
-    private UserDetailsDto convertToDto(UserDetails userDetails) {
-        return objectMapper.convertValue(userDetails, UserDetailsDto.class);
-    }
-
 }

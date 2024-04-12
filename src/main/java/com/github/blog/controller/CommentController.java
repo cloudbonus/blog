@@ -1,57 +1,44 @@
 package com.github.blog.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dto.CommentDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.service.CommentService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Controller
+@AllArgsConstructor
 public class CommentController {
     private final CommentService commentService;
-    private final ObjectMapper objectMapper;
+    private final Mapper mapper;
 
-    @Autowired
-    public CommentController(CommentService commentService, ObjectMapper objectMapper) {
-        this.commentService = commentService;
-        this.objectMapper = objectMapper;
+    public String create(CommentDto commentDto) {
+        return mapper.convertToJson(commentService.create(commentDto));
     }
 
-    public int create(CommentDto commentDto) {
-        return commentService.create(commentDto);
+    public String findById(int id) {
+        return mapper.convertToJson(commentService.findById(id));
     }
 
-    public String readById(int id) {
-        return convertToJson(commentService.readById(id));
+    public String findAll() {
+        List<CommentDto> comments = commentService.findAll();
+        return mapper.convertToJson(comments);
     }
 
-    public String readAll() {
-        List<CommentDto> comments = commentService.readAll();
-        return convertToJsonArray(comments);
+    public String update(int id, CommentDto commentDto) {
+        return mapper.convertToJson(commentService.update(id, commentDto));
     }
 
-    public CommentDto update(int id, CommentDto commentDto) {
-        return commentService.update(id, commentDto);
-    }
-
-    public boolean delete(int id) {
-        return commentService.delete(id);
-    }
-
-    @SneakyThrows
-    private String convertToJson(CommentDto commentDto) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(commentDto);
-    }
-
-    @SneakyThrows
-    private String convertToJsonArray(List<CommentDto> comments) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(comments);
+    public String remove(int id) {
+        int result = commentService.remove(id);
+        if (result > 0)
+            return String.format("Removed Successfully %d", result);
+        else return "Could not remove";
     }
 }
 

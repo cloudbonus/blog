@@ -2,51 +2,64 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.PostReactionDao;
 import com.github.blog.model.PostReaction;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Repository
 public class PostReactionDaoImpl implements PostReactionDao {
-    private final List<PostReaction> reactions = new ArrayList<>();
+    private static final List<PostReaction> POST_REACTIONS = new CopyOnWriteArrayList<>();
 
     @Override
-    public Optional<PostReaction> getById(int id) {
-        return reactions.stream().filter(r -> r.getId() == id).findAny();
+    public Optional<PostReaction> findById(Integer id) {
+        return POST_REACTIONS.stream().filter(r -> r.getId() == id).findAny();
     }
 
     @Override
-    public List<PostReaction> getAll() {
-        return reactions;
+    public List<PostReaction> findAll() {
+        return POST_REACTIONS;
     }
 
     @Override
-    public int save(PostReaction reaction) {
-        reactions.add(reaction);
-        int index = reactions.size();
+    public PostReaction create(PostReaction reaction) {
+        POST_REACTIONS.add(reaction);
+        int index = POST_REACTIONS.size();
         reaction.setId(index);
-        return index;
+        return reaction;
     }
 
     @Override
-    public Optional<PostReaction> update(PostReaction reaction) {
-        for (int i = 0; i < reactions.size(); i++) {
-            if (reactions.get(i).getId() == reaction.getId()) {
-                reactions.set(i, reaction);
-                return Optional.of(reaction);
+    public PostReaction update(PostReaction reaction) {
+        for (int i = 0; i < POST_REACTIONS.size(); i++) {
+            if (POST_REACTIONS.get(i).getId() == reaction.getId()) {
+                POST_REACTIONS.set(i, reaction);
+                return reaction;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public boolean deleteById(int id) {
-        return reactions.removeIf(r -> r.getId() == id);
+    public PostReaction remove(Integer id) {
+        PostReaction postReactionToRemove = null;
+
+        for (PostReaction p : POST_REACTIONS) {
+            if (p.getId() == id) {
+                postReactionToRemove = p;
+                break;
+            }
+        }
+
+        if (postReactionToRemove != null) {
+            POST_REACTIONS.remove(postReactionToRemove);
+        }
+
+        return postReactionToRemove;
     }
 }
 

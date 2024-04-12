@@ -6,14 +6,14 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-public interface CrudDao<T> {
-    Optional<T> getById(int id);
+public interface CrudDao<T, ID> {
+    Optional<T> findById(ID id);
 
-    List<T> getAll();
+    List<T> findAll();
 
-    int save(T t);
+    T create(T t);
 
-    Optional<T> update(T t);
+    T update(T t);
 
-    boolean deleteById(int id);
+    T remove(ID id);
 }

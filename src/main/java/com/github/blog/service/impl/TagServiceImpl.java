@@ -1,12 +1,12 @@
 package com.github.blog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.dao.TagDao;
 import com.github.blog.dto.TagDto;
+import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Tag;
 import com.github.blog.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,74 +14,60 @@ import java.util.Optional;
 /**
  * @author Raman Haurylau
  */
-@Component
+@Service
+@AllArgsConstructor
 public class TagServiceImpl implements TagService {
 
     private final TagDao tagDao;
-    private final ObjectMapper objectMapper;
+    private final Mapper mapper;
 
-    @Autowired
-    public TagServiceImpl(TagDao tagDao, ObjectMapper objectMapper) {
-        this.tagDao = tagDao;
-        this.objectMapper = objectMapper;
+    @Override
+    public TagDto create(TagDto tagDto) {
+        Tag tag = mapper.map(tagDto, Tag.class);
+        return mapper.map(tagDao.create(tag), TagDto.class);
     }
 
     @Override
-    public int create(TagDto tagDto) {
-        Tag tag = convertToObject(tagDto);
-        return tagDao.save(tag);
-    }
-
-    @Override
-    public TagDto readById(int id) {
-        Optional<Tag> result = tagDao.getById(id);
+    public TagDto findById(int id) {
+        Optional<Tag> result = tagDao.findById(id);
         if (result.isEmpty()) {
             throw new RuntimeException("Tag not found");
         }
-        return convertToDto(result.get());
+        return mapper.map(result.get(), TagDto.class);
     }
 
     @Override
-    public List<TagDto> readAll() {
-        List<Tag> tags = tagDao.getAll();
+    public List<TagDto> findAll() {
+        List<Tag> tags = tagDao.findAll();
         if (tags.isEmpty()) {
             throw new RuntimeException("Cannot find any tags");
         }
-        return tags.stream().map(this::convertToDto).toList();
+        return tags.stream().map(t -> mapper.map(t, TagDto.class)).toList();
     }
 
     @Override
     public TagDto update(int id, TagDto tagDto) {
-        Optional<Tag> result = tagDao.getById(id);
+        Optional<Tag> result = tagDao.findById(id);
 
         if (result.isEmpty()) {
             throw new RuntimeException("Tag not found");
         }
 
-        Tag updatedTag = convertToObject(tagDto);
+        Tag updatedTag = mapper.map(tagDto, Tag.class);
         Tag tag = result.get();
 
         updatedTag.setId(tag.getId());
 
-        result = tagDao.update(updatedTag);
+        updatedTag = tagDao.update(updatedTag);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("Couldn't update tag");
-        }
-
-        return convertToDto(result.get());
+        return mapper.map(updatedTag, TagDto.class);
     }
 
     @Override
-    public boolean delete(int id) {
-        return tagDao.deleteById(id);
-    }
-
-    private Tag convertToObject(TagDto tagDto) {
-        return objectMapper.convertValue(tagDto, Tag.class);
-    }
-
-    private TagDto convertToDto(Tag tag) {
-        return objectMapper.convertValue(tag, TagDto.class);
+    public int remove(int id) {
+        Tag tag = tagDao.remove(id);
+        if (tag == null) {
+            return -1;
+        } else return tag.getId();
     }
 }

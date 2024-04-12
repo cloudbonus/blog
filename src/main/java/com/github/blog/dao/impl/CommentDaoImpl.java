@@ -2,51 +2,64 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.CommentDao;
 import com.github.blog.model.Comment;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
-@Component
+@Repository
 public class CommentDaoImpl implements CommentDao {
-    private final List<Comment> comments = new ArrayList<>();
+    private static final List<Comment> COMMENTS = new CopyOnWriteArrayList<>();
 
     @Override
-    public Optional<Comment> getById(int id) {
-        return comments.stream().filter(c -> c.getId() == id).findAny();
+    public Optional<Comment> findById(Integer id) {
+        return COMMENTS.stream().filter(c -> c.getId() == id).findAny();
     }
 
     @Override
-    public List<Comment> getAll() {
-        return comments;
+    public List<Comment> findAll() {
+        return COMMENTS;
     }
 
     @Override
-    public int save(Comment comment) {
-        comments.add(comment);
-        int index = comments.size();
+    public Comment create(Comment comment) {
+        COMMENTS.add(comment);
+        int index = COMMENTS.size();
         comment.setId(index);
-        return index;
+        return comment;
     }
 
     @Override
-    public Optional<Comment> update(Comment comment) {
-        for (int i = 0; i < comments.size(); i++) {
-            if (comments.get(i).getId() == comment.getId()) {
-                comments.set(i, comment);
-                return Optional.of(comment);
+    public Comment update(Comment comment) {
+        for (int i = 0; i < COMMENTS.size(); i++) {
+            if (COMMENTS.get(i).getId() == comment.getId()) {
+                COMMENTS.set(i, comment);
+                return comment;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public boolean deleteById(int id) {
-        return comments.removeIf(c -> c.getId() == id);
+    public Comment remove(Integer id) {
+        Comment commentToRemove = null;
+
+        for (Comment c : COMMENTS) {
+            if (c.getId() == id) {
+                commentToRemove = c;
+                break;
+            }
+        }
+
+        if (commentToRemove != null) {
+            COMMENTS.remove(commentToRemove);
+        }
+
+        return commentToRemove;
     }
 }
 
