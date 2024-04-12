@@ -1,7 +1,7 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDao;
-import com.github.blog.mapper.UserRowMapper;
+import com.github.blog.dao.impl.mapper.RowMapper;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetails;
 import com.github.blog.util.ConnectionHolder;
@@ -26,7 +26,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDaoImpl implements UserDao {
 
-    private final UserRowMapper mapper;
+    private final RowMapper<User> mapper;
     private final ConnectionHolder connectionHolder;
 
     @Override

@@ -1,7 +1,7 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDetailsDao;
-import com.github.blog.mapper.UserDetailsRowMapper;
+import com.github.blog.dao.impl.mapper.RowMapper;
 import com.github.blog.model.UserDetails;
 import com.github.blog.util.ConnectionHolder;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDetailsDaoImpl implements UserDetailsDao {
 
-    private final UserDetailsRowMapper mapper;
+    private final RowMapper<UserDetails> mapper;
     private final ConnectionHolder connectionHolder;
 
     @Override

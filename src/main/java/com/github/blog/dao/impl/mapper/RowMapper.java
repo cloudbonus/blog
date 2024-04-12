@@ -1,4 +1,4 @@
-package com.github.blog.mapper;
+package com.github.blog.dao.impl.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,7 +1,7 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.RoleDao;
-import com.github.blog.mapper.RoleRowMapper;
+import com.github.blog.dao.impl.mapper.RowMapper;
 import com.github.blog.model.Role;
 import com.github.blog.util.ConnectionHolder;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class RoleDaoImpl implements RoleDao {
-    private final RoleRowMapper mapper;
+    private final RowMapper<Role> mapper;
     private final ConnectionHolder connectionHolder;
 
     @Override

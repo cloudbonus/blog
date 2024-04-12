@@ -1,6 +1,6 @@
-package com.github.blog.mapper.impl;
+package com.github.blog.dao.impl.mapper.impl;
 
-import com.github.blog.mapper.UserDetailsRowMapper;
+import com.github.blog.dao.impl.mapper.RowMapper;
 import com.github.blog.model.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * @author Raman Haurylau
  */
 @Component
-public class UserDetailsRowMapperImpl implements UserDetailsRowMapper {
+public class UserDetailsRowMapperImpl implements RowMapper<UserDetails> {
     @Override
     public UserDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
         UserDetails userDetails = new UserDetails();
