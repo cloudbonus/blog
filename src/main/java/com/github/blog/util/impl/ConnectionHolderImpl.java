@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Raman Haurylau
@@ -23,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ConnectionHolderImpl implements DisposableBean, ConnectionHolder {
 
     private final DataSource dataSource;
-    private static final List<Connection> CONNECTION_POOL = new CopyOnWriteArrayList<>();
+    private static final BlockingQueue<Connection> CONNECTION_POOL = new LinkedBlockingQueue<>();
     private static final Map<String, Connection> USED_CONNECTIONS = new ConcurrentHashMap<>();
 
     @Override
@@ -34,11 +34,11 @@ public class ConnectionHolderImpl implements DisposableBean, ConnectionHolder {
         if (USED_CONNECTIONS.containsKey(threadName)) {
             connection = USED_CONNECTIONS.get(threadName);
         } else {
-            if (CONNECTION_POOL.isEmpty()) {
+            connection = CONNECTION_POOL.poll();
+            if (connection == null) {
                 connection = dataSource.getConnection();
                 CONNECTION_POOL.add(connection);
             }
-            connection = CONNECTION_POOL.remove(CONNECTION_POOL.size() - 1);
         }
 
         if (!connection.getAutoCommit() && connection.isClosed()) {
