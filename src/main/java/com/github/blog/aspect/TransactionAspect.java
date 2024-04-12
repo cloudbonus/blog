@@ -34,7 +34,7 @@ public class TransactionAspect {
             log.info("Rollback transaction");
             conn.rollback();
         } finally {
-            conn.close();
+            connectionHolder.releaseConnection(conn);
         }
         return output;
     }

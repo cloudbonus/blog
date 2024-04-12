@@ -9,5 +9,5 @@ import java.sql.SQLException;
 public interface ConnectionHolder {
     Connection getConnection() throws SQLException;
 
-    void closeConnections() throws SQLException;
+    void releaseConnection(Connection connection);
 }

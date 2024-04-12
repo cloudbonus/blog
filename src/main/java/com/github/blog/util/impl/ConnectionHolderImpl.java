@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
@@ -22,57 +22,53 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @AllArgsConstructor
 public class ConnectionHolderImpl implements DisposableBean, ConnectionHolder {
 
-    private static final Queue<Connection> sharedConnections = new ConcurrentLinkedQueue<>();
     private final DataSource dataSource;
-    private final Map<String, Connection> openTransactions = new ConcurrentHashMap<>();
+    private static final List<Connection> CONNECTION_POOL = new CopyOnWriteArrayList<>();
+    private static final Map<String, Connection> USED_CONNECTIONS = new ConcurrentHashMap<>();
 
     @Override
-    public synchronized Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         String threadName = Thread.currentThread().getName();
-        if (sharedConnections.isEmpty()) {
-            Connection connection = dataSource.getConnection();
-            sharedConnections.add(connection);
-            return connection;
+
+        Connection connection;
+        if (USED_CONNECTIONS.containsKey(threadName)) {
+            connection = USED_CONNECTIONS.get(threadName);
+        } else {
+            if (CONNECTION_POOL.isEmpty()) {
+                connection = dataSource.getConnection();
+                CONNECTION_POOL.add(connection);
+            }
+            connection = CONNECTION_POOL.remove(CONNECTION_POOL.size() - 1);
         }
 
-        Connection connection = sharedConnections.poll();
-        try {
-            if (connection.getAutoCommit()) {
-                return connection;
-            } else {
-                if (openTransactions.containsKey(threadName)) {
-                    if (openTransactions.get(threadName).equals(connection)) {
-                        return connection;
-                    } else {
-                        throw new SQLException("Transaction already closed or aborted.");
-                    }
-                } else {
-                    openTransactions.put(threadName, connection);
-                    return connection;
-                }
-            }
-        } catch (SQLException e) {
-            sharedConnections.add(connection);
-            throw e;
+        if (!connection.getAutoCommit() && connection.isClosed()) {
+            throw new SQLException("Transaction already closed");
         }
+
+        USED_CONNECTIONS.putIfAbsent(threadName, connection);
+        return connection;
     }
 
     @Override
-    public synchronized void closeConnections() throws SQLException {
-        for (Connection connection : sharedConnections) {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-            }
+    public void releaseConnection(Connection connection) {
+        String threadName = Thread.currentThread().getName();
+
+        USED_CONNECTIONS.remove(threadName);
+        CONNECTION_POOL.add(connection);
+    }
+
+    public void shutdown() throws SQLException {
+        USED_CONNECTIONS.values().forEach(this::releaseConnection);
+        for (Connection c : CONNECTION_POOL) {
+            c.close();
         }
-        sharedConnections.clear();
-        openTransactions.clear();
+        CONNECTION_POOL.clear();
     }
 
     @Override
     public void destroy() throws SQLException {
         log.info("Closing all connections");
-        closeConnections();
+        shutdown();
     }
 }
-
 
