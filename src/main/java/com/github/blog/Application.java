@@ -1,12 +1,12 @@
 package com.github.blog;
 
+import com.github.blog.config.AppConfig;
 import com.github.blog.controller.UserController;
 import com.github.blog.controller.UserDetailsController;
 import com.github.blog.dto.UserDetailsDto;
 import com.github.blog.dto.UserDto;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.support.AbstractApplicationContext;
 
 import java.util.concurrent.ExecutorService;
@@ -14,11 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
-@ComponentScan("com.github.blog")
 public class Application {
 
     public static void main(String[] args) {
-        AbstractApplicationContext context = new AnnotationConfigApplicationContext(Application.class);
+        AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
         UserDetailsController userDetailsController = context.getBean(UserDetailsController.class);
         UserController userController = context.getBean(UserController.class);
