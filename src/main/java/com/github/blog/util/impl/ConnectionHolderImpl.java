@@ -50,15 +50,19 @@ public class ConnectionHolderImpl implements DisposableBean, ConnectionHolder {
     }
 
     @Override
-    public void releaseConnection(Connection connection) {
+    public void releaseConnection(Connection connection) throws SQLException {
         String threadName = Thread.currentThread().getName();
 
-        USED_CONNECTIONS.remove(threadName);
-        CONNECTION_POOL.add(connection);
+        if (connection.getAutoCommit()) {
+            USED_CONNECTIONS.remove(threadName);
+            CONNECTION_POOL.add(connection);
+        }
     }
 
     public void shutdown() throws SQLException {
-        USED_CONNECTIONS.values().forEach(this::releaseConnection);
+        for (Connection connection : USED_CONNECTIONS.values()) {
+            releaseConnection(connection);
+        }
         for (Connection c : CONNECTION_POOL) {
             c.close();
         }
