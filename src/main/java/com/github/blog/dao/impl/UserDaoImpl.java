@@ -31,7 +31,14 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findById(Integer id) {
-        String findByIdQuery = "SELECT * FROM blogging_platform.user WHERE user_id = ?";
+        String findByIdQuery = """
+                        SELECT u.* , STRING_AGG(CONCAT(r.role_id::text, ':', r.role_name), ',') AS roles
+                            FROM blogging_platform.user u
+                            JOIN blogging_platform.user_role ur ON u.user_id = ur.user_id
+                            JOIN blogging_platform.role r ON ur.role_id = r.role_id
+                            WHERE u.user_id = ?
+                            group by u.user_id;
+                """;
         try {
             Connection conn = connectionHolder.getConnection();
             PreparedStatement ps = conn.prepareStatement(findByIdQuery);
@@ -42,7 +49,7 @@ public class UserDaoImpl implements UserDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +59,13 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        String findAllQuery = "SELECT * FROM blogging_platform.user";
+        String findAllQuery = """
+                        SELECT u.* , STRING_AGG(CONCAT(r.role_id::text, ':', r.role_name), ',') AS roles
+                            FROM blogging_platform.user u
+                            JOIN blogging_platform.user_role ur ON u.user_id = ur.user_id
+                            JOIN blogging_platform.role r ON ur.role_id = r.role_id
+                            group by u.user_id;;
+                """;
         try {
             Connection conn = connectionHolder.getConnection();
             Statement st = conn.createStatement();
@@ -62,7 +75,7 @@ public class UserDaoImpl implements UserDao {
             }
             st.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -73,7 +86,14 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> findAllByRole(String roleName) {
         List<User> users = new ArrayList<>();
-        String findAllByRoleQuery = "SELECT u.* FROM blogging_platform.user u JOIN blogging_platform.user_role ur ON u.user_id = ur.user_id JOIN blogging_platform.role r ON ur.role_id = r.role_id WHERE r.role_name = ?";
+        String findAllByRoleQuery = """
+                    SELECT u.*,  STRING_AGG(CONCAT(r.role_id::text, ':', r.role_name), ',') AS roles
+                        FROM blogging_platform.user u
+                        JOIN blogging_platform.user_role ur ON u.user_id = ur.user_id
+                        JOIN blogging_platform.role r ON ur.role_id = r.role_id
+                        WHERE r.role_name = ?
+                        group by u.user_id;
+            """;
         try {
             Connection conn = connectionHolder.getConnection();
             PreparedStatement ps = conn.prepareStatement(findAllByRoleQuery);
@@ -84,7 +104,7 @@ public class UserDaoImpl implements UserDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -92,7 +112,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     public Optional<User> findByLoginAndPassword(UserDetails userDetails) {
-        String findByLoginAndPasswordQuery = "SELECT * FROM blogging_platform.user WHERE login = ? AND password = ?";
+        String findByLoginAndPasswordQuery = """
+                        SELECT u.* , STRING_AGG(CONCAT(r.role_id::text, ':', r.role_name), ',') AS roles
+                            FROM blogging_platform.user u
+                            JOIN blogging_platform.user_role ur ON u.user_id = ur.user_id
+                            JOIN blogging_platform.role r ON ur.role_id = r.role_id
+                            WHERE login = ? and password = ?
+                            group by u.user_id;
+                """;
         try {
             Connection conn = connectionHolder.getConnection();
             PreparedStatement ps = conn.prepareStatement(findByLoginAndPasswordQuery);
@@ -104,7 +131,7 @@ public class UserDaoImpl implements UserDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -114,7 +141,15 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> findAllByUniversity(String university) {
         List<User> users = new ArrayList<>();
-        String findAllByUniversityQuery = "SELECT u.* FROM blogging_platform.user u JOIN blogging_platform.user_details ud ON u.user_id = ud.user_id WHERE ud.university_name = ?";
+        String findAllByUniversityQuery = """
+                        SELECT u.* , STRING_AGG(CONCAT(r.role_id::text, ':', r.role_name), ',') AS roles
+                            FROM blogging_platform.user u
+                            JOIN blogging_platform.user_role ur ON u.user_id = ur.user_id
+                            JOIN blogging_platform.role r ON ur.role_id = r.role_id
+                            JOIN blogging_platform.user_details ud ON u.user_id = ud.user_id
+                            WHERE ud.university_name = ?
+                            group by u.user_id;
+                """;
         try {
             Connection conn = connectionHolder.getConnection();
             PreparedStatement ps = conn.prepareStatement(findAllByUniversityQuery);
@@ -125,7 +160,7 @@ public class UserDaoImpl implements UserDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -150,7 +185,7 @@ public class UserDaoImpl implements UserDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -174,7 +209,7 @@ public class UserDaoImpl implements UserDao {
                 throw new SQLException("Updating user failed, no rows affected.");
             }
             ps.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -195,7 +230,7 @@ public class UserDaoImpl implements UserDao {
                     throw new SQLException("Deleting user failed, no rows affected.");
                 }
                 ps.close();
-                connectionHolder.releaseConnection(conn);
+                connectionHolder.release();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

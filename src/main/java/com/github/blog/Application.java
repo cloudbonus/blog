@@ -52,7 +52,7 @@ public class Application {
         user1Details.setUser(user1);
         user2Details.setUser(user2);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         executorService.execute(() -> userController.create(user1));
 
@@ -68,7 +68,7 @@ public class Application {
             executorService.shutdownNow();
         }
 
-        executorService = Executors.newFixedThreadPool(2);
+        executorService = Executors.newFixedThreadPool(4);
 
 
         executorService.execute(() -> userDetailsController.create(user1Details));
@@ -85,7 +85,7 @@ public class Application {
             executorService.shutdownNow();
         }
 
-        executorService = Executors.newFixedThreadPool(2);
+        executorService = Executors.newFixedThreadPool(4);
 
 
         executorService.execute(() -> log.info(userController.findAllByUniversity(user2Details)));

@@ -36,7 +36,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +56,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             }
             st.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -83,7 +83,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +108,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
                 throw new SQLException("Updating userDetails failed, no rows affected.");
             }
             ps.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -129,7 +129,7 @@ public class UserDetailsDaoImpl implements UserDetailsDao {
                     throw new SQLException("Deleting userDetails failed, no rows affected.");
                 }
                 ps.close();
-                connectionHolder.releaseConnection(conn);
+                connectionHolder.release();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

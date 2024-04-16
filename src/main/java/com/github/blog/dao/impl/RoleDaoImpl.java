@@ -38,7 +38,7 @@ public class RoleDaoImpl implements RoleDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -58,7 +58,7 @@ public class RoleDaoImpl implements RoleDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -78,7 +78,7 @@ public class RoleDaoImpl implements RoleDao {
             }
             st.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -99,7 +99,7 @@ public class RoleDaoImpl implements RoleDao {
             }
             ps.close();
             rs.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -119,7 +119,7 @@ public class RoleDaoImpl implements RoleDao {
                 throw new SQLException("Updating role failed, no rows affected.");
             }
             ps.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -140,7 +140,7 @@ public class RoleDaoImpl implements RoleDao {
                     throw new SQLException("Deleting role failed, no rows affected.");
                 }
                 ps.close();
-                connectionHolder.releaseConnection(conn);
+                connectionHolder.release();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

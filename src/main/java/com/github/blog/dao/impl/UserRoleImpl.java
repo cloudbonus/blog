@@ -28,7 +28,7 @@ public class UserRoleImpl implements UserRoleDao {
             ps.setLong(2, userRole.getRoleId());
             ps.executeUpdate();
             ps.close();
-            connectionHolder.releaseConnection(conn);
+            connectionHolder.release();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

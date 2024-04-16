@@ -1,9 +1,7 @@
 package com.github.blog.config;
 
 import liquibase.integration.spring.SpringLiquibase;
-import lombok.RequiredArgsConstructor;
 import org.postgresql.ds.PGSimpleDataSource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,32 +11,24 @@ import javax.sql.DataSource;
  * @author Raman Haurylau
  */
 @Configuration
-@RequiredArgsConstructor
 public class DatabaseConfig {
 
-    @Value("${spring.datasource.url}")
-    private String url;
-    @Value("${spring.datasource.username}")
-    private String username;
-    @Value("${spring.datasource.password}")
-    private String password;
-
     @Bean
-    public DataSource dataSource() {
+    public DataSource dataSource(DataSourceProperties dataSourceProperties) {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
 
-        dataSource.setUrl(url);
-        dataSource.setUser(username);
-        dataSource.setPassword(password);
+        dataSource.setUrl(dataSourceProperties.getUrl());
+        dataSource.setUser(dataSourceProperties.getUsername());
+        dataSource.setPassword(dataSourceProperties.getPassword());
         return dataSource;
     }
 
     @Bean
-    public SpringLiquibase liquibase(@Value("${com.github.blog.changelogFile}") String changelogFile) {
+    public SpringLiquibase liquibase(DataSourceProperties dataSourceProperties, DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
 
-        liquibase.setChangeLog(changelogFile);
-        liquibase.setDataSource(dataSource());
+        liquibase.setChangeLog(dataSourceProperties.getChangelogFile());
+        liquibase.setDataSource(dataSource);
         return liquibase;
     }
 }
