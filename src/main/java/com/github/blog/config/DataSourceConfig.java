@@ -1,9 +1,9 @@
 package com.github.blog.config;
 
 import liquibase.integration.spring.SpringLiquibase;
-import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -11,14 +11,14 @@ import javax.sql.DataSource;
  * @author Raman Haurylau
  */
 @Configuration
-public class DatabaseConfig {
-
+public class DataSourceConfig {
     @Bean
     public DataSource dataSource(DataSourceProperties dataSourceProperties) {
-        PGSimpleDataSource dataSource = new PGSimpleDataSource();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
+        dataSource.setDriverClassName(dataSourceProperties.getDriverClassName());
         dataSource.setUrl(dataSourceProperties.getUrl());
-        dataSource.setUser(dataSourceProperties.getUsername());
+        dataSource.setUsername(dataSourceProperties.getUsername());
         dataSource.setPassword(dataSourceProperties.getPassword());
         return dataSource;
     }
