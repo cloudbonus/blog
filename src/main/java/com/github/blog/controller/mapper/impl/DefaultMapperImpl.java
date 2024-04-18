@@ -1,7 +1,7 @@
-package com.github.blog.mapper.impl;
+package com.github.blog.controller.mapper.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.blog.mapper.Mapper;
+import com.github.blog.controller.mapper.JsonMapper;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -11,13 +11,8 @@ import org.springframework.stereotype.Component;
  */
 @AllArgsConstructor
 @Component
-public class DefaultMapperImpl implements Mapper {
+public class DefaultMapperImpl implements JsonMapper {
     private final ObjectMapper objectMapper;
-
-    @Override
-    public <T, U> T map(U source, Class<T> targetClass) {
-        return objectMapper.convertValue(source, targetClass);
-    }
 
     @SneakyThrows
     public <T> String convertToJson(T object) {
