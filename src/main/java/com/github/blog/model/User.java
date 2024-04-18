@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
 @Setter
 @Entity
 @Table(name = "\"user\"", schema = "blogging_platform")
-public class User implements Comparable<User> {
+public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -35,9 +35,4 @@ public class User implements Comparable<User> {
 
     @Column(name = "last_login")
     private OffsetDateTime lastLogin;
-
-    @Override
-    public int compareTo(User o) {
-        return 0;
-    }
 }
