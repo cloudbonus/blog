@@ -2,64 +2,38 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.CommentDao;
 import com.github.blog.model.Comment;
+import com.github.blog.model.Comment_;
+import com.github.blog.model.User_;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Raman Haurylau
  */
 @Repository
-public class CommentDaoImpl implements CommentDao {
-    private static final List<Comment> COMMENTS = new CopyOnWriteArrayList<>();
+public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements CommentDao {
 
-    @Override
-    public Optional<Comment> findById(Integer id) {
-        return COMMENTS.stream().filter(c -> c.getId() == id).findAny();
-    }
+    public List<Comment> findAllByLogin(String login) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Comment> cq = cb.createQuery(Comment.class);
 
-    @Override
-    public List<Comment> findAll() {
-        return COMMENTS;
-    }
+        Root<Comment> commentRoot = cq.from(Comment.class);
 
-    @Override
-    public Comment create(Comment comment) {
-        COMMENTS.add(comment);
-        int index = COMMENTS.size();
-        comment.setId(index);
-        return comment;
-    }
+        commentRoot.fetch(Comment_.user, JoinType.LEFT);
+        cq.select(commentRoot);
+        Predicate loginPredicate = cb.equal(commentRoot.get(Comment_.user).get(User_.login), login);
+        cq.where(loginPredicate);
 
-    @Override
-    public Comment update(Comment comment) {
-        for (int i = 0; i < COMMENTS.size(); i++) {
-            if (COMMENTS.get(i).getId() == comment.getId()) {
-                COMMENTS.set(i, comment);
-                return comment;
-            }
-        }
-        return null;
-    }
+        TypedQuery<Comment> query = entityManager.createQuery(cq);
 
-    @Override
-    public Comment remove(Integer id) {
-        Comment commentToRemove = null;
-
-        for (Comment c : COMMENTS) {
-            if (c.getId() == id) {
-                commentToRemove = c;
-                break;
-            }
-        }
-
-        if (commentToRemove != null) {
-            COMMENTS.remove(commentToRemove);
-        }
-
-        return commentToRemove;
+        return query.getResultList();
     }
 }
 

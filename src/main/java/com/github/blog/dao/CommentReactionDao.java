@@ -5,5 +5,5 @@ import com.github.blog.model.CommentReaction;
 /**
  * @author Raman Haurylau
  */
-public interface CommentReactionDao extends CrudDao<CommentReaction, Integer> {
+public interface CommentReactionDao extends CrudDao<CommentReaction, Long> {
 }
