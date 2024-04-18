@@ -12,22 +12,40 @@ group = "com.github"
 version = "1.0"
 
 ext {
-    springVersion = "6.1.5"
+    springVersion = "6.1.6"
     aspectjVersion = "1.9.22"
+    hibernateVersion="6.4.4.Final"
+    mapStructVersion="1.5.5.Final"
+    junitVersion="5.10.2"
 }
 
 dependencies {
     implementation "org.springframework:spring-context:${springVersion}"
+    implementation "org.springframework:spring-orm:${springVersion}"
+    implementation "org.hibernate.orm:hibernate-core:${hibernateVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0"
     implementation "com.fasterxml.jackson.core:jackson-databind:2.17.0"
     implementation "org.apache.logging.log4j:log4j-api:2.23.1"
     implementation "org.aspectj:aspectjrt:${aspectjVersion}"
-    implementation "org.postgresql:postgresql:42.7.2"
+    implementation 'org.postgresql:postgresql:42.7.3'
     implementation "org.liquibase:liquibase-core:4.27.0"
-    runtimeOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
+    implementation "org.mapstruct:mapstruct:${mapStructVersion}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation "org.springframework:spring-test:${springVersion}"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+
     runtimeOnly "org.apache.logging.log4j:log4j-core:2.23.1"
+    runtimeOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
+
     compileOnly "org.projectlombok:lombok:1.18.32"
+    compileOnly "org.hibernate.orm:hibernate-jpamodelgen:${hibernateVersion}"
+
     annotationProcessor "org.projectlombok:lombok:1.18.32"
+    annotationProcessor "org.hibernate.orm:hibernate-jpamodelgen:${hibernateVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapStructVersion}"
 }
 
 publishing {
@@ -38,11 +56,17 @@ publishing {
     }
 }
 
+sourceSets {
+    main.java.srcDirs += 'build/generated/source/apt/main'
+}
 jar {
     manifest {
         attributes["Implementation-Title"] = "blog"
         attributes["Implementation-Version"] = "1.0"
         attributes["Main-Class"] = "com.github.blog.Main"
-
     }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
