@@ -1,22 +1,42 @@
 package com.github.blog.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
-/**
- * @author Raman Haurylau
- */
-@Data
+@Getter
+@Setter
+@Entity
+@Table(name = "\"order\"", schema = "blogging_platform")
 public class Order {
-    @JsonIgnore
-    private int id;
-    private String message;
-    private String status;
-    @JsonIgnore
-    private LocalDateTime orderedAt;
+    @Id
+    @Column(name = "order_id", nullable = false)
+    private Long id;
 
-    private User user;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(name = "ordered_at", nullable = false)
+    private OffsetDateTime orderedAt;
+
+    @Column(name = "message", length = Integer.MAX_VALUE)
+    private String message;
+
+    @Column(name = "status", nullable = false, length = Integer.MAX_VALUE)
+    private String status;
+
 }

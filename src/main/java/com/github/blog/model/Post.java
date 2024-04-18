@@ -1,23 +1,42 @@
 package com.github.blog.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.OffsetDateTime;
 
-/**
- * @author Raman Haurylau
- */
-@Data
+@Getter
+@Setter
+@Entity
+@Table(name = "post", schema = "blogging_platform")
 public class Post {
-    @JsonIgnore
-    private int id;
-    private String title;
-    private String content;
-    @JsonIgnore
-    private LocalDateTime publishedAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id", nullable = false)
+    private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    private Set<Tag> tags;
+
+    @Column(name = "title", nullable = false, length = Integer.MAX_VALUE)
+    private String title;
+
+    @Column(name = "content", nullable = false, length = Integer.MAX_VALUE)
+    private String content;
+
+    @Column(name = "published_at", nullable = false)
+    private OffsetDateTime publishedAt;
 }
