@@ -31,5 +31,4 @@ public class UserRole {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
-
 }

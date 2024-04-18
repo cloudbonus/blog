@@ -21,5 +21,4 @@ public class Tag {
 
     @Column(name = "tag_name", nullable = false, length = Integer.MAX_VALUE)
     private String tagName;
-
 }

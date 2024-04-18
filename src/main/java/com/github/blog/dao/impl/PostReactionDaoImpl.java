@@ -9,6 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class PostReactionDaoImpl extends AbstractJpaDao<PostReaction, Long> implements PostReactionDao {
-
 }
 

@@ -21,5 +21,4 @@ public class Role {
 
     @Column(name = "role_name", nullable = false, length = Integer.MAX_VALUE)
     private String roleName;
-
 }

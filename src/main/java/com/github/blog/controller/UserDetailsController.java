@@ -37,5 +37,4 @@ public class UserDetailsController {
     public void delete(Long id) {
         userDetailService.delete(id);
     }
-
 }

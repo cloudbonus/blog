@@ -37,5 +37,4 @@ public class PostReactionController {
     public void delete(Long id) {
         postReactionService.delete(id);
     }
-
 }

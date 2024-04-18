@@ -38,5 +38,4 @@ public class Order {
 
     @Column(name = "status", nullable = false, length = Integer.MAX_VALUE)
     private String status;
-
 }

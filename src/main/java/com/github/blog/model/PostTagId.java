@@ -35,5 +35,4 @@ public class PostTagId implements Serializable {
     public int hashCode() {
         return Objects.hash(tagId, postId);
     }
-
 }

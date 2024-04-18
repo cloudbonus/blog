@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class CommentReactionDaoImpl extends AbstractJpaDao<CommentReaction, Long> implements CommentReactionDao {
-
 }
 
 

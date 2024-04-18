@@ -41,5 +41,4 @@ public class Comment {
 
     @Column(name = "published_at", nullable = false)
     private OffsetDateTime publishedAt;
-
 }

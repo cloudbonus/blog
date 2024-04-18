@@ -36,5 +36,4 @@ public class PostReaction {
 
     @Column(name = "reaction_type", nullable = false, length = Integer.MAX_VALUE)
     private String reactionType;
-
 }

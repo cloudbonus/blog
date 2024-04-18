@@ -9,5 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class TagDaoImpl extends AbstractJpaDao<Tag, Long> implements TagDao {
-
 }

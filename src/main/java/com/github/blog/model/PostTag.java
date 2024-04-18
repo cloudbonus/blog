@@ -31,5 +31,4 @@ public class PostTag {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
-
 }

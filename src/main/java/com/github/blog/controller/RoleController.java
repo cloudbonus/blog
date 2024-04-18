@@ -37,6 +37,5 @@ public class RoleController {
     public void delete(Long id) {
         roleService.delete(id);
     }
-
 }
 

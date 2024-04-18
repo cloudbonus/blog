@@ -9,6 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
-
 }
 
