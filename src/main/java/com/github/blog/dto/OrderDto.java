@@ -1,15 +1,18 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
+
+import java.io.Serializable;
+import java.time.OffsetDateTime;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Order}
  */
-@Data
-public class OrderDto {
-    private String message;
-    private String status;
-
-    private UserDto user;
-    private PostDto post;
+@Value
+public class OrderDto implements Serializable {
+    PostDto post;
+    UserDto user;
+    OffsetDateTime orderedAt;
+    String message;
+    String status;
 }

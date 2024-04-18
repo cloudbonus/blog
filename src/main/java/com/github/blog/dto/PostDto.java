@@ -1,17 +1,17 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
 
-import java.util.Set;
+import java.io.Serializable;
+import java.time.OffsetDateTime;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Post}
  */
-@Data
-public class PostDto {
-    private String title;
-    private String content;
-
-    private UserDto user;
-    private Set<TagDto> tags;
+@Value
+public class PostDto implements Serializable {
+    UserDto user;
+    String title;
+    String content;
+    OffsetDateTime publishedAt;
 }

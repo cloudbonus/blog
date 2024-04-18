@@ -1,14 +1,15 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
+
+import java.io.Serializable;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.PostReaction}
  */
-@Data
-public class PostReactionDto {
-    private String reactionType;
-
-    private PostDto post;
-    private UserDto user;
+@Value
+public class PostReactionDto implements Serializable {
+    PostDto post;
+    UserDto user;
+    String reactionType;
 }

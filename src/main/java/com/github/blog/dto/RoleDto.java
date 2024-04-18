@@ -1,11 +1,13 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
+
+import java.io.Serializable;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Role}
  */
-@Data
-public class RoleDto {
-    private String name;
+@Value
+public class RoleDto implements Serializable {
+    String roleName;
 }

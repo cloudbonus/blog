@@ -1,14 +1,15 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
+
+import java.io.Serializable;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.CommentReaction}
  */
-@Data
-public class CommentReactionDto {
-    private String reactionType;
-
-    private CommentDto comment;
-    private UserDto user;
+@Value
+public class CommentReactionDto implements Serializable {
+    CommentDto comment;
+    UserDto user;
+    String reactionType;
 }
