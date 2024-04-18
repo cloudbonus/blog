@@ -5,14 +5,14 @@ import java.util.List;
 /**
  * @author Raman Haurylau
  */
-public interface CrudService<T> {
+public interface CrudService<T, ID> {
     T create(T t);
 
-    T findById(int id);
+    T findById(ID id);
 
     List<T> findAll();
 
-    T update(int id, T t);
+    T update(ID id, T t);
 
-    int remove(int id);
+    void delete(ID id);
 }

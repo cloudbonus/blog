@@ -2,14 +2,13 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dto.RoleDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Role;
+import com.github.blog.model.mapper.RoleMapper;
 import com.github.blog.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Raman Haurylau
@@ -19,21 +18,21 @@ import java.util.Optional;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleDao roleDao;
-    private final Mapper mapper;
+    private final RoleMapper roleMapper;
 
     @Override
     public RoleDto create(RoleDto roleDto) {
-        Role role = mapper.map(roleDto, Role.class);
-        return mapper.map(roleDao.create(role), RoleDto.class);
+        Role role = roleMapper.toEntity(roleDto);
+        return roleMapper.toDto(roleDao.create(role));
     }
 
     @Override
-    public RoleDto findById(int id) {
-        Optional<Role> result = roleDao.findById(id);
-        if (result.isEmpty()) {
+    public RoleDto findById(Long id) {
+        Role role = roleDao.findById(id);
+        if (role == null) {
             throw new RuntimeException("Role not found");
         }
-        return mapper.map(result.get(), RoleDto.class);
+        return roleMapper.toDto(role);
     }
 
     @Override
@@ -42,32 +41,27 @@ public class RoleServiceImpl implements RoleService {
         if (roles.isEmpty()) {
             throw new RuntimeException("Cannot find any roles");
         }
-        return roles.stream().map(r -> mapper.map(r, RoleDto.class)).toList();
+        return roles.stream().map(roleMapper::toDto).toList();
     }
 
     @Override
-    public RoleDto update(int id, RoleDto roleDto) {
-        Optional<Role> result = roleDao.findById(id);
+    public RoleDto update(Long id, RoleDto roleDto) {
+        Role role = roleDao.findById(id);
 
-        if (result.isEmpty()) {
+        if (role == null) {
             throw new RuntimeException("Role not found");
         }
 
-        Role updatedRole = mapper.map(roleDto, Role.class);
-        Role role = result.get();
+        Role updatedRole = roleMapper.toEntity(roleDto);
 
         updatedRole.setId(role.getId());
-
         updatedRole = roleDao.update(updatedRole);
 
-        return mapper.map(updatedRole, RoleDto.class);
+        return roleMapper.toDto(updatedRole);
     }
 
     @Override
-    public int remove(int id) {
-        Role role = roleDao.remove(id);
-        if (role == null) {
-            return -1;
-        } else return role.getId();
+    public void delete(Long id) {
+        roleDao.deleteById(id);
     }
 }

@@ -5,5 +5,5 @@ import com.github.blog.dto.PostDto;
 /**
  * @author Raman Haurylau
  */
-public interface PostService extends CrudService<PostDto> {
+public interface PostService extends CrudService<PostDto, Long> {
 }

@@ -5,5 +5,5 @@ import com.github.blog.dto.TagDto;
 /**
  * @author Raman Haurylau
  */
-public interface TagService extends CrudService<TagDto> {
+public interface TagService extends CrudService<TagDto, Long> {
 }
