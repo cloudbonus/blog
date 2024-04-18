@@ -1,8 +1,8 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.UserDetailsDto;
+import com.github.blog.controller.mapper.JsonMapper;
+import com.github.blog.dto.UserDetailDto;
 import com.github.blog.dto.UserDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -16,40 +16,46 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final Mapper mapper;
+    private final JsonMapper jsonMapper;
 
     public String create(UserDto userDto) {
-        return mapper.convertToJson(userService.create(userDto));
+        return jsonMapper.convertToJson(userService.create(userDto));
     }
 
-    public String findById(int id) {
-        return mapper.convertToJson(userService.findById(id));
+    public String findById(Long id) {
+        return jsonMapper.convertToJson(userService.findById(id));
     }
 
     public String findAll() {
         List<UserDto> users = userService.findAll();
-        return mapper.convertToJson(users);
+        return jsonMapper.convertToJson(users);
     }
 
-    public String findAllByUniversity(UserDetailsDto userDetailsDto) {
+    public String findAllByUniversity(UserDetailDto userDetailsDto) {
         List<UserDto> users = userService.findAllByUniversity(userDetailsDto);
-        return mapper.convertToJson(users);
+        return jsonMapper.convertToJson(users);
     }
 
     public String findAllByRole(String role) {
         List<UserDto> users = userService.findAllByRole(role);
-        return mapper.convertToJson(users);
+        return jsonMapper.convertToJson(users);
     }
 
-    public String update(int id, UserDto userDto) {
-        return mapper.convertToJson(userService.update(id, userDto));
+    public String findAllByJobTitle(UserDetailDto userDetailsDto) {
+        List<UserDto> users = userService.findAllByJobTitle(userDetailsDto);
+        return jsonMapper.convertToJson(users);
     }
 
-    public String remove(int id) {
-        int result = userService.remove(id);
-        if (result > 0)
-            return String.format("Removed Successfully %d", result);
-        else return "Could not remove";
+    public String findByLogin(UserDto userDto) {
+        UserDto user = userService.findByLogin(userDto);
+        return jsonMapper.convertToJson(user);
+    }
+
+    public String update(Long id, UserDto userDto) {
+        return jsonMapper.convertToJson(userService.update(id, userDto));
+    }
+
+    public void delete(Long id) {
+        userService.delete(id);
     }
 }
-

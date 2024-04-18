@@ -1,8 +1,8 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.UserDetailsDto;
-import com.github.blog.mapper.Mapper;
-import com.github.blog.service.UserDetailsService;
+import com.github.blog.controller.mapper.JsonMapper;
+import com.github.blog.dto.UserDetailDto;
+import com.github.blog.service.UserDetailService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 
@@ -14,31 +14,28 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 public class UserDetailsController {
-    private final UserDetailsService userDetailsService;
-    private final Mapper mapper;
+    private final UserDetailService userDetailService;
+    private final JsonMapper jsonMapper;
 
-    public String create(UserDetailsDto userDetails) {
-        return mapper.convertToJson(userDetailsService.create(userDetails));
+    public String create(UserDetailDto userDetails) {
+        return jsonMapper.convertToJson(userDetailService.create(userDetails));
     }
 
-    public String findById(int id) {
-        return mapper.convertToJson(userDetailsService.findById(id));
+    public String findById(Long id) {
+        return jsonMapper.convertToJson(userDetailService.findById(id));
     }
 
     public String findAll() {
-        List<UserDetailsDto> userDetailsDto = userDetailsService.findAll();
-        return mapper.convertToJson(userDetailsDto);
+        List<UserDetailDto> userDetailsDto = userDetailService.findAll();
+        return jsonMapper.convertToJson(userDetailsDto);
     }
 
-    public String update(int id, UserDetailsDto userDetailsDto) {
-        return mapper.convertToJson(userDetailsService.update(id, userDetailsDto));
+    public String update(Long id, UserDetailDto userDetailsDto) {
+        return jsonMapper.convertToJson(userDetailService.update(id, userDetailsDto));
     }
 
-    public String remove(int id) {
-        int result = userDetailsService.remove(id);
-        if (result > 0)
-            return String.format("Removed Successfully %d", result);
-        else return "Could not remove";
+    public void delete(Long id) {
+        userDetailService.delete(id);
     }
 
 }

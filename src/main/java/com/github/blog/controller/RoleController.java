@@ -1,7 +1,7 @@
 package com.github.blog.controller;
 
+import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.RoleDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,30 +15,27 @@ import java.util.List;
 @AllArgsConstructor
 public class RoleController {
     private final RoleService roleService;
-    private final Mapper mapper;
+    private final JsonMapper jsonMapper;
 
     public String create(RoleDto roleDto) {
-        return mapper.convertToJson(roleService.create(roleDto));
+        return jsonMapper.convertToJson(roleService.create(roleDto));
     }
 
-    public String findById(int id) {
-        return mapper.convertToJson(roleService.findById(id));
+    public String findById(Long id) {
+        return jsonMapper.convertToJson(roleService.findById(id));
     }
 
     public String findAll() {
         List<RoleDto> roles = roleService.findAll();
-        return mapper.convertToJson(roles);
+        return jsonMapper.convertToJson(roles);
     }
 
-    public String update(int id, RoleDto roleDto) {
-        return mapper.convertToJson(roleService.update(id, roleDto));
+    public String update(Long id, RoleDto roleDto) {
+        return jsonMapper.convertToJson(roleService.update(id, roleDto));
     }
 
-    public String remove(int id) {
-        int result = roleService.remove(id);
-        if (result > 0)
-            return String.format("Removed Successfully %d", result);
-        else return "Could not remove";
+    public void delete(Long id) {
+        roleService.delete(id);
     }
 
 }
