@@ -1,6 +1,7 @@
 package com.github.blog.config;
 
 import jakarta.persistence.EntityManagerFactory;
+import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
@@ -49,5 +50,14 @@ public class PersistenceJPAConfig {
     @Bean
     public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
         return new PersistenceExceptionTranslationPostProcessor();
+    }
+
+    @Bean
+    public SpringLiquibase liquibase(DataSourceProperties dataSourceProperties, DataSource dataSource) {
+        SpringLiquibase liquibase = new SpringLiquibase();
+
+        liquibase.setChangeLog(dataSourceProperties.getChangelogFile());
+        liquibase.setDataSource(dataSource);
+        return liquibase;
     }
 }

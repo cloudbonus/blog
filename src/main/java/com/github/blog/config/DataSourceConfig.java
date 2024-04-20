@@ -1,6 +1,5 @@
 package com.github.blog.config;
 
-import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -21,14 +20,5 @@ public class DataSourceConfig {
         dataSource.setUsername(dataSourceProperties.getUsername());
         dataSource.setPassword(dataSourceProperties.getPassword());
         return dataSource;
-    }
-
-    @Bean
-    public SpringLiquibase liquibase(DataSourceProperties dataSourceProperties, DataSource dataSource) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-
-        liquibase.setChangeLog(dataSourceProperties.getChangelogFile());
-        liquibase.setDataSource(dataSource);
-        return liquibase;
     }
 }

@@ -1,5 +1,9 @@
+--liquibase formatted sql
+
+--changeset haurylau:1
 CREATE SCHEMA IF NOT EXISTS blogging_platform;
 
+--changeset haurylau:2
 CREATE TABLE IF NOT EXISTS blogging_platform."user" (
     user_id    bigint AUTO_INCREMENT,
     login      varchar(255) NOT NULL,
@@ -18,6 +22,7 @@ ADD CONSTRAINT login_unique UNIQUE (login);
 ALTER TABLE IF EXISTS blogging_platform."user"
 ADD CONSTRAINT email_unique UNIQUE (email);
 
+--changeset haurylau:3
 CREATE TABLE IF NOT EXISTS blogging_platform.user_details (
     user_id         bigint NOT NULL,
     firstname       varchar(255),
@@ -34,6 +39,7 @@ ADD CONSTRAINT user_details_pkey PRIMARY KEY (user_id);
 ALTER TABLE IF EXISTS blogging_platform.user_details
 ADD CONSTRAINT user_details_user_fkey FOREIGN KEY (user_id) REFERENCES blogging_platform."user"(user_id) ON DELETE CASCADE;
 
+--changeset haurylau:4
 CREATE TABLE IF NOT EXISTS blogging_platform.role (
     role_id   bigint AUTO_INCREMENT,
     role_name varchar(255) NOT NULL UNIQUE
@@ -42,6 +48,7 @@ CREATE TABLE IF NOT EXISTS blogging_platform.role (
 ALTER TABLE IF EXISTS blogging_platform.role
 ADD CONSTRAINT role_pkey PRIMARY KEY (role_id);
 
+--changeset haurylau:5
 CREATE TABLE IF NOT EXISTS blogging_platform.user_role (
     user_id bigint NOT NULL,
     role_id bigint NOT NULL
@@ -56,7 +63,7 @@ ADD CONSTRAINT user_role_user_fkey FOREIGN KEY (user_id) REFERENCES blogging_pla
 ALTER TABLE IF EXISTS blogging_platform.user_role
 ADD CONSTRAINT user_role_role_fkey FOREIGN KEY (role_id) REFERENCES blogging_platform.role(role_id) ON DELETE CASCADE;
 
-
+--changeset haurylau:6
 CREATE TABLE IF NOT EXISTS blogging_platform.post (
     post_id      bigint AUTO_INCREMENT NOT NULL,
     user_id      bigint                NOT NULL,
@@ -71,6 +78,7 @@ ADD CONSTRAINT post_pkey PRIMARY KEY (post_id);
 ALTER TABLE IF EXISTS blogging_platform.post
 ADD CONSTRAINT post_user_fkey FOREIGN KEY (user_id) REFERENCES blogging_platform."user"(user_id) ON DELETE SET NULL;
 
+--changeset haurylau:7
 CREATE TABLE IF NOT EXISTS blogging_platform.post_reaction (
     post_id       bigint       NOT NULL,
     user_id       bigint       NOT NULL,
@@ -86,10 +94,10 @@ ADD CONSTRAINT post_reaction_post_fkey FOREIGN KEY (post_id) REFERENCES blogging
 ALTER TABLE IF EXISTS blogging_platform.post_reaction
 ADD CONSTRAINT post_reaction_user_fkey FOREIGN KEY (user_id) REFERENCES blogging_platform."user"(user_id) ON DELETE CASCADE;
 
-
 ALTER TABLE blogging_platform.post_reaction
 ADD CONSTRAINT post_reaction_post_user_key UNIQUE (post_id, user_id);
 
+--changeset haurylau:8
 CREATE TABLE IF NOT EXISTS blogging_platform.tag (
     tag_id   bigint AUTO_INCREMENT,
     tag_name varchar(255) NOT NULL UNIQUE
@@ -98,6 +106,7 @@ CREATE TABLE IF NOT EXISTS blogging_platform.tag (
 ALTER TABLE IF EXISTS blogging_platform.tag
 ADD CONSTRAINT tag_pkey PRIMARY KEY (tag_id);
 
+--changeset haurylau:9
 CREATE TABLE IF NOT EXISTS blogging_platform.post_tag (
     post_id bigint NOT NULL,
     tag_id  bigint NOT NULL
@@ -112,7 +121,7 @@ ADD CONSTRAINT post_tag_post_fkey FOREIGN KEY (post_id) REFERENCES blogging_plat
 ALTER TABLE IF EXISTS blogging_platform.post_tag
 ADD CONSTRAINT post_tag_tag_fkey FOREIGN KEY (tag_id) REFERENCES blogging_platform.tag(tag_id) ON DELETE CASCADE;
 
-
+--changeset haurylau:10
 CREATE TABLE IF NOT EXISTS blogging_platform.comment (
     comment_id   bigint AUTO_INCREMENT,
     post_id      bigint       NOT NULL,
@@ -130,7 +139,7 @@ ADD CONSTRAINT comment_post_fkey FOREIGN KEY (post_id) REFERENCES blogging_platf
 ALTER TABLE IF EXISTS blogging_platform.comment
 ADD CONSTRAINT comment_user_fkey FOREIGN KEY (user_id) REFERENCES blogging_platform."user"(user_id) ON DELETE SET NULL;
 
-
+--changeset haurylau:11
 CREATE TABLE IF NOT EXISTS blogging_platform.comment_reaction (
     comment_id    bigint       NOT NULL,
     user_id       bigint       NOT NULL,
@@ -149,6 +158,7 @@ ADD CONSTRAINT comment_reaction_user_fkey FOREIGN KEY (user_id) REFERENCES blogg
 ALTER TABLE blogging_platform.comment_reaction
 ADD CONSTRAINT comment_reaction_comment_user_key UNIQUE (comment_id, user_id);
 
+--changeset haurylau:12
 CREATE TABLE IF NOT EXISTS blogging_platform."order" (
     order_id   bigint AUTO_INCREMENT,
     post_id    bigint       NOT NULL UNIQUE,
@@ -166,15 +176,3 @@ ADD CONSTRAINT order_post_fkey FOREIGN KEY (post_id) REFERENCES blogging_platfor
 
 ALTER TABLE IF EXISTS blogging_platform."order"
 ADD CONSTRAINT order_user_fkey FOREIGN KEY (user_id) REFERENCES blogging_platform."user"(user_id);
-
-
-CREATE INDEX IF NOT EXISTS post_user_idx ON blogging_platform.post(user_id);
-
-CREATE INDEX IF NOT EXISTS post_reaction_user_idx ON blogging_platform.post_reaction(user_id);
-
-CREATE INDEX IF NOT EXISTS comment_post_idx ON blogging_platform.comment(post_id);
-CREATE INDEX IF NOT EXISTS comment_user_idx ON blogging_platform.comment(user_id);
-
-CREATE INDEX IF NOT EXISTS comment_reaction_user_idx ON blogging_platform.comment_reaction(user_id);
-
-CREATE INDEX IF NOT EXISTS order_user_idx ON blogging_platform."order"(user_id);
