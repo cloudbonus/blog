@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Controller
 @AllArgsConstructor
-public class UserDetailsController {
+public class UserDetailController {
     private final UserDetailService userDetailService;
     private final JsonMapper jsonMapper;
 
