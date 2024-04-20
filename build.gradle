@@ -17,6 +17,8 @@ ext {
     hibernateVersion="6.4.4.Final"
     mapStructVersion="1.5.5.Final"
     junitVersion="5.10.2"
+    lombokVersion="1.18.32"
+    loggerVersion="2.23.1"
 }
 
 dependencies {
@@ -25,27 +27,30 @@ dependencies {
     implementation "org.hibernate.orm:hibernate-core:${hibernateVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0"
     implementation "com.fasterxml.jackson.core:jackson-databind:2.17.0"
-    implementation "org.apache.logging.log4j:log4j-api:2.23.1"
+    implementation "org.apache.logging.log4j:log4j-api:${loggerVersion}"
     implementation "org.aspectj:aspectjrt:${aspectjVersion}"
-    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation "org.postgresql:postgresql:42.7.3"
     implementation "org.liquibase:liquibase-core:4.27.0"
     implementation "org.mapstruct:mapstruct:${mapStructVersion}"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-    testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation "com.h2database:h2:2.2.224"
     testImplementation "org.springframework:spring-test:${springVersion}"
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 
-    runtimeOnly "org.apache.logging.log4j:log4j-core:2.23.1"
+    runtimeOnly "org.apache.logging.log4j:log4j-core:${loggerVersion}"
     runtimeOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
 
-    compileOnly "org.projectlombok:lombok:1.18.32"
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
     compileOnly "org.hibernate.orm:hibernate-jpamodelgen:${hibernateVersion}"
 
-    annotationProcessor "org.projectlombok:lombok:1.18.32"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.hibernate.orm:hibernate-jpamodelgen:${hibernateVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapStructVersion}"
+}
+sourceSets {
+    main.java.srcDirs += 'build/generated/source/apt/main'
 }
 
 publishing {
@@ -56,9 +61,6 @@ publishing {
     }
 }
 
-sourceSets {
-    main.java.srcDirs += 'build/generated/source/apt/main'
-}
 jar {
     manifest {
         attributes["Implementation-Title"] = "blog"
