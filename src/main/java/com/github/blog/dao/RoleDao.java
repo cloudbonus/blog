@@ -6,4 +6,5 @@ import com.github.blog.model.Role;
  * @author Raman Haurylau
  */
 public interface RoleDao extends CrudDao<Role, Long> {
+    Role findByName(String name);
 }
