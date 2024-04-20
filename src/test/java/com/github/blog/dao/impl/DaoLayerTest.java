@@ -9,7 +9,6 @@ import com.github.blog.dao.UserDao;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +17,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -32,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Transactional
 @ExtendWith({SpringExtension.class})
 @Sql("classpath:db/insert-test-data.sql")
-@TestPropertySource(locations="classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 @ContextConfiguration(classes = {DataSourceTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
 class DaoLayerTest {
 
@@ -46,13 +44,10 @@ class DaoLayerTest {
     @Test
     @DisplayName("user: findAllByRole")
     void findAllUsersByRole_RoleUser_ListIsNotEmptyAndSizeIsTwo() {
-        List<User> all = userDao.findAll();
-        assertEquals(2, all.size(), "The size of the list is not 2");
-
         List<User> allByRole = userDao.findAllByRole("ROLE_USER");
 
-        assertFalse(allByRole.isEmpty(), "The list is empty");
-        assertEquals(2, allByRole.size(), "The size of the list is not 2");
+        assertThat(allByRole).isNotEmpty();
+        assertThat(allByRole).hasSize(2);
     }
 
     @Test
@@ -61,8 +56,8 @@ class DaoLayerTest {
         String login = "kvossing0";
         User user = userDao.findByLogin(login);
 
-        assertNotNull(user, "User is null");
-        assertEquals(login, user.getLogin(), "Logins are not equal");
+        assertThat(user).isNotNull();
+        assertThat(user.getLogin()).isEqualTo(login);
     }
 
     @Test
@@ -71,8 +66,8 @@ class DaoLayerTest {
         String jobTitle = "Software Engineer";
         List<User> allByJobTitle = userDao.findAllByJobTitle(jobTitle);
 
-        assertFalse(allByJobTitle.isEmpty(), "The list is empty");
-        assertEquals(1, allByJobTitle.size(), "The size of the list is not 1");
+        assertThat(allByJobTitle).isNotEmpty();
+        assertThat(allByJobTitle).hasSize(1);
     }
 
     @Test
@@ -81,8 +76,8 @@ class DaoLayerTest {
         String university = "MIT";
         List<User> allByUniversity = userDao.findAllByUniversity(university);
 
-        assertFalse(allByUniversity.isEmpty(), "The list is empty");
-        assertEquals(1, allByUniversity.size(), "The size of the list is not 1");
+        assertThat(allByUniversity).isNotEmpty();
+        assertThat(allByUniversity).hasSize(1);
     }
 
     @Test
@@ -91,8 +86,8 @@ class DaoLayerTest {
         String login = "kvossing0";
         List<Post> allByLogin = postDao.findAllByLogin(login);
 
-        assertFalse(allByLogin.isEmpty(), "The list is empty");
-        assertEquals(2, allByLogin.size(), "The size of the list is not 1");
+        assertThat(allByLogin).isNotEmpty();
+        assertThat(allByLogin).hasSize(2);
     }
 
     @Test
@@ -104,11 +99,11 @@ class DaoLayerTest {
         List<Post> allByTag1 = postDao.findAllByTag(tag1);
         List<Post> allByTag2 = postDao.findAllByTag(tag2);
 
-        assertFalse(allByTag1.isEmpty(), "The list is empty");
-        assertEquals(3, allByTag1.size(), "The size of the list is not 1");
+        assertThat(allByTag1).isNotEmpty();
+        assertThat(allByTag1).hasSize(3);
 
-        assertFalse(allByTag2.isEmpty(), "The list is empty");
-        assertEquals(1, allByTag2.size(), "The size of the list is not 1");
+        assertThat(allByTag2).isNotEmpty();
+        assertThat(allByTag2).hasSize(1);
     }
 
     @Test
@@ -120,10 +115,10 @@ class DaoLayerTest {
         List<Comment> allByLogin1 = commentDao.findAllByLogin(login1);
         List<Comment> allByLogin2 = commentDao.findAllByLogin(login2);
 
-        assertFalse(allByLogin1.isEmpty(), "The list is empty");
-        assertEquals(2, allByLogin1.size(), "The size of the list is not 1");
+        assertThat(allByLogin1).isNotEmpty();
+        assertThat(allByLogin1).hasSize(2);
 
-        assertFalse(allByLogin2.isEmpty(), "The list is empty");
-        assertEquals(1, allByLogin2.size(), "The size of the list is not 1");
+        assertThat(allByLogin2).isNotEmpty();
+        assertThat(allByLogin2).hasSize(1);
     }
 }

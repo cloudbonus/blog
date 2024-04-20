@@ -22,7 +22,6 @@ public class Application {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-
         UserDetailController userDetailsController = context.getBean(UserDetailController.class);
         UserController userController = context.getBean(UserController.class);
         JsonMapper jsonMapper = context.getBean(JsonMapper.class);
