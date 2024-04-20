@@ -3,9 +3,10 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dao.UserDetailDao;
 import com.github.blog.dto.UserDetailDto;
+import com.github.blog.model.User;
 import com.github.blog.model.UserDetail;
-import com.github.blog.model.mapper.UserDetailMapper;
 import com.github.blog.service.UserDetailService;
+import com.github.blog.service.mapper.UserDetailMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +23,17 @@ public class UserDetailsServiceImpl implements UserDetailService {
     private final UserDetailDao userDetailDao;
     private final UserDetailMapper detailMapper;
 
-    @Transactional
     @Override
+    @Transactional
     public UserDetailDto create(UserDetailDto userDetailsDto) {
         UserDetail userDetail = detailMapper.toEntity(userDetailsDto);
-        return detailMapper.toDto(userDetailDao.create(userDetail));
+
+        User user = userDao.findById(userDetail.getId());
+        userDetail.setUser(user);
+        userDetail.setId(user.getId());
+        userDetail = userDetailDao.create(userDetail);
+
+        return detailMapper.toDto(userDetail);
     }
 
     @Override

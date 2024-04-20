@@ -1,13 +1,15 @@
 package com.github.blog.service.impl;
 
+import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dto.UserDetailDto;
 import com.github.blog.dto.UserDto;
+import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetail;
-import com.github.blog.model.mapper.UserDetailMapper;
-import com.github.blog.model.mapper.UserMapper;
 import com.github.blog.service.UserService;
+import com.github.blog.service.mapper.UserDetailMapper;
+import com.github.blog.service.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,13 +27,19 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final UserDetailMapper detailMapper;
+    private final RoleDao roleDao;
 
-    @Transactional
+
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
-        enrichUser(user);
-        user = userDao.create(user);
+        userDao.create(user);
+        Role role = roleDao.findByName("ROLE_USER");
+        user.getRoles().add(role);
+        role.getUsers().add(user);
+        roleDao.update(role);
+        user = userDao.update(user);
         return userMapper.toDto(user);
     }
 
@@ -120,10 +128,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private void enrichUser(User user) {
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(OffsetDateTime.now());
-            user.setLastLogin(OffsetDateTime.now());
-        }
-        user.setCreatedAt(OffsetDateTime.now());
+        user.setLastLogin(OffsetDateTime.now());
     }
 }

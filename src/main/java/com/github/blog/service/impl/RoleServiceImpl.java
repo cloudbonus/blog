@@ -3,8 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dto.RoleDto;
 import com.github.blog.model.Role;
-import com.github.blog.model.mapper.RoleMapper;
 import com.github.blog.service.RoleService;
+import com.github.blog.service.mapper.RoleMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

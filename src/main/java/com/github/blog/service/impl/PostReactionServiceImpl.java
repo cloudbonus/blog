@@ -3,8 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.PostReactionDao;
 import com.github.blog.dto.PostReactionDto;
 import com.github.blog.model.PostReaction;
-import com.github.blog.model.mapper.PostReactionMapper;
 import com.github.blog.service.PostReactionService;
+import com.github.blog.service.mapper.PostReactionMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

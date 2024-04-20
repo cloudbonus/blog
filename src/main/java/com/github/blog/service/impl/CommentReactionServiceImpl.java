@@ -3,8 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.CommentReactionDao;
 import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.model.CommentReaction;
-import com.github.blog.model.mapper.CommentReactionMapper;
 import com.github.blog.service.CommentReactionService;
+import com.github.blog.service.mapper.CommentReactionMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

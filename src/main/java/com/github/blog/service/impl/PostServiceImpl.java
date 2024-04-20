@@ -3,8 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.PostDao;
 import com.github.blog.dto.PostDto;
 import com.github.blog.model.Post;
-import com.github.blog.model.mapper.PostMapper;
 import com.github.blog.service.PostService;
+import com.github.blog.service.mapper.PostMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
