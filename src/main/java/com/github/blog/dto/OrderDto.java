@@ -2,14 +2,14 @@ package com.github.blog.dto;
 
 import lombok.Value;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link com.github.blog.model.Order}
  */
 @Value
-public class OrderDto implements Serializable {
+public class OrderDto {
+    Long id;
     PostDto post;
     UserDto user;
     OffsetDateTime orderedAt;

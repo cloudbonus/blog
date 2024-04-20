@@ -1,13 +1,14 @@
 package com.github.blog.dto;
 
-import lombok.Value;
+import lombok.Data;
 
 import java.io.Serializable;
 
 /**
  * DTO for {@link com.github.blog.model.Role}
  */
-@Value
+@Data
 public class RoleDto implements Serializable {
-    String roleName;
+    private Long id;
+    private String roleName;
 }
