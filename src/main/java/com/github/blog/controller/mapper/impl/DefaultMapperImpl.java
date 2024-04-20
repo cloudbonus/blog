@@ -16,6 +16,11 @@ public class DefaultMapperImpl implements JsonMapper {
 
     @SneakyThrows
     public <T> String convertToJson(T object) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+        return objectMapper.writeValueAsString(object);
+    }
+
+    @SneakyThrows
+    public <T> T convertToDto(String json, Class<T> clazz) {
+        return objectMapper.readValue(json, clazz);
     }
 }

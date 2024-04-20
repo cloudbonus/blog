@@ -1,4 +1,4 @@
-package com.github.blog.model.mapper;
+package com.github.blog.service.mapper;
 
 import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.model.CommentReaction;
