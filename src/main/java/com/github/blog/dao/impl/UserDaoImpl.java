@@ -4,13 +4,12 @@ import com.github.blog.dao.UserDao;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
-import com.github.blog.model.UserRole;
-import com.github.blog.model.UserRoleId;
-import com.github.blog.model.UserRole_;
 import com.github.blog.model.User_;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
@@ -20,48 +19,20 @@ import java.util.List;
 /**
  * @author Raman Haurylau
  */
-
 @Repository
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
-
-    @Override
-    public User create(User user) {
-        entityManager.persist(user);
-
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Role> cq = cb.createQuery(Role.class);
-        Root<Role> roleRoot = cq.from(Role.class);
-        cq.select(roleRoot).where(cb.equal(roleRoot.get(Role_.roleName), "ROLE_USER"));
-        Role role = entityManager.createQuery(cq).getSingleResult();
-
-        UserRole userRole = new UserRole();
-        UserRoleId id = new UserRoleId();
-        id.setUserId(user.getId());
-        id.setRoleId(role.getId());
-        userRole.setId(id);
-        userRole.setUser(user);
-        userRole.setRole(role);
-
-        entityManager.persist(userRole);
-        return user;
-    }
 
     @Override
     public List<User> findAllByRole(String roleName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> cq = cb.createQuery(User.class);
 
-        Root<UserRole> userRoleRoot = cq.from(UserRole.class);
         Root<User> userRoot = cq.from(User.class);
-        Root<Role> roleRoot = cq.from(Role.class);
+        Join<User, Role> roles = userRoot.join(User_.roles);
 
-        Predicate userRolePredicate = cb.equal(userRoleRoot.get(UserRole_.user).get(User_.id), userRoot.get(User_.id));
-        Predicate rolePredicate = cb.equal(userRoleRoot.get(UserRole_.role).get(Role_.id), roleRoot.get(Role_.id));
-        Predicate roleNamePredicate = cb.equal(roleRoot.get(Role_.roleName), roleName);
+        Predicate roleNamePredicate = cb.equal(roles.get(Role_.roleName), roleName);
 
-        Predicate combinedPredicate = cb.and(userRolePredicate, rolePredicate, roleNamePredicate);
-
-        cq.select(userRoot).where(combinedPredicate);
+        cq.select(userRoot).where(roleNamePredicate);
 
         return entityManager.createQuery(cq).getResultList();
     }
@@ -85,7 +56,11 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
         cq.select(userRoot).where(loginPredicate);
 
-        return entityManager.createQuery(cq).getSingleResult();
+        try {
+            return entityManager.createQuery(cq).getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
     }
 
     @Override
