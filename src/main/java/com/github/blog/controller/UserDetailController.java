@@ -3,7 +3,7 @@ package com.github.blog.controller;
 import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.UserDetailDto;
 import com.github.blog.service.UserDetailService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserDetailController {
     private final UserDetailService userDetailService;
     private final JsonMapper jsonMapper;

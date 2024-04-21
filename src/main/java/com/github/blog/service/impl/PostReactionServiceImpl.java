@@ -5,8 +5,9 @@ import com.github.blog.dto.PostReactionDto;
 import com.github.blog.model.PostReaction;
 import com.github.blog.service.PostReactionService;
 import com.github.blog.service.mapper.PostReactionMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class PostReactionServiceImpl implements PostReactionService {
 
     private final PostReactionDao postReactionDao;

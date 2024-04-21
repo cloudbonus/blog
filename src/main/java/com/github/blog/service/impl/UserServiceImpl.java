@@ -10,7 +10,7 @@ import com.github.blog.model.UserDetail;
 import com.github.blog.service.UserService;
 import com.github.blog.service.mapper.UserDetailMapper;
 import com.github.blog.service.mapper.UserMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +21,8 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
@@ -31,7 +32,6 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @Transactional
     public UserDto create(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         userDao.create(user);

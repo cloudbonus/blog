@@ -5,8 +5,9 @@ import com.github.blog.dto.PostDto;
 import com.github.blog.model.Post;
 import com.github.blog.service.PostService;
 import com.github.blog.service.mapper.PostMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
     private final PostDao postDao;

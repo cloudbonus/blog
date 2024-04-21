@@ -4,7 +4,7 @@ import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.UserDetailDto;
 import com.github.blog.dto.UserDto;
 import com.github.blog.service.UserService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final JsonMapper jsonMapper;

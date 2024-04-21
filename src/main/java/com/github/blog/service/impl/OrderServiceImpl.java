@@ -5,8 +5,9 @@ import com.github.blog.dto.OrderDto;
 import com.github.blog.model.Order;
 import com.github.blog.service.OrderService;
 import com.github.blog.service.mapper.OrderMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderDao orderDao;

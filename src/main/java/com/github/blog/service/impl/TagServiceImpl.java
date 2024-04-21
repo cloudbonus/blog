@@ -6,7 +6,7 @@ import com.github.blog.model.Tag;
 import com.github.blog.service.TagService;
 import com.github.blog.service.mapper.TagMapper;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,14 +15,14 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
     private final TagDao tagDao;
     private final TagMapper tagMapper;
 
     @Override
-    @Transactional
     public TagDto create(TagDto tagDto) {
         Tag tag = tagMapper.toEntity(tagDto);
         return tagMapper.toDto(tagDao.create(tag));

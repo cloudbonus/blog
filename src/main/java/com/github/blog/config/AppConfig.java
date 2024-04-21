@@ -11,8 +11,8 @@ import org.springframework.context.annotation.PropertySource;
  * @author Raman Haurylau
  */
 @Configuration
-@PropertySource(value = "classpath:application.properties", encoding = "UTF-8")
 @ComponentScan(basePackages = "com.github.blog")
+@PropertySource(value = "classpath:application.properties", encoding = "UTF-8")
 public class AppConfig {
 
     @Bean

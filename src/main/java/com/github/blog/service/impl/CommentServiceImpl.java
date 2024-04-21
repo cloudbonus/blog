@@ -5,8 +5,9 @@ import com.github.blog.dto.CommentDto;
 import com.github.blog.model.Comment;
 import com.github.blog.service.CommentService;
 import com.github.blog.service.mapper.CommentMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;

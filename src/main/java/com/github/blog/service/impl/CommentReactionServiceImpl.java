@@ -5,8 +5,9 @@ import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.service.CommentReactionService;
 import com.github.blog.service.mapper.CommentReactionMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class CommentReactionServiceImpl implements CommentReactionService {
 
     private final CommentReactionDao commentReactionDao;
