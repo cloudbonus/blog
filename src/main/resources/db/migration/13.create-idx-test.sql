@@ -1,4 +1,3 @@
---changeset haurylau:13
 CREATE INDEX IF NOT EXISTS post_user_idx ON blogging_platform.post(user_id);
 
 CREATE INDEX IF NOT EXISTS post_reaction_user_idx ON blogging_platform.post_reaction(user_id);
