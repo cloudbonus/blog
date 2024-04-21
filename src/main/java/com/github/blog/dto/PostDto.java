@@ -1,13 +1,13 @@
 package com.github.blog.dto;
 
-import lombok.Value;
+import lombok.Data;
 
 import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link com.github.blog.model.Post}
  */
-@Value
+@Data
 public class PostDto {
     Long id;
     UserDto user;

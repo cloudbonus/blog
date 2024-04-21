@@ -2,7 +2,6 @@ package com.github.blog.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -23,15 +22,15 @@ public class UserDetail {
     private Long id;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "firstname", length = Integer.MAX_VALUE)
+    @Column(length = Integer.MAX_VALUE)
     private String firstname;
 
-    @Column(name = "surname", length = Integer.MAX_VALUE)
+    @Column(length = Integer.MAX_VALUE)
     private String surname;
 
     @Column(name = "university_name", length = Integer.MAX_VALUE)
