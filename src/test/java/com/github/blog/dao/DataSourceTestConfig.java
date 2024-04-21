@@ -1,4 +1,4 @@
-package com.github.blog.config;
+package com.github.blog.dao;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
