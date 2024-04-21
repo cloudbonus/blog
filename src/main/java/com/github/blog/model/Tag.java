@@ -23,7 +23,7 @@ public class Tag {
     @Column(name = "tag_id", nullable = false)
     private Long id;
 
-    @Column(name = "tag_name", nullable = false, length = Integer.MAX_VALUE)
+    @Column(nullable = false, length = Integer.MAX_VALUE)
     private String tagName;
 
     @ManyToMany(mappedBy = "tags")

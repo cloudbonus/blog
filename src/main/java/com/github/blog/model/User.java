@@ -38,10 +38,10 @@ public class User {
     @Column(nullable = false, length = Integer.MAX_VALUE)
     private String email;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private OffsetDateTime createdAt;
 
-    @Column(name = "last_login")
+    @Column
     private OffsetDateTime lastLogin;
 
     @ManyToMany

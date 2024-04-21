@@ -38,6 +38,6 @@ public class Comment {
     @Column(nullable = false, length = Integer.MAX_VALUE)
     private String content;
 
-    @Column(name = "published_at", nullable = false)
+    @Column(nullable = false)
     private OffsetDateTime publishedAt;
 }

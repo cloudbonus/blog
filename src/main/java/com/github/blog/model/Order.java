@@ -33,7 +33,7 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "ordered_at", nullable = false)
+    @Column(nullable = false)
     private OffsetDateTime orderedAt;
 
     @Column(length = Integer.MAX_VALUE)

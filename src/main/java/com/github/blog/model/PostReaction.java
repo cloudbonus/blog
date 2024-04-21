@@ -33,6 +33,6 @@ public class PostReaction {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "reaction_type", nullable = false, length = Integer.MAX_VALUE)
+    @Column(nullable = false, length = Integer.MAX_VALUE)
     private String reactionType;
 }

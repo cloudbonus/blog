@@ -33,15 +33,15 @@ public class UserDetail {
     @Column(length = Integer.MAX_VALUE)
     private String surname;
 
-    @Column(name = "university_name", length = Integer.MAX_VALUE)
+    @Column(length = Integer.MAX_VALUE)
     private String universityName;
 
-    @Column(name = "major_name", length = Integer.MAX_VALUE)
+    @Column(length = Integer.MAX_VALUE)
     private String majorName;
 
-    @Column(name = "company_name", length = Integer.MAX_VALUE)
+    @Column(length = Integer.MAX_VALUE)
     private String companyName;
 
-    @Column(name = "job_title", length = Integer.MAX_VALUE)
+    @Column(length = Integer.MAX_VALUE)
     private String jobTitle;
 }

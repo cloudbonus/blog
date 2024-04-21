@@ -23,7 +23,7 @@ public class Role {
     @Column(name = "role_id", nullable = false)
     private Long id;
 
-    @Column(name = "role_name", nullable = false, length = Integer.MAX_VALUE)
+    @Column(nullable = false, length = Integer.MAX_VALUE)
     private String roleName;
 
     @ManyToMany(mappedBy = "roles")
