@@ -17,12 +17,14 @@ public class DataSourceProperties {
     private final String driverClassName;
     private final String changelogFile;
     private final String hibernateDdlAuto;
+    private final String hibernatePhysicalNamingStrategy;
 
     public DataSourceProperties(@Value("${spring.datasource.url}") String url,
                                 @Value("${spring.datasource.username}") String username,
                                 @Value("${spring.datasource.password}") String password,
                                 @Value("${spring.datasource.driver-class-name}") String driverClassName,
                                 @Value("${spring.jpa.hibernate.ddl-auto}") String hibernateDdlAuto,
+                                @Value("${spring.jpa.hibernate.hibernate.physical_naming_strategy}") String hibernatePhysicalNamingStrategy,
                                 @Value("${com.github.blog.changelogFile}") String changelogFile
     ) {
         this.url = url;
@@ -31,5 +33,6 @@ public class DataSourceProperties {
         this.changelogFile = changelogFile;
         this.driverClassName = driverClassName;
         this.hibernateDdlAuto = hibernateDdlAuto;
+        this.hibernatePhysicalNamingStrategy = hibernatePhysicalNamingStrategy;
     }
 }

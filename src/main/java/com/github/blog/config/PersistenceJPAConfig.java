@@ -13,6 +13,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * @author Raman Haurylau
@@ -28,14 +29,12 @@ public class PersistenceJPAConfig {
         em.setDataSource(dataSource);
         em.setPackagesToScan("com.github.blog.model");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-//        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-//
-//        Properties properties = new Properties();
-//        properties.setProperty("hibernate.hbm2ddl.auto", dataSourceProperties.getHibernateDdlAuto());
-//
-//        em.setJpaVendorAdapter(vendorAdapter);
-//        em.setJpaProperties(properties);
 
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.hbm2ddl.auto", dataSourceProperties.getHibernateDdlAuto());
+        properties.setProperty("hibernate.physical_naming_strategy", dataSourceProperties.getHibernatePhysicalNamingStrategy());
+
+        em.setJpaProperties(properties);
         return em;
     }
 
