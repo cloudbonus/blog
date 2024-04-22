@@ -1,14 +1,14 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.CommentReaction}
  */
-@Data
+@Value
 public class CommentReactionDto {
-    private String reactionType;
-
-    private CommentDto comment;
-    private UserDto user;
+    Long id;
+    CommentDto comment;
+    UserDto user;
+    String reactionType;
 }

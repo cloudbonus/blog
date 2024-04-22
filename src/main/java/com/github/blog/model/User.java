@@ -1,25 +1,53 @@
 package com.github.blog.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-/**
- * @author Raman Haurylau
- */
-@Data
+@Getter
+@Setter
+@Entity
+@Table(name = "\"user\"", schema = "blogging_platform")
 public class User {
-    @JsonIgnore
-    private int id;
-    private String login;
-    private String password;
-    private String email;
-    @JsonIgnore
-    private LocalDateTime createdAt;
-    @JsonIgnore
-    private LocalDateTime lastLogin;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", nullable = false)
+    private Long id;
 
-    private List<Role> roles;
+    @Column(nullable = false, length = Integer.MAX_VALUE)
+    private String login;
+
+    @Column(nullable = false, length = Integer.MAX_VALUE)
+    private String password;
+
+    @Column(nullable = false, length = Integer.MAX_VALUE)
+    private String email;
+
+    @Column(nullable = false)
+    private OffsetDateTime createdAt;
+
+    @Column
+    private OffsetDateTime lastLogin;
+
+    @ManyToMany
+    @JoinTable(name = "user_role", schema = "blogging_platform", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders = new ArrayList<>();
 }

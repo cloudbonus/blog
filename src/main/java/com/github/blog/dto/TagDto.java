@@ -1,11 +1,12 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Tag}
  */
-@Data
+@Value
 public class TagDto {
-    private String name;
+    Long id;
+    String tagName;
 }

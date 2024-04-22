@@ -2,38 +2,39 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.TagDao;
 import com.github.blog.dto.TagDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Tag;
 import com.github.blog.service.TagService;
-import lombok.AllArgsConstructor;
+import com.github.blog.service.mapper.TagMapper;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
     private final TagDao tagDao;
-    private final Mapper mapper;
+    private final TagMapper tagMapper;
 
     @Override
     public TagDto create(TagDto tagDto) {
-        Tag tag = mapper.map(tagDto, Tag.class);
-        return mapper.map(tagDao.create(tag), TagDto.class);
+        Tag tag = tagMapper.toEntity(tagDto);
+        return tagMapper.toDto(tagDao.create(tag));
     }
 
     @Override
-    public TagDto findById(int id) {
-        Optional<Tag> result = tagDao.findById(id);
-        if (result.isEmpty()) {
+    public TagDto findById(Long id) {
+        Tag tag = tagDao.findById(id);
+        if (tag == null) {
             throw new RuntimeException("Tag not found");
         }
-        return mapper.map(result.get(), TagDto.class);
+        return tagMapper.toDto(tag);
     }
 
     @Override
@@ -42,32 +43,27 @@ public class TagServiceImpl implements TagService {
         if (tags.isEmpty()) {
             throw new RuntimeException("Cannot find any tags");
         }
-        return tags.stream().map(t -> mapper.map(t, TagDto.class)).toList();
+        return tags.stream().map(tagMapper::toDto).toList();
     }
 
     @Override
-    public TagDto update(int id, TagDto tagDto) {
-        Optional<Tag> result = tagDao.findById(id);
+    public TagDto update(Long id, TagDto tagDto) {
+        Tag tag = tagDao.findById(id);
 
-        if (result.isEmpty()) {
+        if (tag == null) {
             throw new RuntimeException("Tag not found");
         }
 
-        Tag updatedTag = mapper.map(tagDto, Tag.class);
-        Tag tag = result.get();
+        Tag updatedTag = tagMapper.toEntity(tagDto);
 
         updatedTag.setId(tag.getId());
-
         updatedTag = tagDao.update(updatedTag);
 
-        return mapper.map(updatedTag, TagDto.class);
+        return tagMapper.toDto(updatedTag);
     }
 
     @Override
-    public int remove(int id) {
-        Tag tag = tagDao.remove(id);
-        if (tag == null) {
-            return -1;
-        } else return tag.getId();
+    public void delete(Long id) {
+        tagDao.deleteById(id);
     }
 }

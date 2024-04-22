@@ -2,16 +2,16 @@ package com.github.blog.dto;
 
 import lombok.Data;
 
-import java.util.Set;
+import java.time.OffsetDateTime;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Post}
  */
 @Data
 public class PostDto {
-    private String title;
-    private String content;
-
-    private UserDto user;
-    private Set<TagDto> tags;
+    Long id;
+    UserDto user;
+    String title;
+    String content;
+    OffsetDateTime publishedAt;
 }

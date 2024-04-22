@@ -3,9 +3,10 @@ package com.github.blog.dto;
 import lombok.Data;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Role}
  */
 @Data
 public class RoleDto {
-    private String name;
+    private Long id;
+    private String roleName;
 }

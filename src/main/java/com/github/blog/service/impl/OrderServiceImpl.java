@@ -2,40 +2,41 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.OrderDao;
 import com.github.blog.dto.OrderDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Order;
 import com.github.blog.service.OrderService;
-import lombok.AllArgsConstructor;
+import com.github.blog.service.mapper.OrderMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderDao orderDao;
-    private final Mapper mapper;
+    private final OrderMapper orderMapper;
 
     @Override
     public OrderDto create(OrderDto orderDto) {
-        Order order = mapper.map(orderDto, Order.class);
+        Order order = orderMapper.toEntity(orderDto);
         enrichOrder(order);
-        return mapper.map(orderDao.create(order), OrderDto.class);
+        return orderMapper.toDto(orderDao.create(order));
     }
 
     @Override
-    public OrderDto findById(int id) {
-        Optional<Order> result = orderDao.findById(id);
-        if (result.isEmpty()) {
+    public OrderDto findById(Long id) {
+        Order order = orderDao.findById(id);
+        if (order == null) {
             throw new RuntimeException("Order not found");
         }
-        return mapper.map(result.get(), OrderDto.class);
+        return orderMapper.toDto(order);
     }
 
     @Override
@@ -44,37 +45,33 @@ public class OrderServiceImpl implements OrderService {
         if (orders.isEmpty()) {
             throw new RuntimeException("Cannot find any orders");
         }
-        return orders.stream().map(o -> mapper.map(o, OrderDto.class)).toList();
+        return orders.stream().map(orderMapper::toDto).toList();
     }
 
     @Override
-    public OrderDto update(int id, OrderDto orderDto) {
-        Optional<Order> result = orderDao.findById(id);
+    public OrderDto update(Long id, OrderDto orderDto) {
+        Order order = orderDao.findById(id);
 
-        if (result.isEmpty()) {
+        if (order == null) {
             throw new RuntimeException("Order not found");
         }
 
-        Order updatedOrder = mapper.map(orderDto, Order.class);
-        Order order = result.get();
+        Order updatedOrder = orderMapper.toEntity(orderDto);
 
         updatedOrder.setOrderedAt(order.getOrderedAt());
         updatedOrder.setId(order.getId());
 
         updatedOrder = orderDao.update(updatedOrder);
 
-        return mapper.map(updatedOrder, OrderDto.class);
+        return orderMapper.toDto(updatedOrder);
     }
 
     @Override
-    public int remove(int id) {
-        Order order = orderDao.remove(id);
-        if (order == null) {
-            return -1;
-        } else return order.getId();
+    public void delete(Long id) {
+        orderDao.deleteById(id);
     }
 
     private void enrichOrder(Order order) {
-        order.setOrderedAt(LocalDateTime.now());
+        order.setOrderedAt(OffsetDateTime.now());
     }
 }

@@ -2,38 +2,39 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostReactionDao;
 import com.github.blog.dto.PostReactionDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.model.PostReaction;
 import com.github.blog.service.PostReactionService;
-import lombok.AllArgsConstructor;
+import com.github.blog.service.mapper.PostReactionMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class PostReactionServiceImpl implements PostReactionService {
 
     private final PostReactionDao postReactionDao;
-    private final Mapper mapper;
+    private final PostReactionMapper postReactionMapper;
 
     @Override
     public PostReactionDto create(PostReactionDto postReactionDto) {
-        PostReaction postReaction = mapper.map(postReactionDto, PostReaction.class);
-        return mapper.map(postReactionDao.create(postReaction), PostReactionDto.class);
+        PostReaction postReaction = postReactionMapper.toEntity(postReactionDto);
+        return postReactionMapper.toDto(postReactionDao.create(postReaction));
     }
 
     @Override
-    public PostReactionDto findById(int id) {
-        Optional<PostReaction> result = postReactionDao.findById(id);
-        if (result.isEmpty()) {
-            throw new RuntimeException("PostReaction not found");
+    public PostReactionDto findById(Long id) {
+        PostReaction postReaction = postReactionDao.findById(id);
+        if (postReaction == null) {
+            throw new RuntimeException("Post reaction not found");
         }
-        return mapper.map(result.get(), PostReactionDto.class);
+        return postReactionMapper.toDto(postReaction);
     }
 
     @Override
@@ -42,32 +43,27 @@ public class PostReactionServiceImpl implements PostReactionService {
         if (postReactions.isEmpty()) {
             throw new RuntimeException("Cannot find any post reactions");
         }
-        return postReactions.stream().map(p -> mapper.map(p, PostReactionDto.class)).toList();
+        return postReactions.stream().map(postReactionMapper::toDto).toList();
     }
 
     @Override
-    public PostReactionDto update(int id, PostReactionDto postReactionDto) {
-        Optional<PostReaction> result = postReactionDao.findById(id);
+    public PostReactionDto update(Long id, PostReactionDto postReactionDto) {
+        PostReaction postReaction = postReactionDao.findById(id);
 
-        if (result.isEmpty()) {
-            throw new RuntimeException("PostReaction not found");
+        if (postReaction == null) {
+            throw new RuntimeException("Post reaction not found");
         }
 
-        PostReaction updatedPostReaction = mapper.map(postReactionDto, PostReaction.class);
-        PostReaction postReaction = result.get();
+        PostReaction updatedPostReaction = postReactionMapper.toEntity(postReactionDto);
 
         updatedPostReaction.setId(postReaction.getId());
-
         updatedPostReaction = postReactionDao.update(updatedPostReaction);
 
-        return mapper.map(updatedPostReaction, PostReactionDto.class);
+        return postReactionMapper.toDto(updatedPostReaction);
     }
 
     @Override
-    public int remove(int id) {
-        PostReaction postReaction = postReactionDao.remove(id);
-        if (postReaction == null) {
-            return -1;
-        } else return postReaction.getId();
+    public void delete(Long id) {
+        postReactionDao.deleteById(id);
     }
 }

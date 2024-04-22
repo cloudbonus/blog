@@ -5,5 +5,5 @@ import com.github.blog.dto.PostReactionDto;
 /**
  * @author Raman Haurylau
  */
-public interface PostReactionService extends CrudService<PostReactionDto> {
+public interface PostReactionService extends CrudService<PostReactionDto, Long> {
 }

@@ -2,41 +2,42 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.CommentDao;
 import com.github.blog.dto.CommentDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Comment;
 import com.github.blog.service.CommentService;
-import lombok.AllArgsConstructor;
+import com.github.blog.service.mapper.CommentMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;
-    private final Mapper mapper;
+    private final CommentMapper commentMapper;
 
 
     @Override
     public CommentDto create(CommentDto commentDto) {
-        Comment comment = mapper.map(commentDto, Comment.class);
+        Comment comment = commentMapper.toEntity(commentDto);
         enrichComment(comment);
-        return mapper.map(commentDao.create(comment), CommentDto.class);
+        return commentMapper.toDto(commentDao.create(comment));
     }
 
     @Override
-    public CommentDto findById(int id) {
-        Optional<Comment> result = commentDao.findById(id);
-        if (result.isEmpty()) {
+    public CommentDto findById(Long id) {
+        Comment comment = commentDao.findById(id);
+        if (comment == null) {
             throw new RuntimeException("Comment not found");
         }
-        return mapper.map(result.get(), CommentDto.class);
+        return commentMapper.toDto(comment);
     }
 
     @Override
@@ -45,38 +46,34 @@ public class CommentServiceImpl implements CommentService {
         if (comments.isEmpty()) {
             throw new RuntimeException("Cannot find any comments");
         }
-        return comments.stream().map(c -> mapper.map(c, CommentDto.class)).toList();
+        return comments.stream().map(commentMapper::toDto).toList();
     }
 
     @Override
-    public CommentDto update(int id, CommentDto commentDto) {
-        Optional<Comment> result = commentDao.findById(id);
+    public CommentDto update(Long id, CommentDto commentDto) {
+        Comment comment = commentDao.findById(id);
 
-        if (result.isEmpty()) {
+        if (comment == null) {
             throw new RuntimeException("Comment not found");
         }
 
-        Comment updatedComment = mapper.map(commentDto, Comment.class);
-        Comment comment = result.get();
+        Comment updatedComment = commentMapper.toEntity(commentDto);
 
         updatedComment.setId(comment.getId());
         updatedComment.setPublishedAt(comment.getPublishedAt());
 
         updatedComment = commentDao.update(updatedComment);
 
-        return mapper.map(updatedComment, CommentDto.class);
+        return commentMapper.toDto(updatedComment);
     }
 
     @Override
-    public int remove(int id) {
-        Comment comment = commentDao.remove(id);
-        if (comment == null) {
-            return -1;
-        } else return comment.getId();
+    public void delete(Long id) {
+        commentDao.deleteById(id);
     }
 
     private void enrichComment(Comment comment) {
-        comment.setPublishedAt(LocalDateTime.now());
+        comment.setPublishedAt(OffsetDateTime.now());
     }
 }
 

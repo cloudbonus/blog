@@ -1,92 +1,95 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.annotation.Transaction;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
-import com.github.blog.dao.UserRoleDao;
-import com.github.blog.dto.UserDetailsDto;
+import com.github.blog.dto.UserDetailDto;
 import com.github.blog.dto.UserDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
-import com.github.blog.model.UserDetails;
-import com.github.blog.model.UserRole;
+import com.github.blog.model.UserDetail;
 import com.github.blog.service.UserService;
-import lombok.AllArgsConstructor;
+import com.github.blog.service.mapper.UserDetailMapper;
+import com.github.blog.service.mapper.UserMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final UserMapper userMapper;
+    private final UserDetailMapper detailMapper;
     private final RoleDao roleDao;
-    private final UserRoleDao userRoleDao;
-    private final Mapper mapper;
+
 
     @Override
-    @Transaction
     public UserDto create(UserDto userDto) {
-        User user = mapper.map(userDto, User.class);
-
-        Optional<Role> result = roleDao.findByName("ROLE_USER");
-
-        if (result.isEmpty()) {
-            throw new RuntimeException("Role not found");
-        }
-
-        Role role = result.get();
-        List<Role> roleForUser = Collections.singletonList(result.get());
-        user.setRoles(roleForUser);
-
-        enrichUser(user);
-
-        user = userDao.create(user);
-
-        UserRole userRole = new UserRole();
-        userRole.setUserId(user.getId());
-        userRole.setRoleId(role.getId());
-
-        userRoleDao.create(userRole);
-
-        return mapper.map(user, UserDto.class);
+        User user = userMapper.toEntity(userDto);
+        userDao.create(user);
+        Role role = roleDao.findByName("ROLE_USER");
+        user.getRoles().add(role);
+        role.getUsers().add(user);
+        roleDao.update(role);
+        user = userDao.update(user);
+        return userMapper.toDto(user);
     }
 
     @Override
-    public UserDto findById(int id) {
-        Optional<User> result = userDao.findById(id);
+    public UserDto findById(Long id) {
+        User user = userDao.findById(id);
 
-        if (result.isEmpty()) {
+        if (user == null) {
             throw new RuntimeException("User not found");
         }
 
-        User user = result.get();
-
         enrichUser(user);
-
-        return mapper.map(user, UserDto.class);
+        return userMapper.toDto(user);
     }
 
     @Override
-    public List<UserDto> findAllByUniversity(UserDetailsDto userDetailsDto) {
-        UserDetails userDetails = mapper.map(userDetailsDto, UserDetails.class);
+    public List<UserDto> findAllByUniversity(UserDetailDto userDetailsDto) {
+        UserDetail userDetails = detailMapper.toEntity(userDetailsDto);
 
         List<User> users = userDao.findAllByUniversity(userDetails.getUniversityName());
-        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
+
+        return users.stream().map(userMapper::toDto).toList();
     }
 
     @Override
     public List<UserDto> findAllByRole(String role) {
         List<User> users = userDao.findAllByRole(role);
-        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
+        return users.stream().map(userMapper::toDto).toList();
+    }
+
+    @Override
+    public List<UserDto> findAllByJobTitle(UserDetailDto userDetailsDto) {
+        UserDetail userDetails = detailMapper.toEntity(userDetailsDto);
+
+        List<User> users = userDao.findAllByJobTitle(userDetails.getJobTitle());
+
+        return users.stream().map(userMapper::toDto).toList();
+    }
+
+    @Override
+    public UserDto findByLogin(UserDto userDto) {
+        User user = userMapper.toEntity(userDto);
+
+        user = userDao.findByLogin(user.getLogin());
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -96,19 +99,19 @@ public class UserServiceImpl implements UserService {
         if (users.isEmpty()) {
             throw new RuntimeException("Cannot find any users");
         }
-        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
+
+        return users.stream().map(userMapper::toDto).toList();
     }
 
     @Override
-    public UserDto update(int id, UserDto userDto) {
-        Optional<User> result = userDao.findById(id);
+    public UserDto update(Long id, UserDto userDto) {
+        User user = userDao.findById(id);
 
-        if (result.isEmpty()) {
+        if (user == null) {
             throw new RuntimeException("User not found");
         }
 
-        User updatedUser = mapper.map(userDto, User.class);
-        User user = result.get();
+        User updatedUser = userMapper.toEntity(userDto);
 
         updatedUser.setId(user.getId());
         updatedUser.setCreatedAt(user.getCreatedAt());
@@ -116,26 +119,15 @@ public class UserServiceImpl implements UserService {
 
         updatedUser = userDao.update(updatedUser);
 
-        return mapper.map(updatedUser, UserDto.class);
+        return userMapper.toDto(updatedUser);
     }
 
     @Override
-    public int remove(int id) {
-        User user = userDao.remove(id);
-        if (user == null) {
-            return -1;
-        } else return user.getId();
+    public void delete(Long id) {
+        userDao.deleteById(id);
     }
 
     private void enrichUser(User user) {
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(LocalDateTime.now());
-            user.setLastLogin(LocalDateTime.now());
-            Role role = new Role();
-            role.setName("ROLE_USER");
-            List<Role> userRole = Collections.singletonList(role);
-            user.setRoles(userRole);
-        }
-        user.setCreatedAt(LocalDateTime.now());
+        user.setLastLogin(OffsetDateTime.now());
     }
 }

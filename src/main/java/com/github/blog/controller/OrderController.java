@@ -1,9 +1,9 @@
 package com.github.blog.controller;
 
+import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.OrderDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.service.OrderService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -12,34 +12,30 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-    private final Mapper mapper;
+    private final JsonMapper jsonMapper;
 
     public String create(OrderDto orderDto) {
-        return mapper.convertToJson(orderService.create(orderDto));
+        return jsonMapper.convertToJson(orderService.create(orderDto));
     }
 
-    public String findById(int id) {
-        return mapper.convertToJson(orderService.findById(id));
+    public String findById(Long id) {
+        return jsonMapper.convertToJson(orderService.findById(id));
     }
 
     public String findAll() {
         List<OrderDto> orders = orderService.findAll();
-        return mapper.convertToJson(orders);
+        return jsonMapper.convertToJson(orders);
     }
 
-    public OrderDto update(int id, OrderDto orderDto) {
+    public OrderDto update(Long id, OrderDto orderDto) {
         return orderService.update(id, orderDto);
     }
 
-    public String remove(int id) {
-        int result = orderService.remove(id);
-        if (result > 0)
-            return String.format("Removed Successfully %d", result);
-        else return "Could not remove";
+    public void delete(Long id) {
+        orderService.delete(id);
     }
-
 }
 

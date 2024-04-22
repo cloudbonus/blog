@@ -2,63 +2,52 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.PostDao;
 import com.github.blog.model.Post;
+import com.github.blog.model.Post_;
+import com.github.blog.model.Tag;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Raman Haurylau
  */
 @Repository
-public class PostDaoImpl implements PostDao {
-    private static final List<Post> POSTS = new CopyOnWriteArrayList<>();
+public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
 
-    @Override
-    public Optional<Post> findById(Integer id) {
-        return POSTS.stream().filter(p -> p.getId() == id).findAny();
+    public List<Post> findAllByLogin(String login) {
+        String jpql = "select p from Post p join fetch p.user u where u.login = :login";
+        TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
+        query.setParameter("login", login);
+        return query.getResultList();
     }
 
-    @Override
-    public List<Post> findAll() {
-        return POSTS;
+    public List<Post> findAllByTag(String tagName) {
+        EntityGraph<Post> graph = entityManager.createEntityGraph(Post.class);
+        graph.addSubgraph(Post_.user);
+
+        String jpql = "SELECT p FROM Post p JOIN p.tags t WHERE t.tagName = :tagName";
+
+        TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
+        query.setParameter("tagName", tagName);
+        query.setHint("jakarta.persistence.loadgraph", graph);
+
+        return query.getResultList();
     }
 
-    @Override
-    public Post create(Post post) {
-        POSTS.add(post);
-        int index = POSTS.size();
-        post.setId(index);
+    public Post updateTags(Post post, Set<Tag> tags) {
+        Set<Long> newTagIds = tags.stream().map(Tag::getId).collect(Collectors.toSet());
+        post.getTags().removeIf(tag -> !newTagIds.contains(tag.getId()));
+
+        for (Tag tag : tags) {
+            post.getTags().add(tag);
+        }
+
+        entityManager.merge(post);
+
         return post;
-    }
-
-    @Override
-    public Post update(Post post) {
-        for (int i = 0; i < POSTS.size(); i++) {
-            if (POSTS.get(i).getId() == post.getId()) {
-                POSTS.set(i, post);
-                return post;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Post remove(Integer id) {
-        Post postToRemove = null;
-
-        for (Post p : POSTS) {
-            if (p.getId() == id) {
-                postToRemove = p;
-                break;
-            }
-        }
-
-        if (postToRemove != null) {
-            POSTS.remove(postToRemove);
-        }
-
-        return postToRemove;
     }
 }

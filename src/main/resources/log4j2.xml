@@ -6,9 +6,12 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="org.springframework" level="WARN"/>
+        <Logger name="org.hibernate.SQL" level="DEBUG"/>
+        <Logger name="com.github.blog" level="DEBUG"/>
+
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
+
 </Configuration>

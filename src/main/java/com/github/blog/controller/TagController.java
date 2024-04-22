@@ -1,9 +1,9 @@
 package com.github.blog.controller;
 
+import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.TagDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.service.TagService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -12,33 +12,29 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TagController {
     private final TagService tagService;
-    private final Mapper mapper;
+    private final JsonMapper jsonMapper;
 
     public String create(TagDto tagDto) {
-        return mapper.convertToJson(tagService.create(tagDto));
+        return jsonMapper.convertToJson(tagService.create(tagDto));
     }
 
-    public String findById(int id) {
-        return mapper.convertToJson(tagService.findById(id));
+    public String findById(Long id) {
+        return jsonMapper.convertToJson(tagService.findById(id));
     }
 
     public String findAll() {
         List<TagDto> tags = tagService.findAll();
-        return mapper.convertToJson(tags);
+        return jsonMapper.convertToJson(tags);
     }
 
-    public String update(int id, TagDto tagDto) {
-        return mapper.convertToJson(tagService.update(id, tagDto));
+    public String update(Long id, TagDto tagDto) {
+        return jsonMapper.convertToJson(tagService.update(id, tagDto));
     }
 
-    public String remove(int id) {
-        int result = tagService.remove(id);
-        if (result > 0)
-            return String.format("Removed Successfully %d", result);
-        else return "Could not remove";
+    public void delete(Long id) {
+        tagService.delete(id);
     }
-
 }

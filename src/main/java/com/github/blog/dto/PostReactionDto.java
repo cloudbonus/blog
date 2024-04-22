@@ -1,14 +1,14 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.PostReaction}
  */
-@Data
+@Value
 public class PostReactionDto {
-    private String reactionType;
-
-    private PostDto post;
-    private UserDto user;
+    Long id;
+    PostDto post;
+    UserDto user;
+    String reactionType;
 }

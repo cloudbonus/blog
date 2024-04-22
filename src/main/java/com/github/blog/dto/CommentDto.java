@@ -1,14 +1,17 @@
 package com.github.blog.dto;
 
-import lombok.Data;
+import lombok.Value;
+
+import java.time.OffsetDateTime;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Comment}
  */
-@Data
+@Value
 public class CommentDto {
-    private String content;
-
-    private PostDto post;
-    private UserDto user;
+    Long id;
+    PostDto post;
+    UserDto user;
+    String content;
+    OffsetDateTime publishedAt;
 }

@@ -1,9 +1,9 @@
 package com.github.blog.controller;
 
+import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.CommentReactionDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.service.CommentReactionService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -12,33 +12,30 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommentReactionController {
     private final CommentReactionService commentReactionService;
-    private final Mapper mapper;
+    private final JsonMapper jsonMapper;
 
     public String create(CommentReactionDto commentReactionDto) {
-        return mapper.convertToJson(commentReactionService.create(commentReactionDto));
+        return jsonMapper.convertToJson(commentReactionService.create(commentReactionDto));
     }
 
-    public String findById(int id) {
-        return mapper.convertToJson(commentReactionService.findById(id));
+    public String findById(Long id) {
+        return jsonMapper.convertToJson(commentReactionService.findById(id));
     }
 
     public String findAll() {
         List<CommentReactionDto> commentReactions = commentReactionService.findAll();
-        return mapper.convertToJson(commentReactions);
+        return jsonMapper.convertToJson(commentReactions);
     }
 
-    public String update(int id, CommentReactionDto commentReactionDto) {
-        return mapper.convertToJson(commentReactionService.update(id, commentReactionDto));
+    public String update(Long id, CommentReactionDto commentReactionDto) {
+        return jsonMapper.convertToJson(commentReactionService.update(id, commentReactionDto));
     }
 
-    public String remove(int id) {
-        int result = commentReactionService.remove(id);
-        if (result > 0)
-            return String.format("Removed Successfully %d", result);
-        else return "Could not remove";
+    public void delete(Long id) {
+        commentReactionService.delete(id);
     }
 }
 

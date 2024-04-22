@@ -2,16 +2,17 @@ package com.github.blog.dto;
 
 import lombok.Data;
 
-import java.util.Set;
+import java.time.OffsetDateTime;
 
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.User}
  */
 @Data
 public class UserDto {
+    private Long id;
     private String login;
     private String password;
     private String email;
-
-    private Set<RoleDto> roles;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime lastLogin;
 }

@@ -2,40 +2,41 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostDao;
 import com.github.blog.dto.PostDto;
-import com.github.blog.mapper.Mapper;
 import com.github.blog.model.Post;
 import com.github.blog.service.PostService;
-import lombok.AllArgsConstructor;
+import com.github.blog.service.mapper.PostMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Service
-@AllArgsConstructor
+@Transactional
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
     private final PostDao postDao;
-    private final Mapper mapper;
+    private final PostMapper postMapper;
 
     @Override
     public PostDto create(PostDto postDto) {
-        Post post = mapper.map(postDto, Post.class);
+        Post post = postMapper.toEntity(postDto);
         enrichPost(post);
-        return mapper.map(postDao.create(post), PostDto.class);
+        return postMapper.toDto(postDao.create(post));
     }
 
     @Override
-    public PostDto findById(int id) {
-        Optional<Post> result = postDao.findById(id);
-        if (result.isEmpty()) {
+    public PostDto findById(Long id) {
+        Post post = postDao.findById(id);
+        if (post == null) {
             throw new RuntimeException("Post not found");
         }
-        return mapper.map(result.get(), PostDto.class);
+        return postMapper.toDto(post);
     }
 
     @Override
@@ -44,38 +45,34 @@ public class PostServiceImpl implements PostService {
         if (posts.isEmpty()) {
             throw new RuntimeException("Cannot find any posts");
         }
-        return posts.stream().map(p -> mapper.map(p, PostDto.class)).toList();
+        return posts.stream().map(postMapper::toDto).toList();
     }
 
     @Override
-    public PostDto update(int id, PostDto postDto) {
-        Optional<Post> result = postDao.findById(id);
+    public PostDto update(Long id, PostDto postDto) {
+        Post post = postDao.findById(id);
 
-        if (result.isEmpty()) {
+        if (post == null) {
             throw new RuntimeException("Post not found");
         }
 
-        Post updatedPost = mapper.map(postDto, Post.class);
-        Post post = result.get();
+        Post updatedPost = postMapper.toEntity(postDto);
 
         updatedPost.setId(post.getId());
         updatedPost.setPublishedAt(post.getPublishedAt());
 
         updatedPost = postDao.update(updatedPost);
 
-        return mapper.map(updatedPost, PostDto.class);
+        return postMapper.toDto(updatedPost);
     }
 
     @Override
-    public int remove(int id) {
-        Post post = postDao.remove(id);
-        if (post == null) {
-            return -1;
-        } else return post.getId();
+    public void delete(Long id) {
+        postDao.deleteById(id);
     }
 
     private void enrichPost(Post post) {
-        post.setPublishedAt(LocalDateTime.now());
+        post.setPublishedAt(OffsetDateTime.now());
     }
 }
 
