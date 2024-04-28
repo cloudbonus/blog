@@ -1,0 +1,33 @@
+package com.github.blog.dao;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+import javax.sql.DataSource;
+
+
+/**
+ * @author Raman Haurylau
+ */
+@Configuration
+@ComponentScan(basePackages = "com.github.blog.dao")
+public class DaoTestConfig {
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public PostgreSQLContainer<?> postgresContainer() {
+        return new PostgreSQLContainer<>("postgres:latest");
+    }
+
+    @Bean
+    public DataSource dataSource(final PostgreSQLContainer<?> container) {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+
+        dataSource.setDriverClassName(container.getDriverClassName());
+        dataSource.setUrl(container.getJdbcUrl());
+        dataSource.setUsername(container.getUsername());
+        dataSource.setPassword(container.getPassword());
+        return dataSource;
+    }
+}
