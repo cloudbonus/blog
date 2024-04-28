@@ -1,40 +1,61 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.PostDto;
 import com.github.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final JsonMapper jsonMapper;
 
-    public String create(PostDto postDto) {
-        return jsonMapper.convertToJson(postService.create(postDto));
+    @PostMapping
+    public PostDto create(@RequestBody PostDto postDto) {
+        return postService.create(postDto);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(postService.findById(id));
+    @GetMapping("{id}")
+    public PostDto findById(@PathVariable Long id) {
+        return postService.findById(id);
     }
 
-    public String findAll() {
-        List<PostDto> posts = postService.findAll();
-        return jsonMapper.convertToJson(posts);
+    @GetMapping
+    public List<PostDto> findAll() {
+        return postService.findAll();
     }
 
-    public String update(Long id, PostDto postDto) {
-        return jsonMapper.convertToJson(postService.update(id, postDto));
+    @PutMapping("{id}")
+    public PostDto update(@PathVariable("id") Long id, @RequestBody PostDto postDto) {
+        return postService.update(id, postDto);
     }
 
-    public void delete(Long id) {
-        postService.delete(id);
+    @GetMapping("login")
+    public List<PostDto> findAllByLogin(@RequestParam(name = "loginName") String login) {
+        return postService.findAllByLogin(login);
+    }
+
+    @GetMapping("tag")
+    public List<PostDto> findAllByTag(@RequestParam(name = "tagName") String tagName) {
+        return postService.findAllByTag(tagName);
+    }
+
+    @DeleteMapping("{id}")
+    public PostDto delete(@PathVariable("id") Long id) {
+        return postService.delete(id);
     }
 }

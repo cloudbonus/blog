@@ -1,41 +1,51 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.service.CommentReactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("commentreactions")
 @RequiredArgsConstructor
 public class CommentReactionController {
     private final CommentReactionService commentReactionService;
-    private final JsonMapper jsonMapper;
 
-    public String create(CommentReactionDto commentReactionDto) {
-        return jsonMapper.convertToJson(commentReactionService.create(commentReactionDto));
+    @PostMapping
+    public CommentReactionDto create(@RequestBody CommentReactionDto commentReactionDto) {
+        return commentReactionService.create(commentReactionDto);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(commentReactionService.findById(id));
+    @GetMapping("{id}")
+    public CommentReactionDto findById(@PathVariable("id") Long id) {
+        return commentReactionService.findById(id);
     }
 
-    public String findAll() {
-        List<CommentReactionDto> commentReactions = commentReactionService.findAll();
-        return jsonMapper.convertToJson(commentReactions);
+    @GetMapping
+    public List<CommentReactionDto> findAll() {
+        return commentReactionService.findAll();
     }
 
-    public String update(Long id, CommentReactionDto commentReactionDto) {
-        return jsonMapper.convertToJson(commentReactionService.update(id, commentReactionDto));
+    @PutMapping("{id}")
+    public CommentReactionDto update(@PathVariable("id") Long id, @RequestBody CommentReactionDto commentReactionDto) {
+        return commentReactionService.update(id, commentReactionDto);
     }
 
-    public void delete(Long id) {
-        commentReactionService.delete(id);
+    @DeleteMapping("{id}")
+    public CommentReactionDto delete(@PathVariable("id") Long id) {
+        return commentReactionService.delete(id);
     }
 }
 

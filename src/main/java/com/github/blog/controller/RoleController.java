@@ -1,41 +1,51 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
 import com.github.blog.dto.RoleDto;
 import com.github.blog.service.RoleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("roles")
 @RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;
-    private final JsonMapper jsonMapper;
 
-    public String create(RoleDto roleDto) {
-        return jsonMapper.convertToJson(roleService.create(roleDto));
+    @PostMapping
+    public RoleDto create(@RequestBody RoleDto roleDto) {
+        return roleService.create(roleDto);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(roleService.findById(id));
+    @GetMapping("{id}")
+    public RoleDto findById(@PathVariable("id") Long id) {
+        return roleService.findById(id);
     }
 
-    public String findAll() {
-        List<RoleDto> roles = roleService.findAll();
-        return jsonMapper.convertToJson(roles);
+    @GetMapping
+    public List<RoleDto> findAll() {
+        return roleService.findAll();
     }
 
-    public String update(Long id, RoleDto roleDto) {
-        return jsonMapper.convertToJson(roleService.update(id, roleDto));
+    @PutMapping("{id}")
+    public RoleDto update(@PathVariable("id") Long id, @RequestBody RoleDto roleDto) {
+        return roleService.update(id, roleDto);
     }
 
-    public void delete(Long id) {
-        roleService.delete(id);
+    @DeleteMapping("{id}")
+    public RoleDto delete(@PathVariable("id") Long id) {
+        return roleService.delete(id);
     }
 }
 
