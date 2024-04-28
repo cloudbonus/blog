@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: 'homework2-postgres'
+    environment:
+      POSTGRES_DB: "senladb"
+      POSTGRES_USER: "senlapguser"
+      POSTGRES_PASSWORD: "pgpwd4senla"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  tomcat:
+    image: tomcat:latest
+    volumes:
+      - ./build/libs:/usr/local/tomcat/webapps
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    environment:
+      JPDA_ADDRESS: 8000
+    command: [ "catalina.sh", "jpda", "run" ]
+
+volumes:
+  pgdata:

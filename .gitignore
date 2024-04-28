@@ -15,9 +15,6 @@ target/
 # Java Class Files
 *.class
 
-# Compose
-docker-compose.yaml
-
 #Gradle
 /.gradle/
 /build/
