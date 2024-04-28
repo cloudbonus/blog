@@ -1,17 +1,17 @@
 package com.github.blog.dto;
 
-import lombok.Value;
+import lombok.Data;
 
 import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link com.github.blog.model.Comment}
  */
-@Value
+@Data
 public class CommentDto {
     Long id;
-    PostDto post;
-    UserDto user;
+    Long postId;
+    Long userId;
     String content;
     OffsetDateTime publishedAt;
 }

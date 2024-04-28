@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 @Data
 public class PostDto {
     Long id;
-    UserDto user;
+    Long userId;
     String title;
     String content;
     OffsetDateTime publishedAt;
