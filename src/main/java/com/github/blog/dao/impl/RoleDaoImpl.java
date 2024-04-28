@@ -2,8 +2,11 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.model.Role;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
@@ -11,10 +14,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
 
-    public Role findByName(String name) {
+    public Optional<Role> findByName(String name) {
         TypedQuery<Role> query = entityManager.createQuery("SELECT r FROM Role r WHERE r.roleName = :name", Role.class);
         query.setParameter("name", name);
-        return query.getSingleResult();
+        try {
+            Role role = query.getSingleResult();
+            return Optional.of(role);
+        } catch (NoResultException ex) {
+            return Optional.empty();
+        }
     }
 }
 

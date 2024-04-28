@@ -6,6 +6,7 @@ import jakarta.persistence.PersistenceContext;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
@@ -22,8 +23,8 @@ public class AbstractJpaDao<E, ID> implements CrudDao<E, ID> {
     @PersistenceContext
     protected EntityManager entityManager;
 
-    public E findById(ID id) {
-        return entityManager.find(clazz, id);
+    public Optional<E> findById(ID id) {
+        return Optional.of(entityManager.find(clazz, id));
     }
 
     @SuppressWarnings("unchecked")
@@ -42,10 +43,5 @@ public class AbstractJpaDao<E, ID> implements CrudDao<E, ID> {
 
     public void delete(E entity) {
         entityManager.remove(entity);
-    }
-
-    public void deleteById(ID entityId) {
-        final E entity = findById(entityId);
-        delete(entity);
     }
 }

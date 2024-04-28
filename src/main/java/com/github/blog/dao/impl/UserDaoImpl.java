@@ -15,6 +15,7 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
@@ -46,7 +47,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
     }
 
     @Override
-    public User findByLogin(String login) {
+    public Optional<User> findByLogin(String login) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> cq = cb.createQuery(User.class);
 
@@ -57,9 +58,10 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         cq.select(userRoot).where(loginPredicate);
 
         try {
-            return entityManager.createQuery(cq).getSingleResult();
+            User user = entityManager.createQuery(cq).getSingleResult();
+            return Optional.of(user);
         } catch (NoResultException ex) {
-            return null;
+            return Optional.empty();
         }
     }
 

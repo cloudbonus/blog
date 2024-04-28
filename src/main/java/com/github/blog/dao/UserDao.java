@@ -3,6 +3,7 @@ package com.github.blog.dao;
 import com.github.blog.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
@@ -14,5 +15,5 @@ public interface UserDao extends CrudDao<User, Long> {
 
     List<User> findAllByJobTitle(String jobTitle);
 
-    User findByLogin(String login);
+    Optional<User> findByLogin(String login);
 }

@@ -1,12 +1,13 @@
 package com.github.blog.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 public interface CrudDao<E, ID> {
-    E findById(final ID id);
+    Optional<E> findById(final ID id);
 
     List<E> findAll();
 
@@ -15,6 +16,4 @@ public interface CrudDao<E, ID> {
     E update(final E entity);
 
     void delete(final E entity);
-
-    void deleteById(final ID entityId);
 }

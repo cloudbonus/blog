@@ -3,14 +3,11 @@ package com.github.blog.dao.impl;
 import com.github.blog.dao.PostDao;
 import com.github.blog.model.Post;
 import com.github.blog.model.Post_;
-import com.github.blog.model.Tag;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Raman Haurylau
@@ -36,18 +33,5 @@ public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
         query.setHint("jakarta.persistence.loadgraph", graph);
 
         return query.getResultList();
-    }
-
-    public Post updateTags(Post post, Set<Tag> tags) {
-        Set<Long> newTagIds = tags.stream().map(Tag::getId).collect(Collectors.toSet());
-        post.getTags().removeIf(tag -> !newTagIds.contains(tag.getId()));
-
-        for (Tag tag : tags) {
-            post.getTags().add(tag);
-        }
-
-        entityManager.merge(post);
-
-        return post;
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @ExtendWith({SpringExtension.class})
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(classes = {DataSourceTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
 public class CommentDaoImplTests {
 
     @Autowired
@@ -39,14 +40,15 @@ public class CommentDaoImplTests {
     private PostDao postDao;
 
     @Test
-    @DisplayName("comment: create")
+    @DisplayName("comment dao: create")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
-    void updateComment_LoginIsKvossing0_ReturnNonNullAndNotEmptyCommentList() {
+    void create_returnsCommentDto_whenDataIsValid() {
         String login = "kvossing0";
 
-        User user = userDao.findByLogin(login);
+        Optional<User> u = userDao.findByLogin(login);
+        assertThat(u).isPresent();
 
-        assertThat(user).isNotNull();
+        User user = u.get();
         assertThat(user.getLogin()).isEqualTo(login);
 
         List<Comment> allComments = commentDao.findAll();
@@ -74,9 +76,9 @@ public class CommentDaoImplTests {
     }
 
     @Test
-    @DisplayName("comment: update")
+    @DisplayName("comment dao: update")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
-    void updateComment_LoginIsKvossing0_ReturnsNonNullIdAndNonNullContent() {
+    void update_returnsUpdatedCommentDto_whenDataIsValid() {
         String login = "kvossing0";
 
         List<Comment> allComments = commentDao.findAllByLogin(login);
@@ -92,17 +94,19 @@ public class CommentDaoImplTests {
 
         commentDao.update(comment);
 
-        comment = commentDao.findById(updatedId);
+        Optional<Comment> c = commentDao.findById(updatedId);
+        assertThat(c).isPresent();
 
+        comment = c.get();
         assertThat(comment).isNotNull();
         assertThat(comment.getId()).isEqualTo(updatedId);
         assertThat(comment.getContent()).isEqualTo(updatedContent);
     }
 
     @Test
-    @DisplayName("comment: delete")
+    @DisplayName("comment dao: delete")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
-    void deleteComment_LoginIsKvossing0_ReturnReducedListSize() {
+    void delete_deletesComment_whenDataIsValid() {
         String login = "kvossing0";
 
         List<Comment> allCommentsByLogin = commentDao.findAllByLogin(login);
@@ -119,9 +123,9 @@ public class CommentDaoImplTests {
     }
 
     @Test
-    @DisplayName("comment: allByLogin")
+    @DisplayName("comment dao: allByLogin")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
-    void findAllCommentsByLogin_GivenLogins_ReturnsNonEmptyList() {
+    void find_findsAllCommentsByLogin_whenDataIsValid() {
         String login1 = "kvossing0";
         String login2 = "gmaccook1";
 
