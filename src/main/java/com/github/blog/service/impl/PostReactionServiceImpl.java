@@ -4,6 +4,8 @@ import com.github.blog.dao.PostReactionDao;
 import com.github.blog.dto.PostReactionDto;
 import com.github.blog.model.PostReaction;
 import com.github.blog.service.PostReactionService;
+import com.github.blog.service.exception.PostReactionErrorResult;
+import com.github.blog.service.exception.impl.PostReactionException;
 import com.github.blog.service.mapper.PostReactionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,40 +32,42 @@ public class PostReactionServiceImpl implements PostReactionService {
 
     @Override
     public PostReactionDto findById(Long id) {
-        PostReaction postReaction = postReactionDao.findById(id);
-        if (postReaction == null) {
-            throw new RuntimeException("Post reaction not found");
-        }
+        PostReaction postReaction = postReactionDao
+                .findById(id)
+                .orElseThrow(() -> new PostReactionException(PostReactionErrorResult.POST_REACTION_NOT_FOUND));
+
         return postReactionMapper.toDto(postReaction);
     }
 
     @Override
     public List<PostReactionDto> findAll() {
         List<PostReaction> postReactions = postReactionDao.findAll();
+
         if (postReactions.isEmpty()) {
-            throw new RuntimeException("Cannot find any post reactions");
+            throw new PostReactionException(PostReactionErrorResult.POST_REACTIONS_NOT_FOUND);
         }
+
         return postReactions.stream().map(postReactionMapper::toDto).toList();
     }
 
     @Override
     public PostReactionDto update(Long id, PostReactionDto postReactionDto) {
-        PostReaction postReaction = postReactionDao.findById(id);
+        PostReaction postReaction = postReactionDao
+                .findById(id)
+                .orElseThrow(() -> new PostReactionException(PostReactionErrorResult.POST_REACTION_NOT_FOUND));
 
-        if (postReaction == null) {
-            throw new RuntimeException("Post reaction not found");
-        }
+        postReaction = postReactionMapper.partialUpdate(postReactionDto, postReaction);
+        postReaction = postReactionDao.update(postReaction);
 
-        PostReaction updatedPostReaction = postReactionMapper.toEntity(postReactionDto);
-
-        updatedPostReaction.setId(postReaction.getId());
-        updatedPostReaction = postReactionDao.update(updatedPostReaction);
-
-        return postReactionMapper.toDto(updatedPostReaction);
+        return postReactionMapper.toDto(postReaction);
     }
 
     @Override
-    public void delete(Long id) {
-        postReactionDao.deleteById(id);
+    public PostReactionDto delete(Long id) {
+        PostReaction postReaction = postReactionDao
+                .findById(id)
+                .orElseThrow(() -> new PostReactionException(PostReactionErrorResult.POST_REACTION_NOT_FOUND));
+        postReactionDao.delete(postReaction);
+        return postReactionMapper.toDto(postReaction);
     }
 }

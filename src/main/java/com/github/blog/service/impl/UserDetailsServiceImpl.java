@@ -6,6 +6,10 @@ import com.github.blog.dto.UserDetailDto;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetail;
 import com.github.blog.service.UserDetailService;
+import com.github.blog.service.exception.UserDetailErrorResult;
+import com.github.blog.service.exception.UserErrorResult;
+import com.github.blog.service.exception.impl.UserDetailException;
+import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.mapper.UserDetailMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +32,10 @@ public class UserDetailsServiceImpl implements UserDetailService {
     public UserDetailDto create(UserDetailDto userDetailsDto) {
         UserDetail userDetail = detailMapper.toEntity(userDetailsDto);
 
-        User user = userDao.findById(userDetail.getId());
+        User user = userDao
+                .findById(userDetail.getId())
+                .orElseThrow(() -> new UserException(UserErrorResult.USERS_NOT_FOUND));
+
         userDetail.setUser(user);
         userDetail.setId(user.getId());
         userDetail = userDetailDao.create(userDetail);
@@ -38,41 +45,42 @@ public class UserDetailsServiceImpl implements UserDetailService {
 
     @Override
     public UserDetailDto findById(Long id) {
-        UserDetail userDetail = userDetailDao.findById(id);
-        if (userDetail == null) {
-            throw new RuntimeException("User Details not found");
-        }
+        UserDetail userDetail = userDetailDao
+                .findById(id)
+                .orElseThrow(() -> new UserDetailException(UserDetailErrorResult.USER_DETAIL_NOT_FOUND));
+
         return detailMapper.toDto(userDetail);
     }
 
     @Override
     public List<UserDetailDto> findAll() {
         List<UserDetail> userDetails = userDetailDao.findAll();
+
         if (userDetails.isEmpty()) {
-            throw new RuntimeException("Cannot find any user details");
+            throw new UserDetailException(UserDetailErrorResult.USER_DETAILS_NOT_FOUND);
         }
+
         return userDetails.stream().map(detailMapper::toDto).toList();
     }
 
     @Override
     public UserDetailDto update(Long id, UserDetailDto userDetailsDto) {
-        UserDetail userDetail = userDetailDao.findById(id);
+        UserDetail userDetail = userDetailDao
+                .findById(id)
+                .orElseThrow(() -> new UserDetailException(UserDetailErrorResult.USER_DETAIL_NOT_FOUND));
 
-        if (userDetail == null) {
-            throw new RuntimeException("User Detail not found");
-        }
+        userDetail = detailMapper.partialUpdate(userDetailsDto, userDetail);
+        userDetail = userDetailDao.update(userDetail);
 
-        UserDetail updatedUserDetails = detailMapper.toEntity(userDetailsDto);
-
-        updatedUserDetails.setId(userDetail.getId());
-
-        updatedUserDetails = userDetailDao.update(updatedUserDetails);
-
-        return detailMapper.toDto(updatedUserDetails);
+        return detailMapper.toDto(userDetail);
     }
 
     @Override
-    public void delete(Long id) {
-        userDetailDao.deleteById(id);
+    public UserDetailDto delete(Long id) {
+        UserDetail userDetail = userDetailDao
+                .findById(id)
+                .orElseThrow(() -> new UserDetailException(UserDetailErrorResult.USER_DETAIL_NOT_FOUND));
+        userDetailDao.delete(userDetail);
+        return detailMapper.toDto(userDetail);
     }
 }

@@ -2,13 +2,14 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
-import com.github.blog.dto.UserDetailDto;
 import com.github.blog.dto.UserDto;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
-import com.github.blog.model.UserDetail;
 import com.github.blog.service.UserService;
-import com.github.blog.service.mapper.UserDetailMapper;
+import com.github.blog.service.exception.RoleErrorResult;
+import com.github.blog.service.exception.UserErrorResult;
+import com.github.blog.service.exception.impl.RoleException;
+import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,67 +28,75 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
     private final UserMapper userMapper;
-    private final UserDetailMapper detailMapper;
     private final RoleDao roleDao;
 
 
     @Override
     public UserDto create(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
+
         userDao.create(user);
-        Role role = roleDao.findByName("ROLE_USER");
+
+        Role role = roleDao
+                .findByName("ROLE_USER")
+                .orElseThrow(() -> new RoleException(RoleErrorResult.ROLE_NOT_FOUND));
+
         user.getRoles().add(role);
         role.getUsers().add(user);
+
         roleDao.update(role);
         user = userDao.update(user);
+
         return userMapper.toDto(user);
     }
 
     @Override
     public UserDto findById(Long id) {
-        User user = userDao.findById(id);
-
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
-
+        User user = userDao
+                .findById(id)
+                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
         enrichUser(user);
         return userMapper.toDto(user);
     }
 
     @Override
-    public List<UserDto> findAllByUniversity(UserDetailDto userDetailsDto) {
-        UserDetail userDetails = detailMapper.toEntity(userDetailsDto);
+    public List<UserDto> findAllByUniversity(String universityName) {
+        List<User> users = userDao.findAllByUniversity(universityName);
 
-        List<User> users = userDao.findAllByUniversity(userDetails.getUniversityName());
-
-        return users.stream().map(userMapper::toDto).toList();
-    }
-
-    @Override
-    public List<UserDto> findAllByRole(String role) {
-        List<User> users = userDao.findAllByRole(role);
-        return users.stream().map(userMapper::toDto).toList();
-    }
-
-    @Override
-    public List<UserDto> findAllByJobTitle(UserDetailDto userDetailsDto) {
-        UserDetail userDetails = detailMapper.toEntity(userDetailsDto);
-
-        List<User> users = userDao.findAllByJobTitle(userDetails.getJobTitle());
-
-        return users.stream().map(userMapper::toDto).toList();
-    }
-
-    @Override
-    public UserDto findByLogin(UserDto userDto) {
-        User user = userMapper.toEntity(userDto);
-
-        user = userDao.findByLogin(user.getLogin());
-
-        if (user == null) {
-            throw new RuntimeException("User not found");
+        if (users.isEmpty()) {
+            throw new UserException(UserErrorResult.USERS_NOT_FOUND);
         }
+
+        return users.stream().map(userMapper::toDto).toList();
+    }
+
+    @Override
+    public List<UserDto> findAllByRole(String roleName) {
+        List<User> users = userDao.findAllByRole(roleName);
+
+        if (users.isEmpty()) {
+            throw new UserException(UserErrorResult.USERS_NOT_FOUND);
+        }
+
+        return users.stream().map(userMapper::toDto).toList();
+    }
+
+    @Override
+    public List<UserDto> findAllByJobTitle(String jobName) {
+        List<User> users = userDao.findAllByJobTitle(jobName);
+
+        if (users.isEmpty()) {
+            throw new UserException(UserErrorResult.USERS_NOT_FOUND);
+        }
+
+        return users.stream().map(userMapper::toDto).toList();
+    }
+
+    @Override
+    public UserDto findByLogin(String login) {
+        User user = userDao
+                .findByLogin(login)
+                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
 
         return userMapper.toDto(user);
     }
@@ -97,7 +106,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userDao.findAll();
 
         if (users.isEmpty()) {
-            throw new RuntimeException("Cannot find any users");
+            throw new UserException(UserErrorResult.USERS_NOT_FOUND);
         }
 
         return users.stream().map(userMapper::toDto).toList();
@@ -105,26 +114,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(Long id, UserDto userDto) {
-        User user = userDao.findById(id);
+        User user = userDao
+                .findById(id)
+                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
 
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+        user = userMapper.partialUpdate(userDto, user);
+        user = userDao.update(user);
 
-        User updatedUser = userMapper.toEntity(userDto);
-
-        updatedUser.setId(user.getId());
-        updatedUser.setCreatedAt(user.getCreatedAt());
-        updatedUser.setLastLogin(user.getLastLogin());
-
-        updatedUser = userDao.update(updatedUser);
-
-        return userMapper.toDto(updatedUser);
+        return userMapper.toDto(user);
     }
 
     @Override
-    public void delete(Long id) {
-        userDao.deleteById(id);
+    public UserDto delete(Long id) {
+        User user = userDao
+                .findById(id)
+                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
+        userDao.delete(user);
+        return userMapper.toDto(user);
     }
 
     private void enrichUser(User user) {

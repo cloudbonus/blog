@@ -4,6 +4,8 @@ import com.github.blog.dao.CommentReactionDao;
 import com.github.blog.dto.CommentReactionDto;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.service.CommentReactionService;
+import com.github.blog.service.exception.CommentReactionErrorResult;
+import com.github.blog.service.exception.impl.CommentReactionException;
 import com.github.blog.service.mapper.CommentReactionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,41 +32,43 @@ public class CommentReactionServiceImpl implements CommentReactionService {
 
     @Override
     public CommentReactionDto findById(Long id) {
-        CommentReaction commentReaction = commentReactionDao.findById(id);
-        if (commentReaction == null) {
-            throw new RuntimeException("Comment reaction not found");
-        }
+        CommentReaction commentReaction = commentReactionDao
+                .findById(id)
+                .orElseThrow(() -> new CommentReactionException(CommentReactionErrorResult.COMMENT_REACTION_NOT_FOUND));
+
         return commentReactionMapper.toDto(commentReaction);
     }
 
     @Override
     public List<CommentReactionDto> findAll() {
         List<CommentReaction> commentReactions = commentReactionDao.findAll();
+
         if (commentReactions.isEmpty()) {
-            throw new RuntimeException("Cannot find any comment reactions");
+            throw new CommentReactionException(CommentReactionErrorResult.COMMENT_REACTIONS_NOT_FOUND);
         }
+
         return commentReactions.stream().map(commentReactionMapper::toDto).toList();
     }
 
     @Override
     public CommentReactionDto update(Long id, CommentReactionDto commentReactionDto) {
-        CommentReaction commentReaction = commentReactionDao.findById(id);
+        CommentReaction commentReaction = commentReactionDao
+                .findById(id)
+                .orElseThrow(() -> new CommentReactionException(CommentReactionErrorResult.COMMENT_REACTION_NOT_FOUND));
 
-        if (commentReaction == null) {
-            throw new RuntimeException("Comment reaction not found");
-        }
+        commentReaction = commentReactionMapper.partialUpdate(commentReactionDto, commentReaction);
+        commentReaction = commentReactionDao.update(commentReaction);
 
-        CommentReaction updatedCommentReaction = commentReactionMapper.toEntity(commentReactionDto);
-
-        updatedCommentReaction.setId(commentReaction.getId());
-        updatedCommentReaction = commentReactionDao.update(updatedCommentReaction);
-
-        return commentReactionMapper.toDto(updatedCommentReaction);
+        return commentReactionMapper.toDto(commentReaction);
     }
 
     @Override
-    public void delete(Long id) {
-        commentReactionDao.deleteById(id);
+    public CommentReactionDto delete(Long id) {
+        CommentReaction commentReaction = commentReactionDao
+                .findById(id)
+                .orElseThrow(() -> new CommentReactionException(CommentReactionErrorResult.COMMENT_REACTION_NOT_FOUND));
+        commentReactionDao.delete(commentReaction);
+        return commentReactionMapper.toDto(commentReaction);
     }
 }
 

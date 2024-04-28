@@ -4,6 +4,8 @@ import com.github.blog.dao.PostDao;
 import com.github.blog.dto.PostDto;
 import com.github.blog.model.Post;
 import com.github.blog.service.PostService;
+import com.github.blog.service.exception.PostErrorResult;
+import com.github.blog.service.exception.impl.PostException;
 import com.github.blog.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,43 +34,65 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto findById(Long id) {
-        Post post = postDao.findById(id);
-        if (post == null) {
-            throw new RuntimeException("Post not found");
-        }
+        Post post = postDao
+                .findById(id)
+                .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND));
+
         return postMapper.toDto(post);
     }
 
     @Override
     public List<PostDto> findAll() {
         List<Post> posts = postDao.findAll();
+
         if (posts.isEmpty()) {
-            throw new RuntimeException("Cannot find any posts");
+            throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
         }
+
         return posts.stream().map(postMapper::toDto).toList();
     }
 
     @Override
     public PostDto update(Long id, PostDto postDto) {
-        Post post = postDao.findById(id);
+        Post post = postDao
+                .findById(id)
+                .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND));
 
-        if (post == null) {
-            throw new RuntimeException("Post not found");
-        }
+        post = postMapper.partialUpdate(postDto, post);
+        post = postDao.update(post);
 
-        Post updatedPost = postMapper.toEntity(postDto);
-
-        updatedPost.setId(post.getId());
-        updatedPost.setPublishedAt(post.getPublishedAt());
-
-        updatedPost = postDao.update(updatedPost);
-
-        return postMapper.toDto(updatedPost);
+        return postMapper.toDto(post);
     }
 
     @Override
-    public void delete(Long id) {
-        postDao.deleteById(id);
+    public PostDto delete(Long id) {
+        Post post = postDao
+                .findById(id)
+                .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND));
+        postDao.delete(post);
+        return postMapper.toDto(post);
+    }
+
+    @Override
+    public List<PostDto> findAllByLogin(String login) {
+        List<Post> posts = postDao.findAllByLogin(login);
+
+        if (posts.isEmpty()) {
+            throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
+        }
+
+        return posts.stream().map(postMapper::toDto).toList();
+    }
+
+    @Override
+    public List<PostDto> findAllByTag(String tagName) {
+        List<Post> posts = postDao.findAllByTag(tagName);
+
+        if (posts.isEmpty()) {
+            throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
+        }
+
+        return posts.stream().map(postMapper::toDto).toList();
     }
 
     private void enrichPost(Post post) {

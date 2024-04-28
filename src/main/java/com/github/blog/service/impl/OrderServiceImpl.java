@@ -4,6 +4,8 @@ import com.github.blog.dao.OrderDao;
 import com.github.blog.dto.OrderDto;
 import com.github.blog.model.Order;
 import com.github.blog.service.OrderService;
+import com.github.blog.service.exception.OrderErrorResult;
+import com.github.blog.service.exception.impl.OrderException;
 import com.github.blog.service.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,43 +34,44 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto findById(Long id) {
-        Order order = orderDao.findById(id);
-        if (order == null) {
-            throw new RuntimeException("Order not found");
-        }
+        Order order = orderDao
+                .findById(id)
+                .orElseThrow(() -> new OrderException(OrderErrorResult.ORDER_NOT_FOUND));
+
         return orderMapper.toDto(order);
     }
 
     @Override
     public List<OrderDto> findAll() {
         List<Order> orders = orderDao.findAll();
+
         if (orders.isEmpty()) {
-            throw new RuntimeException("Cannot find any orders");
+            throw new OrderException(OrderErrorResult.ORDERS_NOT_FOUND);
         }
+
         return orders.stream().map(orderMapper::toDto).toList();
     }
 
     @Override
     public OrderDto update(Long id, OrderDto orderDto) {
-        Order order = orderDao.findById(id);
+        Order order = orderDao
+                .findById(id)
+                .orElseThrow(() -> new OrderException(OrderErrorResult.ORDER_NOT_FOUND));
 
-        if (order == null) {
-            throw new RuntimeException("Order not found");
-        }
+        order = orderMapper.partialUpdate(orderDto, order);
+        order = orderDao.update(order);
 
-        Order updatedOrder = orderMapper.toEntity(orderDto);
-
-        updatedOrder.setOrderedAt(order.getOrderedAt());
-        updatedOrder.setId(order.getId());
-
-        updatedOrder = orderDao.update(updatedOrder);
-
-        return orderMapper.toDto(updatedOrder);
+        return orderMapper.toDto(order);
     }
 
     @Override
-    public void delete(Long id) {
-        orderDao.deleteById(id);
+    public OrderDto delete(Long id) {
+        Order order = orderDao
+                .findById(id)
+                .orElseThrow(() -> new OrderException(OrderErrorResult.ORDER_NOT_FOUND));
+
+        orderDao.delete(order);
+        return orderMapper.toDto(order);
     }
 
     private void enrichOrder(Order order) {
