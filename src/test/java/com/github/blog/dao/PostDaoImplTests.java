@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @ExtendWith({SpringExtension.class})
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(classes = {DataSourceTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
 public class PostDaoImplTests {
 
     @Autowired
@@ -43,15 +44,17 @@ public class PostDaoImplTests {
     private CommentDao commentDao;
 
     @Test
-    @DisplayName("post: create")
+    @DisplayName("post dao: create")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql"})
-    void createPost_LoginIsKvossing0_PostIsNotNullAndIdIsNotNull() {
+    void create_returnsPostDto_whenDataIsValid() {
         String login = "kvossing0";
 
         String content = "This is the content of the first post.";
-        User user = userDao.findByLogin(login);
+        Optional<User> user = userDao.findByLogin(login);
+        assertThat(user).isPresent();
+
         Post post = new Post();
-        post.setUser(user);
+        post.setUser(user.get());
         post.setTitle("First Post");
         post.setContent(content);
         post.setPublishedAt(OffsetDateTime.now());
@@ -68,9 +71,9 @@ public class PostDaoImplTests {
     }
 
     @Test
-    @DisplayName("post: update")
+    @DisplayName("post dao: update")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql"})
-    void updatePost_LoginIsGmaccook1_ContentIsUpdated() {
+    void update_returnsUpdatedPostDto_whenDataIsValid() {
         String login = "gmaccook1";
 
         List<Post> allPostsByLogin = postDao.findAllByLogin(login);
@@ -93,9 +96,9 @@ public class PostDaoImplTests {
     }
 
     @Test
-    @DisplayName("post: delete")
+    @DisplayName("post dao: delete")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql", "/db/insert-test-data-into-comment-table.sql"})
-    void deletePost_LoginIsGmaccook1_PostAndCommentsAreDeleted() {
+    void delete_deletesPost_whenDataIsValid() {
         String login = "gmaccook1";
 
         List<Post> allPostsByLogin = postDao.findAllByLogin(login);
@@ -104,22 +107,22 @@ public class PostDaoImplTests {
 
         Post post = allPostsByLogin.get(0);
 
-        postDao.deleteById(post.getId());
+        postDao.delete(post);
 
         List<Post> allPosts = postDao.findAll();
         assertThat(allPosts).isNotEmpty().hasSize(2);
 
         List<Tag> allTags = tagDao.findAll();
-        assertThat(allTags).isNotEmpty().hasSize(2);
+        assertThat(allTags).isNotEmpty().hasSize(4);
 
         List<Comment> allComments = commentDao.findAll();
         assertThat(allComments).isNotEmpty().hasSize(2);
     }
 
     @Test
-    @DisplayName("post: findByLogin")
+    @DisplayName("post dao: findAllByLogin")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql"})
-    void findAllPostsByLogin_LoginIsKvossing0_ReturnsNonEmptyList() {
+    void find_findsAllPostsByLogin_whenDataIsValid() {
         String login = "kvossing0";
         List<Post> allPostsByLogin = postDao.findAllByLogin(login);
 
@@ -128,9 +131,9 @@ public class PostDaoImplTests {
     }
 
     @Test
-    @DisplayName("post: findByTag")
+    @DisplayName("post dao: findAllByTag")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql"})
-    void findAllPostsByTag_TagIsNews_ReturnsNonEmptyList() {
+    void find_findsAllPostsByTag_whenDataIsValid() {
         String tag1 = "news";
         String tag2 = "education";
 
@@ -144,5 +147,4 @@ public class PostDaoImplTests {
         assertThat(allPostsByTag2).isNotEmpty();
         assertThat(allPostsByTag2).hasSize(1);
     }
-
 }

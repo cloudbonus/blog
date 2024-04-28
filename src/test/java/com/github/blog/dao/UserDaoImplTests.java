@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @ExtendWith({SpringExtension.class})
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(classes = {DataSourceTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
 public class UserDaoImplTests {
 
     @Autowired
@@ -39,24 +40,25 @@ public class UserDaoImplTests {
     private UserDetailDao userDetailDao;
 
     @Test
-    @DisplayName("user: create")
+    @DisplayName("user dao: create")
     @Sql("/db/insert-test-data-into-user-table.sql")
-    void createUser_twoUsers_UserListIsNotEmptyAndSizeIsTwo() {
-        User user1 = new User();
-        user1.setLogin("login1");
-        user1.setEmail("temp1@test.by");
-        user1.setPassword("123");
-        user1.setLastLogin(OffsetDateTime.now());
-        user1.setCreatedAt(OffsetDateTime.now());
+    void create_returnsUserDto_whenDataIsValid() {
+        User user = new User();
+        user.setLogin("login1");
+        user.setEmail("temp1@test.by");
+        user.setPassword("123");
+        user.setLastLogin(OffsetDateTime.now());
+        user.setCreatedAt(OffsetDateTime.now());
 
-        Role role = roleDao.findByName("ROLE_USER");
-        user1.getRoles().add(role);
+        Optional<Role> role = roleDao.findByName("ROLE_USER");
+        assertThat(role).isPresent();
+        user.getRoles().add(role.get());
 
-        user1 = userDao.create(user1);
+        user = userDao.create(user);
 
-        assertThat(user1).isNotNull();
-        assertThat(user1.getId()).isNotNull();
-        assertThat(user1.getRoles()).isNotEmpty().hasSize(1);
+        assertThat(user).isNotNull();
+        assertThat(user.getId()).isNotNull();
+        assertThat(user.getRoles()).isNotEmpty().hasSize(1);
 
         List<User> allUsers = userDao.findAll();
 
@@ -64,14 +66,15 @@ public class UserDaoImplTests {
     }
 
     @Test
-    @DisplayName("user: update")
+    @DisplayName("user dao: update")
     @Sql("/db/insert-test-data-into-user-table.sql")
-    void updateUser_LoginIsKvossing0_LoginIsUpdated() {
+    void update_returnsUpdatedUserDto_whenDataIsValid() {
         String login = "kvossing0";
         String expectedLogin = "new_kvossing0";
 
-        User user = userDao.findByLogin(login);
-
+        Optional<User> u = userDao.findByLogin(login);
+        assertThat(u).isPresent();
+        User user = u.get();
         user.setLogin("new_kvossing0");
 
         Long id = user.getId();
@@ -84,31 +87,31 @@ public class UserDaoImplTests {
     }
 
     @Test
-    @DisplayName("user: delete")
+    @DisplayName("user dao: delete")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql"})
-    void deleteUser_LoginIsKvossing0_UserAndDetailsAreDeleted() {
+    void delete_deletesUser_whenDataIsValid() {
         String login = "kvossing0";
 
-        User user = userDao.findByLogin(login);
-
-        userDao.deleteById(user.getId());
+        Optional<User> user = userDao.findByLogin(login);
+        assertThat(user).isPresent();
+        userDao.delete(user.get());
 
         user = userDao.findByLogin(login);
 
-        assertThat(user).isNull();
+        assertThat(user).isEmpty();
 
         List<UserDetail> allUserDetail = userDetailDao.findAll();
         List<User> allUsers = userDao.findAll();
 
         assertThat(allUserDetail).isNotEmpty().hasSize(1);
         assertThat(allUsers).isNotEmpty().hasSize(1);
-        assertThat(roleDao.findAll()).isNotEmpty().hasSize(1);
+        assertThat(roleDao.findAll()).isNotEmpty().hasSize(2);
     }
 
     @Test
-    @DisplayName("user: findAllByRole")
+    @DisplayName("user dao: findAllByRole")
     @Sql("/db/insert-test-data-into-user-table.sql")
-    void findAllUsersByRole_RoleUser_ListIsNotEmptyAndSizeIsTwo() {
+    void find_findsAllUsersByRole_whenDataIsValid() {
         List<User> allUsersByRole = userDao.findAllByRole("ROLE_USER");
 
         assertThat(allUsersByRole).isNotEmpty();
@@ -116,20 +119,19 @@ public class UserDaoImplTests {
     }
 
     @Test
-    @DisplayName("user: findByLogin")
+    @DisplayName("user dao: findByLogin")
     @Sql("/db/insert-test-data-into-user-table.sql")
-    void findUserByLogin_LoginIsKvossing0_UserIsNotNullAndLoginIsEqual() {
+    void find_findsUserByLogin_whenDataIsValid() {
         String login = "kvossing0";
-        User user = userDao.findByLogin(login);
-
-        assertThat(user).isNotNull();
-        assertThat(user.getLogin()).isEqualTo(login);
+        Optional<User> user = userDao.findByLogin(login);
+        assertThat(user).isPresent();
+        assertThat(user.get().getLogin()).isEqualTo(login);
     }
 
     @Test
-    @DisplayName("user: findAllByJobTitle")
+    @DisplayName("user dao: findAllByJobTitle")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql"})
-    void findAllUsersByJobTitle_JobTitleIsSoftwareEngineer_ReturnsNonEmptyList() {
+    void find_findsAllUsersByJobTitle_whenDataIsValid() {
         String jobTitle = "Software Engineer";
         List<User> allUsersByJobTitle = userDao.findAllByJobTitle(jobTitle);
 
@@ -138,14 +140,13 @@ public class UserDaoImplTests {
     }
 
     @Test
-    @DisplayName("user: findAllByUniversity")
+    @DisplayName("user dao: findAllByUniversity")
     @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql"})
-    void findAllUsersByUniversity_UniversityIsMIT_ReturnsNonEmptyList() {
+    void find_findsAllUsersByUniversity_whenDataIsValid() {
         String university = "MIT";
         List<User> allUsersByUniversity = userDao.findAllByUniversity(university);
 
         assertThat(allUsersByUniversity).isNotEmpty();
         assertThat(allUsersByUniversity).hasSize(1);
     }
-
 }
