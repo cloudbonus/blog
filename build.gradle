@@ -53,6 +53,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:junit-jupiter")
     testRuntimeOnly("com.jayway.jsonpath:json-path:2.9.0")
+    testRuntimeOnly("com.h2database:h2:2.2.224")
 }
 
 tasks.named('test') {

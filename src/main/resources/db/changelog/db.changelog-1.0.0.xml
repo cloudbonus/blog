@@ -13,46 +13,93 @@
         <sqlFile encoding="utf8" path="../migration/02.create-user-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-2-user-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/02.create-user-table-h2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
     <changeSet id="homework-2-user_details" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/03.create-user_details-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-2-user_details-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/03.create-user_details-table-test.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
     <changeSet id="homework-2-role" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/04.create-role-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-2-role-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/04.create-role-table-test.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
     <changeSet id="homework-2-user_role" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/05.create-user_role-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-2-user_role-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/05.create-user_role-table-test.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
     <changeSet id="homework-2-post" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/06.create-post-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-2-post-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/06.create-post-table-test.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
     <changeSet id="homework-2-post_reaction" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/07.create-post_reaction-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-2-post_reaction-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/07.create-post_reaction-table-test.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
     <changeSet id="homework-2-tag" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/08.create-tag-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-2-tag-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/08.create-tag-table-test.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
     <changeSet id="homework-2-post_tag" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/09.create-post_tag-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-2-post_tag-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/09.create-post_tag-table-test.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
     <changeSet id="homework-2-comment" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/10.create-comment-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-2-comment-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/10.create-comment-table-test.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
     <changeSet id="homework-2-comment_reaction" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/11.create-comment_reaction-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-2-comment_reaction-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/11.create-comment_reaction-table-test.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
     <changeSet id="homework-2-order" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/12.create-order-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-2-order-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/12.create-order-table-test.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-2-create-idx-test" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/13.create-idx-test.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 
     <changeSet id="homework-2-insert-values-into-role" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/13.insert-values-into-role-table.sql" relativeToChangelogFile="true"/>
@@ -60,6 +107,10 @@
 
     <changeSet id="homework-2-insert-values-into-tag" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/14.insert-values-into-tag-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-7-replace-type-varchar-to-varchar_ignorecase" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/14.replace-type-varchar-to-varchar_ignorecase-in-tables.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
     <changeSet id="homework-2-create-idx-in-post" author="Raman Haurylau" dbms="postgresql">
@@ -160,5 +211,9 @@
 
     <changeSet id="homework-6-drop-null-in-order" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/39.drop-null-in-order-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-7-add-case-insensitive-unique-constraints-in-tables" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/40.add-case-insensitive-unique-constraints-in-tables.sql" relativeToChangelogFile="true"/>
     </changeSet>
 </databaseChangeLog>
