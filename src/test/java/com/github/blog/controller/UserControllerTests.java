@@ -37,7 +37,7 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("user controller: create")
-    @Sql("/db/insert-test-data-into-user-table.sql")
+    @Sql("/db/controllertests/insert-test-data-into-user-table.sql")
     void create_returnsUserDto_whenDataIsValid() throws Exception {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -46,7 +46,7 @@ public class UserControllerTests {
                                 "login": "test login",
                                 "password": "test password",
                                 "email": "test email",
-                                "publishedAt": 1714320006.512803000,
+                                "createdAt": 1714320006.512803000,
                                 "lastLogin": 1714320006.512803000
                                 }
                                 """))
@@ -57,7 +57,7 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("user controller: update")
-    @Sql("/db/insert-test-data-into-user-table.sql")
+    @Sql("/db/controllertests/insert-test-data-into-user-table.sql")
     void update_returnsUpdatedUserDto_whenDataIsValid() throws Exception {
         mockMvc.perform(put("/users/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -74,9 +74,9 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("user controller: delete")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
     void delete_deletesUser_whenDataIsValid() throws Exception {
-        mockMvc.perform(delete("/posts/{id}", 1))
+        mockMvc.perform(delete("/users/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.login").value("kvossing0"));
@@ -84,17 +84,17 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("user controller: delete exception")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql"})
-    void delete_throwsExceptionNotFound_whenDataIsInvalid() throws Exception {
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
+    void delete_throwsExceptionBadRequest_whenDataIsInvalid() throws Exception {
         mockMvc.perform(delete("/posts/{id}", 4))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("user controller: findAllByRole")
-    @Sql("/db/insert-test-data-into-user-table.sql")
+    @Sql("/db/controllertests/insert-test-data-into-user-table.sql")
     void find_findsAllUsersByRole_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/posts/role").param("roleName", "ROLE_USER"))
+        mockMvc.perform(get("/users").param("role", "user"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].login").value("kvossing0"))
@@ -103,29 +103,37 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("user controller: findByLogin")
-    @Sql("/db/insert-test-data-into-user-table.sql")
+    @Sql("/db/controllertests/insert-test-data-into-user-table.sql")
     void find_findsUserByLogin_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/posts/login").param("loginName", "kvossing0"))
+        mockMvc.perform(get("/users").param("login", "kvossing0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.login").value("kvossing0"));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].login").value("kvossing0"));
     }
 
     @Test
     @DisplayName("user controller: findAllByJobTitle")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
     void find_findsAllUsersByJobTitle_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/posts/job").param("jobName", "Artificial Intelligence"))
+        mockMvc.perform(get("/users").param("job", "ai researcher"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].login").value("gmaccook1"));
     }
 
     @Test
+    @DisplayName("user controller: findAllByJobTitle")
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
+    void find_throwsExceptionNotFound_whenDataIsInvalid() throws Exception {
+        mockMvc.perform(get("/users").param("job", "test work"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("user controller: findAllByUniversity")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
     void find_findsAllUsersByUniversity_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/users/university").param("universityName", "MIT"))
+        mockMvc.perform(get("/users").param("university", "mit"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].login").value("gmaccook1"));

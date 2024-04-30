@@ -2,6 +2,9 @@ package com.github.blog.dao;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
+import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
@@ -41,55 +44,53 @@ public class CommentDaoImplTests {
 
     @Test
     @DisplayName("comment dao: create")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void create_returnsCommentDto_whenDataIsValid() {
         String login = "kvossing0";
 
-        Optional<User> u = userDao.findByLogin(login);
-        assertThat(u).isPresent();
+        UserFilter userFilter = new UserFilter();
+        userFilter.setLogin(login);
 
-        User user = u.get();
-        assertThat(user.getLogin()).isEqualTo(login);
+        List<User> filteredUserResult = userDao.findAll(userFilter);
 
-        List<Comment> allComments = commentDao.findAll();
+        assertThat(filteredUserResult).isNotEmpty();
 
-        assertThat(allComments).isNotEmpty().hasSize(3);
+        PostFilter postFilter = new PostFilter();
+        postFilter.setLogin(login);
 
-        List<Post> allPosts = postDao.findAll();
-
-        assertThat(allPosts).isNotEmpty().hasSize(3);
+        List<Post> filteredPostResult = postDao.findAll(postFilter);
+        assertThat(filteredPostResult).isNotEmpty();
 
         Comment comment = new Comment();
-        comment.setUser(user);
+        comment.setUser(filteredUserResult.get(0));
         comment.setContent("Hello World!");
         comment.setPublishedAt(OffsetDateTime.now());
-        comment.setPost(allPosts.get(0));
+        comment.setPost(filteredPostResult.get(0));
 
         comment = commentDao.create(comment);
 
         assertThat(comment).isNotNull();
         assertThat(comment.getId()).isNotNull();
 
-        allComments = commentDao.findAll();
-
-        assertThat(allComments).isNotEmpty().hasSize(4);
+        assertThat(commentDao.findAll()).isNotEmpty().hasSize(4);
     }
 
     @Test
     @DisplayName("comment dao: update")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void update_returnsUpdatedCommentDto_whenDataIsValid() {
         String login = "kvossing0";
+        CommentFilter filter = new CommentFilter();
+        filter.setLogin(login);
 
-        List<Comment> allComments = commentDao.findAllByLogin(login);
+        List<Comment> filteredCommentResult = commentDao.findAll(filter);
 
-        assertThat(allComments).isNotEmpty().hasSize(2);
+        assertThat(filteredCommentResult).isNotEmpty();
 
-        Comment comment = allComments.get(0);
+        Comment comment = filteredCommentResult.get(0);
 
         Long updatedId = comment.getId();
         String updatedContent = "Updated content";
-
         comment.setContent(updatedContent);
 
         commentDao.update(comment);
@@ -97,44 +98,44 @@ public class CommentDaoImplTests {
         Optional<Comment> c = commentDao.findById(updatedId);
         assertThat(c).isPresent();
 
-        comment = c.get();
-        assertThat(comment).isNotNull();
-        assertThat(comment.getId()).isEqualTo(updatedId);
-        assertThat(comment.getContent()).isEqualTo(updatedContent);
+        assertThat(c.get()).isNotNull();
+        assertThat(c.get().getId()).isEqualTo(updatedId);
+        assertThat(c.get().getContent()).isEqualTo(updatedContent);
     }
 
     @Test
     @DisplayName("comment dao: delete")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void delete_deletesComment_whenDataIsValid() {
         String login = "kvossing0";
+        CommentFilter filter = new CommentFilter();
+        filter.setLogin(login);
 
-        List<Comment> allCommentsByLogin = commentDao.findAllByLogin(login);
+        List<Comment> filteredCommentResult = commentDao.findAll(filter);
 
-        assertThat(allCommentsByLogin).isNotEmpty().hasSize(2);
+        assertThat(filteredCommentResult).isNotEmpty();
 
-        Comment comment = allCommentsByLogin.get(0);
+        commentDao.delete(filteredCommentResult.get(0));
 
-        commentDao.delete(comment);
-
-        allCommentsByLogin = commentDao.findAllByLogin(login);
-
-        assertThat(allCommentsByLogin).isNotEmpty().hasSize(1);
+        assertThat(commentDao.findAll()).isNotEmpty().hasSize(2);
     }
 
     @Test
     @DisplayName("comment dao: allByLogin")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void find_findsAllCommentsByLogin_whenDataIsValid() {
         String login1 = "kvossing0";
         String login2 = "gmaccook1";
 
-        List<Comment> allCommentsByLogin1 = commentDao.findAllByLogin(login1);
+        CommentFilter filter = new CommentFilter();
+        filter.setLogin(login1);
 
-        assertThat(allCommentsByLogin1).isNotEmpty().hasSize(2);
+        List<Comment> filteredCommentResult1 = commentDao.findAll(filter);
 
-        List<Comment> allCommentsByLogin2 = commentDao.findAllByLogin(login2);
+        filter.setLogin(login2);
+        List<Comment> filteredCommentResult2 = commentDao.findAll(filter);
 
-        assertThat(allCommentsByLogin2).isNotEmpty().hasSize(1);
+        assertThat(filteredCommentResult1).isNotEmpty().hasSize(2);
+        assertThat(filteredCommentResult2).isNotEmpty().hasSize(1);
     }
 }

@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,7 +38,7 @@ public class PostControllerTests {
 
     @Test
     @DisplayName("post controller: create")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql"})
     void create_returnsPostDto_whenDataIsValid() throws Exception {
         mockMvc.perform(post("/posts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -57,7 +58,7 @@ public class PostControllerTests {
 
     @Test
     @DisplayName("post controller: update")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-post_tag-table.sql"})
     void update_returnsUpdatedPostDto_whenDataIsValid() throws Exception {
         mockMvc.perform(put("/posts/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +77,7 @@ public class PostControllerTests {
 
     @Test
     @DisplayName("post controller: delete")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-post_tag-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void delete_deletesPost_whenDataIsValid() throws Exception {
         mockMvc.perform(delete("/posts/{id}", 1))
                 .andExpect(status().isOk())
@@ -86,9 +87,9 @@ public class PostControllerTests {
 
     @Test
     @DisplayName("post controller: findAllByLogin")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql"})
     void find_findsAllPostsByLogin_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/posts/login").param("loginName", "kvossing0"))
+        mockMvc.perform(get("/posts").param("login", "kvossing0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].title").value("First Post"))
@@ -97,12 +98,13 @@ public class PostControllerTests {
 
     @Test
     @DisplayName("post controller: findByTag")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-post_tag-table.sql"})
     void find_findsAllPostsByTag_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/posts/tag").param("tagName", "news"))
+        mockMvc.perform(get("/posts").param("tag", "news"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[0].title").value("First Post"))
+                .andExpect(jsonPath("$[0].tagIds.size()").value(1))
                 .andExpect(jsonPath("$[1].title").value("Second Post"))
                 .andExpect(jsonPath("$[2].title").value("Third Post"));
     }

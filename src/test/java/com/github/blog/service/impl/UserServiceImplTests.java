@@ -2,10 +2,12 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
-import com.github.blog.dto.UserDto;
+import com.github.blog.dto.common.UserDto;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.mapper.UserMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,24 +38,21 @@ public class UserServiceImplTests {
     @InjectMocks
     UserServiceImpl userService;
 
-    @Test
-    @DisplayName("user service: create")
-    void create_returnsUserDto_whenDataIsValid() {
-        Long id = 1L;
-        String login = "test_login";
-        String password = "test_password";
+    private User user;
+    private UserDto returnedUserDto;
+    private UserDto userDto;
+
+    private final Long id = 1L;
+    private final String login = "test login";
+
+    @BeforeEach
+    void setUp() {
+        String password = "test password";
         String email = "temp@test.temp";
         OffsetDateTime createdAt = OffsetDateTime.now();
         OffsetDateTime updatedAt = OffsetDateTime.now();
 
-        UserDto userDto = new UserDto();
-        userDto.setLogin(login);
-        userDto.setPassword(password);
-        userDto.setEmail(email);
-        userDto.setCreatedAt(createdAt);
-        userDto.setLastLogin(updatedAt);
-
-        User user = new User();
+        user = new User();
         user.setId(id);
         user.setLogin(login);
         user.setPassword(password);
@@ -61,7 +60,7 @@ public class UserServiceImplTests {
         user.setCreatedAt(createdAt);
         user.setLastLogin(updatedAt);
 
-        UserDto returnedUserDto = new UserDto();
+        returnedUserDto = new UserDto();
         returnedUserDto.setId(id);
         returnedUserDto.setLogin(login);
         returnedUserDto.setPassword(password);
@@ -69,6 +68,17 @@ public class UserServiceImplTests {
         returnedUserDto.setCreatedAt(createdAt);
         returnedUserDto.setLastLogin(updatedAt);
 
+        userDto = new UserDto();
+        userDto.setLogin(login);
+        userDto.setPassword(password);
+        userDto.setEmail(email);
+        userDto.setCreatedAt(createdAt);
+        userDto.setLastLogin(updatedAt);
+    }
+
+    @Test
+    @DisplayName("user service: create")
+    void create_returnsUserDto_whenDataIsValid() {
         String roleName = "ROLE_USER";
         Role role = new Role();
         role.setId(id);
@@ -80,247 +90,113 @@ public class UserServiceImplTests {
         when(roleDao.findByName(roleName)).thenReturn(optionalRole);
         when(userDao.update(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
-        UserDto createdUser = userService.create(userDto);
+        UserDto createdUserDto = userService.create(userDto);
 
-        assertThat(createdUser).isNotNull();
-        assertThat(createdUser.getId()).isEqualTo(id);
-        assertThat(createdUser.getLogin()).isEqualTo(login);
+        assertThat(createdUserDto).isNotNull();
+        assertThat(createdUserDto.getId()).isEqualTo(id);
+        assertThat(createdUserDto.getLogin()).isEqualTo(login);
     }
 
     @Test
     @DisplayName("user service: update")
     void update_returnsUpdatedUserDto_whenDataIsValid() {
-        Long id = 1L;
-        String login = "test_login";
-        String password = "test_password";
-        String email = "temp@test.temp";
-        OffsetDateTime createdAt = OffsetDateTime.now();
-        OffsetDateTime updatedAt = OffsetDateTime.now();
-
-        UserDto userDto = new UserDto();
-        userDto.setLogin(login);
-        userDto.setPassword(password);
-        userDto.setEmail(email);
-        userDto.setCreatedAt(createdAt);
-        userDto.setLastLogin(updatedAt);
-
-        User user = new User();
-        user.setId(id);
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setCreatedAt(createdAt);
-        user.setLastLogin(updatedAt);
         Optional<User> optionalUser = Optional.of(user);
-
-        UserDto returnedUserDto = new UserDto();
-        returnedUserDto.setId(id);
-        returnedUserDto.setLogin(login);
-        returnedUserDto.setPassword(password);
-        returnedUserDto.setEmail(email);
-        returnedUserDto.setCreatedAt(createdAt);
-        returnedUserDto.setLastLogin(updatedAt);
 
         when(userDao.findById(id)).thenReturn(optionalUser);
         when(userMapper.partialUpdate(userDto, user)).thenReturn(user);
         when(userDao.update(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
-        UserDto updatedUser = userService.update(id, userDto);
+        UserDto updatedUserDto = userService.update(id, userDto);
 
-        assertThat(updatedUser).isNotNull();
-        assertThat(updatedUser.getId()).isEqualTo(id);
-        assertThat(updatedUser.getLogin()).isEqualTo(login);
+        assertThat(updatedUserDto).isNotNull();
+        assertThat(updatedUserDto.getId()).isEqualTo(id);
+        assertThat(updatedUserDto.getLogin()).isEqualTo(login);
     }
 
     @Test
     @DisplayName("user service: delete")
     void delete_deletesUser_whenDataIsValid() {
-        Long id = 1L;
-        String login = "test_login";
-        String password = "test_password";
-        String email = "temp@test.temp";
-        OffsetDateTime createdAt = OffsetDateTime.now();
-        OffsetDateTime updatedAt = OffsetDateTime.now();
-
-        User user = new User();
-        user.setId(id);
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setCreatedAt(createdAt);
-        user.setLastLogin(updatedAt);
         Optional<User> optionalUser = Optional.of(user);
-
-        UserDto returnedUserDto = new UserDto();
-        returnedUserDto.setId(id);
-        returnedUserDto.setLogin(login);
-        returnedUserDto.setPassword(password);
-        returnedUserDto.setEmail(email);
-        returnedUserDto.setCreatedAt(createdAt);
-        returnedUserDto.setLastLogin(updatedAt);
 
         when(userDao.findById(id)).thenReturn(optionalUser);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        UserDto deletedUser = userService.delete(id);
+        UserDto deletedUserDto = userService.delete(id);
 
-        assertThat(deletedUser).isNotNull();
-        assertThat(deletedUser.getId()).isEqualTo(id);
-        assertThat(deletedUser.getLogin()).isEqualTo(login);
+        assertThat(deletedUserDto).isNotNull();
+        assertThat(deletedUserDto.getId()).isEqualTo(id);
+        assertThat(deletedUserDto.getLogin()).isEqualTo(login);
         verify(userDao, times(1)).delete(user);
     }
 
     @Test
     @DisplayName("user service: findAllByRole")
     void find_findsAllUsersByRole_whenDataIsValid() {
-        Long id = 1L;
-        String login = "test_login";
-        String password = "test_password";
-        String email = "temp@test.temp";
-        OffsetDateTime createdAt = OffsetDateTime.now();
-        OffsetDateTime updatedAt = OffsetDateTime.now();
-
-        User user = new User();
-        user.setId(id);
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setCreatedAt(createdAt);
-        user.setLastLogin(updatedAt);
-
-        UserDto returnedUserDto = new UserDto();
-        returnedUserDto.setId(id);
-        returnedUserDto.setLogin(login);
-        returnedUserDto.setPassword(password);
-        returnedUserDto.setEmail(email);
-        returnedUserDto.setCreatedAt(createdAt);
-        returnedUserDto.setLastLogin(updatedAt);
-
-        String roleName = "ROLE_USER";
+        String role = "ROLE_USER";
         List<User> users = List.of(user);
+        UserFilter filter = new UserFilter();
+        filter.setRole(role);
 
-        when(userDao.findAllByRole(roleName)).thenReturn(users);
+        when(userDao.findAll(filter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> allUsersByRole = userService.findAllByRole(roleName);
+        List<UserDto> filterSearchResult = userService.findAll(filter);
 
-        assertThat(allUsersByRole).isNotEmpty().hasSize(1);
-        assertThat(allUsersByRole).extracting(UserDto::getLogin).containsExactly(login);
-        assertThat(allUsersByRole).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
     }
 
     @Test
     @DisplayName("user: findByLogin")
     void find_findsUserByLogin_whenDataIsValid() {
-        Long id = 1L;
-        String login = "test_login";
-        String password = "test_password";
-        String email = "temp@test.temp";
-        OffsetDateTime createdAt = OffsetDateTime.now();
-        OffsetDateTime updatedAt = OffsetDateTime.now();
+        List<User> users = List.of(user);
+        UserFilter filter = new UserFilter();
+        filter.setLogin(user.getLogin());
 
-        User user = new User();
-        user.setId(id);
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setCreatedAt(createdAt);
-        user.setLastLogin(updatedAt);
-        Optional<User> optionalUser = Optional.of(user);
-
-        UserDto returnedUserDto = new UserDto();
-        returnedUserDto.setId(id);
-        returnedUserDto.setLogin(login);
-        returnedUserDto.setPassword(password);
-        returnedUserDto.setEmail(email);
-        returnedUserDto.setCreatedAt(createdAt);
-        returnedUserDto.setLastLogin(updatedAt);
-
-        when(userDao.findByLogin(login)).thenReturn(optionalUser);
+        when(userDao.findAll(filter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        UserDto foundUserDto = userService.findByLogin(login);
+        List<UserDto> filterSearchResult = userService.findAll(filter);
 
-        assertThat(foundUserDto).isNotNull();
-        assertThat(foundUserDto.getId()).isEqualTo(id);
-        assertThat(foundUserDto.getLogin()).isEqualTo(login);
+        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
     }
 
     @Test
     @DisplayName("user service: findAllByJobTitle")
     void find_findsAllUsersByJobTitle_whenDataIsValid() {
-        Long id = 1L;
-        String login = "test_login";
-        String password = "test_password";
-        String email = "temp@test.temp";
-        OffsetDateTime createdAt = OffsetDateTime.now();
-        OffsetDateTime updatedAt = OffsetDateTime.now();
-
-        User user = new User();
-        user.setId(id);
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setCreatedAt(createdAt);
-        user.setLastLogin(updatedAt);
-
-        UserDto returnedUserDto = new UserDto();
-        returnedUserDto.setId(id);
-        returnedUserDto.setLogin(login);
-        returnedUserDto.setPassword(password);
-        returnedUserDto.setEmail(email);
-        returnedUserDto.setCreatedAt(createdAt);
-        returnedUserDto.setLastLogin(updatedAt);
-
         String jobTitle = "Software Engineer";
         List<User> users = List.of(user);
+        UserFilter filter = new UserFilter();
+        filter.setJob(jobTitle);
 
-        when(userDao.findAllByJobTitle(jobTitle)).thenReturn(users);
+        when(userDao.findAll(filter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> allByJobTitle = userService.findAllByJobTitle(jobTitle);
+        List<UserDto> filterSearchResult = userService.findAll(filter);
 
-        assertThat(allByJobTitle).isNotEmpty().hasSize(1);
-        assertThat(allByJobTitle).extracting(UserDto::getLogin).containsExactly(login);
-        assertThat(allByJobTitle).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
     }
 
     @Test
     @DisplayName("user service: findAllByUniversity")
     void find_findsAllUsersByUniversity_whenDataIsValid() {
-        Long id = 1L;
-        String login = "test_login";
-        String password = "test_password";
-        String email = "temp@test.temp";
-        OffsetDateTime createdAt = OffsetDateTime.now();
-        OffsetDateTime updatedAt = OffsetDateTime.now();
-
-        User user = new User();
-        user.setId(id);
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setCreatedAt(createdAt);
-        user.setLastLogin(updatedAt);
-
-        UserDto returnedUserDto = new UserDto();
-        returnedUserDto.setId(id);
-        returnedUserDto.setLogin(login);
-        returnedUserDto.setPassword(password);
-        returnedUserDto.setEmail(email);
-        returnedUserDto.setCreatedAt(createdAt);
-        returnedUserDto.setLastLogin(updatedAt);
-
         String university = "MIT";
         List<User> users = List.of(user);
+        UserFilter filter = new UserFilter();
+        filter.setUniversity(university);
 
-        when(userDao.findAllByUniversity(university)).thenReturn(users);
+        when(userDao.findAll(filter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> allByJobTitle = userService.findAllByUniversity(university);
+        List<UserDto> filterSearchResult = userService.findAll(filter);
 
-        assertThat(allByJobTitle).isNotEmpty().hasSize(1);
-        assertThat(allByJobTitle).extracting(UserDto::getLogin).containsExactly(login);
-        assertThat(allByJobTitle).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
     }
 }

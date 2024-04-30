@@ -2,6 +2,8 @@ package com.github.blog.dao;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
+import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
@@ -18,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,16 +46,19 @@ public class PostDaoImplTests {
 
     @Test
     @DisplayName("post dao: create")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql"})
     void create_returnsPostDto_whenDataIsValid() {
+        String content = "This is the content of the first post.";
         String login = "kvossing0";
 
-        String content = "This is the content of the first post.";
-        Optional<User> user = userDao.findByLogin(login);
-        assertThat(user).isPresent();
+        UserFilter filter = new UserFilter();
+        filter.setLogin(login);
+        List<User> filteredUserResult = userDao.findAll(filter);
+
+        assertThat(filteredUserResult).isNotEmpty();
 
         Post post = new Post();
-        post.setUser(user.get());
+        post.setUser(filteredUserResult.get(0));
         post.setTitle("First Post");
         post.setContent(content);
         post.setPublishedAt(OffsetDateTime.now());
@@ -72,15 +76,17 @@ public class PostDaoImplTests {
 
     @Test
     @DisplayName("post dao: update")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql"})
     void update_returnsUpdatedPostDto_whenDataIsValid() {
         String login = "gmaccook1";
+        PostFilter filter = new PostFilter();
+        filter.setLogin(login);
 
-        List<Post> allPostsByLogin = postDao.findAllByLogin(login);
+        List<Post> filteredPostResult = postDao.findAll(filter);
 
-        assertThat(allPostsByLogin).isNotEmpty().hasSize(1);
+        assertThat(filteredPostResult).isNotEmpty().hasSize(1);
 
-        Post post = allPostsByLogin.get(0);
+        Post post = filteredPostResult.get(0);
         String updatedContent = "Look at me i've made it!!!";
         OffsetDateTime updatedTime = OffsetDateTime.now();
 
@@ -97,54 +103,57 @@ public class PostDaoImplTests {
 
     @Test
     @DisplayName("post dao: delete")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void delete_deletesPost_whenDataIsValid() {
         String login = "gmaccook1";
+        PostFilter filter = new PostFilter();
+        filter.setLogin(login);
 
-        List<Post> allPostsByLogin = postDao.findAllByLogin(login);
+        List<Post> filteredPostResult = postDao.findAll(filter);
 
-        assertThat(allPostsByLogin).isNotEmpty().hasSize(1);
+        assertThat(filteredPostResult).isNotEmpty().hasSize(1);
 
-        Post post = allPostsByLogin.get(0);
+        Post post = filteredPostResult.get(0);
 
         postDao.delete(post);
 
         List<Post> allPosts = postDao.findAll();
-        assertThat(allPosts).isNotEmpty().hasSize(2);
-
         List<Tag> allTags = tagDao.findAll();
-        assertThat(allTags).isNotEmpty().hasSize(4);
-
         List<Comment> allComments = commentDao.findAll();
+
+        assertThat(allPosts).isNotEmpty().hasSize(2);
+        assertThat(allTags).isNotEmpty().hasSize(2);
         assertThat(allComments).isNotEmpty().hasSize(2);
     }
 
     @Test
     @DisplayName("post dao: findAllByLogin")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql"})
     void find_findsAllPostsByLogin_whenDataIsValid() {
         String login = "kvossing0";
-        List<Post> allPostsByLogin = postDao.findAllByLogin(login);
+        PostFilter filter = new PostFilter();
+        filter.setLogin(login);
 
-        assertThat(allPostsByLogin).isNotEmpty();
-        assertThat(allPostsByLogin).hasSize(2);
+        List<Post> filteredPostResult2 = postDao.findAll(filter);
+
+        assertThat(filteredPostResult2).isNotEmpty().hasSize(2);
     }
 
     @Test
     @DisplayName("post dao: findAllByTag")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql"})
+    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql"})
     void find_findsAllPostsByTag_whenDataIsValid() {
         String tag1 = "news";
         String tag2 = "education";
+        PostFilter filter = new PostFilter();
 
-        List<Post> allPostsByTag1 = postDao.findAllByTag(tag1);
+        filter.setTag(tag1);
+        List<Post> filteredPostResult1 = postDao.findAll(filter);
 
-        assertThat(allPostsByTag1).isNotEmpty();
-        assertThat(allPostsByTag1).hasSize(3);
+        filter.setTag(tag2);
+        List<Post> filteredPostResult2 = postDao.findAll(filter);
 
-        List<Post> allPostsByTag2 = postDao.findAllByTag(tag2);
-
-        assertThat(allPostsByTag2).isNotEmpty();
-        assertThat(allPostsByTag2).hasSize(1);
+        assertThat(filteredPostResult1).isNotEmpty().hasSize(3);
+        assertThat(filteredPostResult2).isNotEmpty().hasSize(1);
     }
 }

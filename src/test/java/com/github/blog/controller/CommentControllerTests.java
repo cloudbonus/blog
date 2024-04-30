@@ -37,7 +37,7 @@ public class CommentControllerTests {
 
     @Test
     @DisplayName("comment controller: create")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void create_returnsCommentDto_whenDataIsValid() throws Exception {
         mockMvc.perform(post("/comments")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -57,7 +57,7 @@ public class CommentControllerTests {
 
     @Test
     @DisplayName("comment controller: update")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void update_returnsUpdatedCommentDto_whenDataIsValid() throws Exception {
         mockMvc.perform(put("/comments/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,9 +73,9 @@ public class CommentControllerTests {
 
     @Test
     @DisplayName("comment controller: update exception")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
-    void update_throwsExceptionBadRequest_whenDataIsInvalid() throws Exception {
-        mockMvc.perform(put("/comments/{id}", 1)
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
+    void create_throwsExceptionBadRequest_whenDataIsInvalid() throws Exception {
+        mockMvc.perform(post("/comments", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -87,7 +87,7 @@ public class CommentControllerTests {
 
     @Test
     @DisplayName("comment controller: delete")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void delete_deletesComment_whenDataIsValid() throws Exception {
         mockMvc.perform(delete("/comments/{id}", 1))
                 .andExpect(status().isOk())
@@ -97,7 +97,7 @@ public class CommentControllerTests {
 
     @Test
     @DisplayName("comment controller: findById")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void find_findsById_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/comments/{id}", 1))
                 .andExpect(status().isOk())
@@ -107,9 +107,9 @@ public class CommentControllerTests {
 
     @Test
     @DisplayName("comment controller: allByLogin")
-    @Sql({"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_details-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+    @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void find_findsAllCommentsByLogin_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/comments/login").param("loginName", "kvossing0"))
+        mockMvc.perform(get("/comments").param("login", "kvossing0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].content").value("This is the content of the first comment."))
