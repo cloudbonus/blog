@@ -1,6 +1,6 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dto.CommentDto;
+import com.github.blog.dto.common.CommentDto;
 import com.github.blog.model.Comment;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

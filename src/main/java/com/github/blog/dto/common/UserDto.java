@@ -1,4 +1,4 @@
-package com.github.blog.dto;
+package com.github.blog.dto.common;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dto.TagDto;
+import com.github.blog.dto.common.TagDto;
 import com.github.blog.model.Tag;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

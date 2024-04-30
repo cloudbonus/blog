@@ -1,4 +1,4 @@
-package com.github.blog.dto;
+package com.github.blog.dto.common;
 
 import lombok.Data;
 
@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 public class UserDetailDto {
     private Long id;
-    private UserDto user;
     private String firstname;
     private String surname;
     private String universityName;

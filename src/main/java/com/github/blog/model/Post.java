@@ -48,7 +48,7 @@ public class Post {
 
     @ManyToMany
     @JoinTable(name = "post_tag", schema = "blogging_platform", joinColumns = {@JoinColumn(name = "post_id")}, inverseJoinColumns = {@JoinColumn(name = "tag_id")})
-    private Set<Tag> tags = new HashSet<>();
+    private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

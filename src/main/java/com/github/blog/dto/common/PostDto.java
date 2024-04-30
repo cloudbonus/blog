@@ -1,8 +1,10 @@
-package com.github.blog.dto;
+package com.github.blog.dto.common;
 
 import lombok.Data;
 
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DTO for {@link com.github.blog.model.Post}
@@ -14,4 +16,6 @@ public class PostDto {
     String title;
     String content;
     OffsetDateTime publishedAt;
+    List<Long> tagIds;
+    List<Long> commentIds;
 }

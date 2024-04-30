@@ -10,7 +10,9 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -27,5 +29,5 @@ public class Tag {
     private String tagName;
 
     @ManyToMany(mappedBy = "tags")
-    private Set<Post> users = new HashSet<>();
+    private List<Post> posts = new ArrayList<>();
 }
