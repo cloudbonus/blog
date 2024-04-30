@@ -24,7 +24,7 @@ public class AbstractJpaDao<E, ID> implements CrudDao<E, ID> {
     protected EntityManager entityManager;
 
     public Optional<E> findById(ID id) {
-        return Optional.of(entityManager.find(clazz, id));
+        return Optional.ofNullable(entityManager.find(clazz, id));
     }
 
     @SuppressWarnings("unchecked")
