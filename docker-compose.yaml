@@ -16,9 +16,9 @@ services:
       - ./build/libs:/usr/local/tomcat/webapps
     ports:
       - "8080:8080"
-      - "8000:8000"
+      - "5005:5005"
     environment:
-      JPDA_ADDRESS: 8000
+      JPDA_ADDRESS: "*:5005"
     command: [ "catalina.sh", "jpda", "run" ]
 
 volumes:
