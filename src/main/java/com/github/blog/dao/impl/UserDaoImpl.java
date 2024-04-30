@@ -1,7 +1,7 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDao;
-import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.filter.UserDtoFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
@@ -30,7 +30,7 @@ import java.util.List;
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
     @Override
-    public List<User> findAll(UserFilter filter) {
+    public List<User> findAll(UserDtoFilter filter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<User> cq = cb.createQuery(User.class);

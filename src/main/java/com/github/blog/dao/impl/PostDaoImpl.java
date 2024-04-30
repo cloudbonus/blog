@@ -1,7 +1,7 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.PostDao;
-import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.filter.PostDtoFilter;
 import com.github.blog.model.Post;
 import com.github.blog.model.Post_;
 import com.github.blog.model.Tag;
@@ -28,7 +28,7 @@ import java.util.List;
 public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
 
     @Override
-    public List<Post> findAll(PostFilter filter) {
+    public List<Post> findAll(PostDtoFilter filter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Post> cq = cb.createQuery(Post.class);

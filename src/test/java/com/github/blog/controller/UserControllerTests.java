@@ -87,7 +87,7 @@ public class UserControllerTests {
     @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
     void delete_throwsExceptionBadRequest_whenDataIsInvalid() throws Exception {
         mockMvc.perform(delete("/posts/{id}", 4))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -2,7 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostDao;
 import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.filter.PostDtoFilter;
+import com.github.blog.dto.request.PostRequestFilter;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.model.User;
@@ -139,14 +140,19 @@ public class PostServiceImplTests {
     @Test
     @DisplayName("post service: findAllByLogin")
     void find_findsAllPostsByLogin_whenDataIsValid() {
-        PostFilter filter = new PostFilter();
-        filter.setLogin("test login");
+        PostDtoFilter dtoFilter = new PostDtoFilter();
+        dtoFilter.setLogin("test login");
+
         List<Post> posts = List.of(post);
 
-        when(postDao.findAll(filter)).thenReturn(posts);
+        PostRequestFilter requestFilter = new PostRequestFilter();
+        requestFilter.setLogin("test login");
+
+        when(postMapper.toDto(requestFilter)).thenReturn(dtoFilter);
+        when(postDao.findAll(dtoFilter)).thenReturn(posts);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        List<PostDto> filterSearchResult = postService.findAll(filter);
+        List<PostDto> filterSearchResult = postService.findAll(requestFilter);
 
         assertThat(filterSearchResult).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult).extracting(PostDto::getTitle).containsExactly(title);
@@ -156,14 +162,19 @@ public class PostServiceImplTests {
     @Test
     @DisplayName("post service: findAllByLogin")
     void find_findsAllPostsByTag_whenDataIsValid() {
-        PostFilter filter = new PostFilter();
-        filter.setTag("news");
+        PostDtoFilter dtoFilter = new PostDtoFilter();
+        dtoFilter.setTag("news");
+
         List<Post> posts = List.of(post);
 
-        when(postDao.findAll(filter)).thenReturn(posts);
+        PostRequestFilter requestFilter = new PostRequestFilter();
+        requestFilter.setTag("news");
+
+        when(postMapper.toDto(requestFilter)).thenReturn(dtoFilter);
+        when(postDao.findAll(dtoFilter)).thenReturn(posts);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        List<PostDto> filterSearchResult = postService.findAll(filter);
+        List<PostDto> filterSearchResult = postService.findAll(requestFilter);
 
         assertThat(filterSearchResult).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult).extracting(PostDto::getTitle).containsExactly(title);

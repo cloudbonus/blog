@@ -1,7 +1,7 @@
 package com.github.blog.service;
 
 import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.request.CommentRequestFilter;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 public interface CommentService {
-    List<CommentDto> findAll(CommentFilter filter);
+    List<CommentDto> findAll(CommentRequestFilter requestFilter);
 
     CommentDto create(CommentDto t);
 

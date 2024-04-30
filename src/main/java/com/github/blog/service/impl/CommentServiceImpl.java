@@ -2,7 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.CommentDao;
 import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.filter.CommentDtoFilter;
+import com.github.blog.dto.request.CommentRequestFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.service.CommentService;
 import com.github.blog.service.exception.CommentErrorResult;
@@ -29,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto create(CommentDto commentDto) {
         Comment comment = commentMapper.toEntity(commentDto);
-        enrichComment(comment);
+        comment.setPublishedAt(OffsetDateTime.now());
         return commentMapper.toDto(commentDao.create(comment));
     }
 
@@ -43,8 +44,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findAll(CommentFilter commentFilter) {
-        List<Comment> comments = commentDao.findAll(commentFilter);
+    public List<CommentDto> findAll(CommentRequestFilter requestFilter) {
+        CommentDtoFilter dtoFilter = commentMapper.toDto(requestFilter);
+
+        List<Comment> comments = commentDao.findAll(dtoFilter);
 
         if (comments.isEmpty()) {
             throw new CommentException(CommentErrorResult.COMMENTS_NOT_FOUND);
@@ -72,10 +75,6 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new CommentException(CommentErrorResult.COMMENT_NOT_FOUND));
         commentDao.delete(comment);
         return commentMapper.toDto(comment);
-    }
-
-    private void enrichComment(Comment comment) {
-        comment.setPublishedAt(OffsetDateTime.now());
     }
 }
 

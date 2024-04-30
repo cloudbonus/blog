@@ -1,7 +1,7 @@
 package com.github.blog.controller;
 
 import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.request.UserRequestFilter;
 import com.github.blog.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,8 +35,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> findAll(UserFilter filter) {
-        return userService.findAll(filter);
+    public List<UserDto> findAll(UserRequestFilter requestFilter) {
+        return userService.findAll(requestFilter);
     }
 
     @PutMapping("{id}")

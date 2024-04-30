@@ -2,7 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostDao;
 import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.filter.PostDtoFilter;
+import com.github.blog.dto.request.PostRequestFilter;
 import com.github.blog.model.Post;
 import com.github.blog.service.PostService;
 import com.github.blog.service.exception.PostErrorResult;
@@ -29,7 +30,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto create(PostDto postDto) {
         Post post = postMapper.toEntity(postDto);
-        enrichPost(post);
+        post.setPublishedAt(OffsetDateTime.now());
         return postMapper.toDto(postDao.create(post));
     }
 
@@ -43,8 +44,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> findAll(PostFilter filter) {
-        List<Post> posts = postDao.findAll(filter);
+    public List<PostDto> findAll(PostRequestFilter requestFilter) {
+        PostDtoFilter dtoFilter = postMapper.toDto(requestFilter);
+
+        List<Post> posts = postDao.findAll(dtoFilter);
 
         if (posts.isEmpty()) {
             throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
@@ -72,10 +75,6 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND));
         postDao.delete(post);
         return postMapper.toDto(post);
-    }
-
-    private void enrichPost(Post post) {
-        post.setPublishedAt(OffsetDateTime.now());
     }
 }
 

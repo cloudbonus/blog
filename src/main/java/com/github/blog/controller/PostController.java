@@ -1,7 +1,7 @@
 package com.github.blog.controller;
 
 import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.request.PostRequestFilter;
 import com.github.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,24 +35,14 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> findAll(PostFilter filter) {
-        return postService.findAll(filter);
+    public List<PostDto> findAll(PostRequestFilter requestFilter) {
+        return postService.findAll(requestFilter);
     }
 
     @PutMapping("{id}")
     public PostDto update(@PathVariable("id") Long id, @RequestBody PostDto postDto) {
         return postService.update(id, postDto);
     }
-
-//    @GetMapping("login")
-//    public List<PostDto> findAllByLogin(@RequestParam(name = "loginName") String login) {
-//        return postService.findAllByLogin(login);
-//    }
-//
-//    @GetMapping("tag")
-//    public List<PostDto> findAllByTag(@RequestParam(name = "tagName") String tagName) {
-//        return postService.findAllByTag(tagName);
-//    }
 
     @DeleteMapping("{id}")
     public PostDto delete(@PathVariable("id") Long id) {

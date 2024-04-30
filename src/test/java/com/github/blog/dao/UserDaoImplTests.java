@@ -2,7 +2,7 @@ package com.github.blog.dao;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.filter.UserDtoFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import org.junit.jupiter.api.DisplayName;
@@ -68,7 +68,7 @@ public class UserDaoImplTests {
         String login = "kvossing0";
         String expectedLogin = "new_kvossing0";
 
-        UserFilter filter = new UserFilter();
+        UserDtoFilter filter = new UserDtoFilter();
         filter.setLogin(login);
 
         List<User> filteredUserResult = userDao.findAll(filter);
@@ -92,7 +92,7 @@ public class UserDaoImplTests {
     void delete_deletesUser_whenDataIsValid() {
         String login = "kvossing0";
 
-        UserFilter filter = new UserFilter();
+        UserDtoFilter filter = new UserDtoFilter();
         filter.setLogin(login);
         List<User> filteredUserResult = userDao.findAll(filter);
 
@@ -109,7 +109,7 @@ public class UserDaoImplTests {
     void find_findsAllUsersByRole_whenDataIsValid() {
         String role = "user";
 
-        UserFilter filter = new UserFilter();
+        UserDtoFilter filter = new UserDtoFilter();
         filter.setRole(role);
 
         assertThat(userDao.findAll(filter)).isNotEmpty().hasSize(2);
@@ -121,7 +121,7 @@ public class UserDaoImplTests {
     void find_findsUserByLogin_whenDataIsValid() {
         String login = "kvossing0";
 
-        UserFilter filter = new UserFilter();
+        UserDtoFilter filter = new UserDtoFilter();
         filter.setLogin(login);
 
         List<User> filteredUserResult = userDao.findAll(filter);
@@ -136,7 +136,7 @@ public class UserDaoImplTests {
     void find_findsAllUsersByJobTitle_whenDataIsValid() {
         String jobTitle = "Software Engineer";
 
-        UserFilter filter = new UserFilter();
+        UserDtoFilter filter = new UserDtoFilter();
         filter.setJob(jobTitle);
 
         assertThat(userDao.findAll(filter)).isNotEmpty().hasSize(1);
@@ -148,7 +148,7 @@ public class UserDaoImplTests {
     void find_findsAllUsersByUniversity_whenDataIsValid() {
         String university = "MIT";
 
-        UserFilter filter = new UserFilter();
+        UserDtoFilter filter = new UserDtoFilter();
         filter.setUniversity(university);
 
         assertThat(userDao.findAll(filter)).isNotEmpty().hasSize(1);

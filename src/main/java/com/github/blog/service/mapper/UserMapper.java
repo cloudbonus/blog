@@ -1,6 +1,8 @@
 package com.github.blog.service.mapper;
 
 import com.github.blog.dto.common.UserDto;
+import com.github.blog.dto.filter.UserDtoFilter;
+import com.github.blog.dto.request.UserRequestFilter;
 import com.github.blog.model.User;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -14,6 +16,8 @@ public interface UserMapper {
     User toEntity(UserDto userDto);
 
     UserDto toDto(User user);
+
+    UserDtoFilter toDto(UserRequestFilter requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserDto userDto, @MappingTarget User user);

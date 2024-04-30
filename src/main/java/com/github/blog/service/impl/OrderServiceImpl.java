@@ -28,7 +28,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto create(OrderDto orderDto) {
         Order order = orderMapper.toEntity(orderDto);
-        enrichOrder(order);
+        order.setOrderedAt(OffsetDateTime.now());
         return orderMapper.toDto(orderDao.create(order));
     }
 
@@ -72,9 +72,5 @@ public class OrderServiceImpl implements OrderService {
 
         orderDao.delete(order);
         return orderMapper.toDto(order);
-    }
-
-    private void enrichOrder(Order order) {
-        order.setOrderedAt(OffsetDateTime.now());
     }
 }

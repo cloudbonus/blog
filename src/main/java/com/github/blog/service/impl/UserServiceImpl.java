@@ -3,7 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.filter.UserDtoFilter;
+import com.github.blog.dto.request.UserRequestFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.UserService;
@@ -13,6 +14,7 @@ import com.github.blog.service.exception.impl.RoleException;
 import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Log4j2
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
@@ -35,6 +38,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
+
+        user.setCreatedAt(OffsetDateTime.now());
+        user.setLastLogin(OffsetDateTime.now());
 
         userDao.create(user);
 
@@ -56,13 +62,15 @@ public class UserServiceImpl implements UserService {
         User user = userDao
                 .findById(id)
                 .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
-        enrichUser(user);
+        user.setLastLogin(OffsetDateTime.now());
         return userMapper.toDto(user);
     }
 
     @Override
-    public List<UserDto> findAll(UserFilter userFilter) {
-        List<User> users = userDao.findAll(userFilter);
+    public List<UserDto> findAll(UserRequestFilter requestFilter) {
+        UserDtoFilter dtoFilter = userMapper.toDto(requestFilter);
+
+        List<User> users = userDao.findAll(dtoFilter);
 
         if (users.isEmpty()) {
             throw new UserException(UserErrorResult.USERS_NOT_FOUND);
@@ -90,9 +98,5 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
         userDao.delete(user);
         return userMapper.toDto(user);
-    }
-
-    private void enrichUser(User user) {
-        user.setLastLogin(OffsetDateTime.now());
     }
 }

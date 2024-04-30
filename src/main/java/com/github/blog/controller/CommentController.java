@@ -1,7 +1,7 @@
 package com.github.blog.controller;
 
 import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.request.CommentRequestFilter;
 import com.github.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,8 +35,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public List<CommentDto> findAll(CommentFilter filter) {
-        return commentService.findAll(filter);
+    public List<CommentDto> findAll(CommentRequestFilter requestFilter) {
+        return commentService.findAll(requestFilter);
     }
 
     @PutMapping("{id}")

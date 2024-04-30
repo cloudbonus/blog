@@ -1,7 +1,7 @@
 package com.github.blog.service;
 
 import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.request.UserRequestFilter;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 public interface UserService {
-    List<UserDto> findAll(UserFilter filter);
+    List<UserDto> findAll(UserRequestFilter requestFilter);
 
     UserDto create(UserDto t);
 

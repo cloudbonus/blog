@@ -1,7 +1,7 @@
 package com.github.blog.service;
 
 import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.request.PostRequestFilter;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 public interface PostService {
-    List<PostDto> findAll(PostFilter filter);
+    List<PostDto> findAll(PostRequestFilter requestFilter);
 
     PostDto create(PostDto t);
 

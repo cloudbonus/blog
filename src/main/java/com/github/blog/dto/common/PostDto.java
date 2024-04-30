@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Set;
 
 /**
  * DTO for {@link com.github.blog.model.Post}

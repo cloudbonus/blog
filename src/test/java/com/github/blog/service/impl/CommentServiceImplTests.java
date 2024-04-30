@@ -2,7 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.CommentDao;
 import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.filter.CommentDtoFilter;
+import com.github.blog.dto.request.CommentRequestFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
@@ -137,14 +138,19 @@ public class CommentServiceImplTests {
     @Test
     @DisplayName("comment service: findAllByLogin")
     void find_findsAllCommentsByLogin_whenDataIsValid() {
-        CommentFilter filter = new CommentFilter();
-        filter.setLogin("test login");
+        CommentDtoFilter dtoFilter = new CommentDtoFilter();
+        dtoFilter.setLogin("test login");
+
         List<Comment> comments = List.of(comment);
 
-        when(commentDao.findAll(filter)).thenReturn(comments);
+        CommentRequestFilter requestFilter = new CommentRequestFilter();
+        requestFilter.setLogin("test login");
+
+        when(commentMapper.toDto(requestFilter)).thenReturn(dtoFilter);
+        when(commentDao.findAll(dtoFilter)).thenReturn(comments);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
 
-        List<CommentDto> filterSearchResult = commentService.findAll(filter);
+        List<CommentDto> filterSearchResult = commentService.findAll(requestFilter);
 
         assertThat(filterSearchResult).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult).extracting(CommentDto::getContent).containsExactly(content);

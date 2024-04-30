@@ -3,7 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.filter.UserDtoFilter;
+import com.github.blog.dto.request.UserRequestFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.mapper.UserMapper;
@@ -134,13 +135,17 @@ public class UserServiceImplTests {
     void find_findsAllUsersByRole_whenDataIsValid() {
         String role = "ROLE_USER";
         List<User> users = List.of(user);
-        UserFilter filter = new UserFilter();
-        filter.setRole(role);
+        UserDtoFilter dtoFilter = new UserDtoFilter();
+        dtoFilter.setRole(role);
 
-        when(userDao.findAll(filter)).thenReturn(users);
+        UserRequestFilter requestFilter = new UserRequestFilter();
+        requestFilter.setRole(role);
+
+        when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
+        when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(filter);
+        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
         assertThat(filterSearchResult).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
@@ -151,13 +156,17 @@ public class UserServiceImplTests {
     @DisplayName("user: findByLogin")
     void find_findsUserByLogin_whenDataIsValid() {
         List<User> users = List.of(user);
-        UserFilter filter = new UserFilter();
-        filter.setLogin(user.getLogin());
+        UserDtoFilter dtoFilter = new UserDtoFilter();
+        dtoFilter.setLogin(user.getLogin());
 
-        when(userDao.findAll(filter)).thenReturn(users);
+        UserRequestFilter requestFilter = new UserRequestFilter();
+        requestFilter.setLogin(user.getLogin());
+
+        when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
+        when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(filter);
+        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
         assertThat(filterSearchResult).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
@@ -169,13 +178,18 @@ public class UserServiceImplTests {
     void find_findsAllUsersByJobTitle_whenDataIsValid() {
         String jobTitle = "Software Engineer";
         List<User> users = List.of(user);
-        UserFilter filter = new UserFilter();
-        filter.setJob(jobTitle);
 
-        when(userDao.findAll(filter)).thenReturn(users);
+        UserDtoFilter dtoFilter = new UserDtoFilter();
+        dtoFilter.setJob(jobTitle);
+
+        UserRequestFilter requestFilter = new UserRequestFilter();
+        requestFilter.setJob(jobTitle);
+
+        when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
+        when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(filter);
+        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
         assertThat(filterSearchResult).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
@@ -187,13 +201,18 @@ public class UserServiceImplTests {
     void find_findsAllUsersByUniversity_whenDataIsValid() {
         String university = "MIT";
         List<User> users = List.of(user);
-        UserFilter filter = new UserFilter();
-        filter.setUniversity(university);
 
-        when(userDao.findAll(filter)).thenReturn(users);
+        UserDtoFilter dtoFilter = new UserDtoFilter();
+        dtoFilter.setUniversity(university);
+
+        UserRequestFilter requestFilter = new UserRequestFilter();
+        requestFilter.setUniversity(university);
+
+        when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
+        when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(filter);
+        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
         assertThat(filterSearchResult).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
