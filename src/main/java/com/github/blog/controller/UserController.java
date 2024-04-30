@@ -1,6 +1,7 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.UserDto;
+import com.github.blog.dto.common.UserDto;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,29 +35,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> findAll() {
-        return userService.findAll();
-    }
-
-
-    @GetMapping("university")
-    public List<UserDto> findAllByUniversity(@RequestParam(name = "universityName") String universityName) {
-        return userService.findAllByUniversity(universityName);
-    }
-
-    @GetMapping("role")
-    public List<UserDto> findAllByRole(@RequestParam(name = "roleName") String roleName) {
-        return userService.findAllByRole(roleName);
-    }
-
-    @GetMapping("job")
-    public List<UserDto> findAllByJobTitle(@RequestParam(name = "jobName") String jobName) {
-        return userService.findAllByJobTitle(jobName);
-    }
-
-    @GetMapping("login")
-    public UserDto findByLogin(@RequestParam(name = "loginName") String login) {
-        return userService.findByLogin(login);
+    public List<UserDto> findAll(UserFilter filter) {
+        return userService.findAll(filter);
     }
 
     @PutMapping("{id}")

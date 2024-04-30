@@ -1,7 +1,7 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.dao.TagDao;
-import com.github.blog.dto.TagDto;
+import com.github.blog.dto.common.TagDto;
 import com.github.blog.model.Tag;
 import com.github.blog.service.TagService;
 import com.github.blog.service.exception.TagErrorResult;

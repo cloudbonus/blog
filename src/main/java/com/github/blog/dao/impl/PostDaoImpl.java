@@ -1,12 +1,24 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.PostDao;
+import com.github.blog.dto.filter.PostFilter;
 import com.github.blog.model.Post;
 import com.github.blog.model.Post_;
-import jakarta.persistence.EntityGraph;
+import com.github.blog.model.Tag;
+import com.github.blog.model.Tag_;
+import com.github.blog.model.User;
+import com.github.blog.model.User_;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,22 +27,29 @@ import java.util.List;
 @Repository
 public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
 
-    public List<Post> findAllByLogin(String login) {
-        String jpql = "select p from Post p join fetch p.user u where u.login = :login";
-        TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
-        query.setParameter("login", login);
-        return query.getResultList();
-    }
+    @Override
+    public List<Post> findAll(PostFilter filter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-    public List<Post> findAllByTag(String tagName) {
-        EntityGraph<Post> graph = entityManager.createEntityGraph(Post.class);
-        graph.addSubgraph(Post_.user);
+        CriteriaQuery<Post> cq = cb.createQuery(Post.class);
+        Root<Post> post = cq.from(Post.class);
+        Join<Post, User> user = post.join(Post_.user, JoinType.LEFT);
+        Join<Post, Tag> tag = post.join(Post_.tags, JoinType.LEFT);
 
-        String jpql = "SELECT p FROM Post p JOIN p.tags t WHERE t.tagName = :tagName";
+        List<Predicate> predicates = new ArrayList<>();
 
-        TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
-        query.setParameter("tagName", tagName);
-        query.setHint("jakarta.persistence.loadgraph", graph);
+        if (!ObjectUtils.isEmpty(filter.getLogin())) {
+            predicates.add(cb.equal(cb.lower(user.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
+        }
+
+        if (!ObjectUtils.isEmpty(filter.getTag())) {
+            predicates.add(cb.equal(cb.lower(tag.get(Tag_.tagName).as(String.class)), filter.getTag().toLowerCase()));
+        }
+
+        cq.orderBy(cb.asc(post.get(Post_.id)));
+
+        cq.where(cb.and(predicates.toArray(Predicate[]::new)));
+        TypedQuery<Post> query = entityManager.createQuery(cq.select(post).distinct(true));
 
         return query.getResultList();
     }

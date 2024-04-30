@@ -1,6 +1,6 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.TagDto;
+import com.github.blog.dto.common.TagDto;
 import com.github.blog.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;

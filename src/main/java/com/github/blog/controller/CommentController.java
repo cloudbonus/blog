@@ -1,6 +1,7 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.CommentDto;
+import com.github.blog.dto.common.CommentDto;
+import com.github.blog.dto.filter.CommentFilter;
 import com.github.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,18 +35,13 @@ public class CommentController {
     }
 
     @GetMapping
-    public List<CommentDto> findAll() {
-        return commentService.findAll();
+    public List<CommentDto> findAll(CommentFilter filter) {
+        return commentService.findAll(filter);
     }
 
     @PutMapping("{id}")
     public CommentDto update(@PathVariable("id") Long id, @RequestBody CommentDto commentDto) {
         return commentService.update(id, commentDto);
-    }
-
-    @GetMapping("/login")
-    public List<CommentDto> findAllByLogin(@RequestParam(name = "loginName") String login) {
-        return commentService.findAllByLogin(login);
     }
 
     @DeleteMapping("{id}")

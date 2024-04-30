@@ -2,7 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
-import com.github.blog.dto.UserDto;
+import com.github.blog.dto.common.UserDto;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.UserService;
@@ -60,50 +61,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllByUniversity(String universityName) {
-        List<User> users = userDao.findAllByUniversity(universityName);
-
-        if (users.isEmpty()) {
-            throw new UserException(UserErrorResult.USERS_NOT_FOUND);
-        }
-
-        return users.stream().map(userMapper::toDto).toList();
-    }
-
-    @Override
-    public List<UserDto> findAllByRole(String roleName) {
-        List<User> users = userDao.findAllByRole(roleName);
-
-        if (users.isEmpty()) {
-            throw new UserException(UserErrorResult.USERS_NOT_FOUND);
-        }
-
-        return users.stream().map(userMapper::toDto).toList();
-    }
-
-    @Override
-    public List<UserDto> findAllByJobTitle(String jobName) {
-        List<User> users = userDao.findAllByJobTitle(jobName);
-
-        if (users.isEmpty()) {
-            throw new UserException(UserErrorResult.USERS_NOT_FOUND);
-        }
-
-        return users.stream().map(userMapper::toDto).toList();
-    }
-
-    @Override
-    public UserDto findByLogin(String login) {
-        User user = userDao
-                .findByLogin(login)
-                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
-
-        return userMapper.toDto(user);
-    }
-
-    @Override
-    public List<UserDto> findAll() {
-        List<User> users = userDao.findAll();
+    public List<UserDto> findAll(UserFilter userFilter) {
+        List<User> users = userDao.findAll(userFilter);
 
         if (users.isEmpty()) {
             throw new UserException(UserErrorResult.USERS_NOT_FOUND);

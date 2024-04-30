@@ -1,7 +1,8 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostDao;
-import com.github.blog.dto.PostDto;
+import com.github.blog.dto.common.PostDto;
+import com.github.blog.dto.filter.PostFilter;
 import com.github.blog.model.Post;
 import com.github.blog.service.PostService;
 import com.github.blog.service.exception.PostErrorResult;
@@ -42,8 +43,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> findAll() {
-        List<Post> posts = postDao.findAll();
+    public List<PostDto> findAll(PostFilter filter) {
+        List<Post> posts = postDao.findAll(filter);
 
         if (posts.isEmpty()) {
             throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
@@ -71,28 +72,6 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND));
         postDao.delete(post);
         return postMapper.toDto(post);
-    }
-
-    @Override
-    public List<PostDto> findAllByLogin(String login) {
-        List<Post> posts = postDao.findAllByLogin(login);
-
-        if (posts.isEmpty()) {
-            throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
-        }
-
-        return posts.stream().map(postMapper::toDto).toList();
-    }
-
-    @Override
-    public List<PostDto> findAllByTag(String tagName) {
-        List<Post> posts = postDao.findAllByTag(tagName);
-
-        if (posts.isEmpty()) {
-            throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
-        }
-
-        return posts.stream().map(postMapper::toDto).toList();
     }
 
     private void enrichPost(Post post) {

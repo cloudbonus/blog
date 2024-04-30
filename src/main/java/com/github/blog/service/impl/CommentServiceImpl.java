@@ -1,7 +1,8 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.dao.CommentDao;
-import com.github.blog.dto.CommentDto;
+import com.github.blog.dto.common.CommentDto;
+import com.github.blog.dto.filter.CommentFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.service.CommentService;
 import com.github.blog.service.exception.CommentErrorResult;
@@ -25,7 +26,6 @@ public class CommentServiceImpl implements CommentService {
     private final CommentDao commentDao;
     private final CommentMapper commentMapper;
 
-
     @Override
     public CommentDto create(CommentDto commentDto) {
         Comment comment = commentMapper.toEntity(commentDto);
@@ -43,8 +43,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findAll() {
-        List<Comment> comments = commentDao.findAll();
+    public List<CommentDto> findAll(CommentFilter commentFilter) {
+        List<Comment> comments = commentDao.findAll(commentFilter);
 
         if (comments.isEmpty()) {
             throw new CommentException(CommentErrorResult.COMMENTS_NOT_FOUND);
@@ -76,17 +76,6 @@ public class CommentServiceImpl implements CommentService {
 
     private void enrichComment(Comment comment) {
         comment.setPublishedAt(OffsetDateTime.now());
-    }
-
-    @Override
-    public List<CommentDto> findAllByLogin(String login) {
-        List<Comment> comments = commentDao.findAllByLogin(login);
-
-        if (comments.isEmpty()) {
-            throw new CommentException(CommentErrorResult.COMMENTS_NOT_FOUND);
-        }
-
-        return comments.stream().map(commentMapper::toDto).toList();
     }
 }
 

@@ -15,7 +15,7 @@ import java.util.Optional;
 public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
 
     public Optional<Role> findByName(String name) {
-        TypedQuery<Role> query = entityManager.createQuery("SELECT r FROM Role r WHERE r.roleName = :name", Role.class);
+        TypedQuery<Role> query = entityManager.createQuery("select r from Role r where r.roleName = :name", Role.class);
         query.setParameter("name", name);
         try {
             Role role = query.getSingleResult();

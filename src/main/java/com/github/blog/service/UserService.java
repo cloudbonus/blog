@@ -1,6 +1,7 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.UserDto;
+import com.github.blog.dto.common.UserDto;
+import com.github.blog.dto.filter.UserFilter;
 
 import java.util.List;
 
@@ -8,12 +9,14 @@ import java.util.List;
 /**
  * @author Raman Haurylau
  */
-public interface UserService extends CrudService<UserDto, Long> {
-    List<UserDto> findAllByUniversity(String universityName);
+public interface UserService {
+    List<UserDto> findAll(UserFilter filter);
 
-    List<UserDto> findAllByRole(String role);
+    UserDto create(UserDto t);
 
-    List<UserDto> findAllByJobTitle(String jobName);
+    UserDto findById(Long id);
 
-    UserDto findByLogin(String login);
+    UserDto update(Long id, UserDto t);
+
+    UserDto delete(Long id);
 }

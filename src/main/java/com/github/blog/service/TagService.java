@@ -1,6 +1,6 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.TagDto;
+import com.github.blog.dto.common.TagDto;
 
 /**
  * @author Raman Haurylau

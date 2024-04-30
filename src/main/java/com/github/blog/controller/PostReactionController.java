@@ -1,6 +1,6 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.PostReactionDto;
+import com.github.blog.dto.common.PostReactionDto;
 import com.github.blog.service.PostReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @RestController
-@RequestMapping("postreactions")
+@RequestMapping("post-reactions")
 @RequiredArgsConstructor
 public class PostReactionController {
     private final PostReactionService postReactionService;
@@ -42,7 +42,6 @@ public class PostReactionController {
     public PostReactionDto update(@PathVariable("id") Long id, @RequestBody PostReactionDto postReactionDto) {
         return postReactionService.update(id, postReactionDto);
     }
-
 
     @DeleteMapping("{id}")
     public PostReactionDto delete(@PathVariable("id") Long id) {

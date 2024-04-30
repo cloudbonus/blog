@@ -1,6 +1,7 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.PostDto;
+import com.github.blog.dto.common.PostDto;
+import com.github.blog.dto.filter.PostFilter;
 import com.github.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,8 +35,8 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> findAll() {
-        return postService.findAll();
+    public List<PostDto> findAll(PostFilter filter) {
+        return postService.findAll(filter);
     }
 
     @PutMapping("{id}")
@@ -44,15 +44,15 @@ public class PostController {
         return postService.update(id, postDto);
     }
 
-    @GetMapping("login")
-    public List<PostDto> findAllByLogin(@RequestParam(name = "loginName") String login) {
-        return postService.findAllByLogin(login);
-    }
-
-    @GetMapping("tag")
-    public List<PostDto> findAllByTag(@RequestParam(name = "tagName") String tagName) {
-        return postService.findAllByTag(tagName);
-    }
+//    @GetMapping("login")
+//    public List<PostDto> findAllByLogin(@RequestParam(name = "loginName") String login) {
+//        return postService.findAllByLogin(login);
+//    }
+//
+//    @GetMapping("tag")
+//    public List<PostDto> findAllByTag(@RequestParam(name = "tagName") String tagName) {
+//        return postService.findAllByTag(tagName);
+//    }
 
     @DeleteMapping("{id}")
     public PostDto delete(@PathVariable("id") Long id) {

@@ -1,6 +1,6 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.CommentReactionDto;
+import com.github.blog.dto.common.CommentReactionDto;
 import com.github.blog.service.CommentReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @RestController
-@RequestMapping("commentreactions")
+@RequestMapping("comment-reactions")
 @RequiredArgsConstructor
 public class CommentReactionController {
     private final CommentReactionService commentReactionService;

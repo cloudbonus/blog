@@ -2,7 +2,7 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.UserDao;
 import com.github.blog.dao.UserDetailDao;
-import com.github.blog.dto.UserDetailDto;
+import com.github.blog.dto.common.UserDetailDto;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetail;
 import com.github.blog.service.UserDetailService;

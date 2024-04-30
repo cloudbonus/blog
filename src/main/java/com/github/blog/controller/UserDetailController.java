@@ -1,6 +1,6 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.UserDetailDto;
+import com.github.blog.dto.common.UserDetailDto;
 import com.github.blog.service.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @RestController
-@RequestMapping("userdetails")
+@RequestMapping("user-details")
 @RequiredArgsConstructor
 public class UserDetailController {
     private final UserDetailService userDetailService;
