@@ -1,7 +1,7 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.repository.RoleDao;
 import com.github.blog.model.Role;
+import com.github.blog.repository.RoleDao;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;

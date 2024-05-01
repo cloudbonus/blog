@@ -1,10 +1,10 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.UserDetailDao;
 import com.github.blog.controller.dto.common.UserDetailDto;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetail;
+import com.github.blog.repository.UserDao;
+import com.github.blog.repository.UserDetailDao;
 import com.github.blog.service.UserDetailService;
 import com.github.blog.service.exception.UserDetailErrorResult;
 import com.github.blog.service.exception.UserErrorResult;

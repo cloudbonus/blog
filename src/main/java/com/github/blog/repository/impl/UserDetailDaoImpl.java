@@ -1,7 +1,7 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.repository.UserDetailDao;
 import com.github.blog.model.UserDetail;
+import com.github.blog.repository.UserDetailDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

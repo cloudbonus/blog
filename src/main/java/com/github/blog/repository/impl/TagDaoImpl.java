@@ -1,7 +1,7 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.repository.TagDao;
 import com.github.blog.model.Tag;
+import com.github.blog.repository.TagDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

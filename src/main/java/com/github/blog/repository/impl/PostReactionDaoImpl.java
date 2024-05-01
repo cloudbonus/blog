@@ -1,7 +1,7 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.repository.PostReactionDao;
 import com.github.blog.model.PostReaction;
+import com.github.blog.repository.PostReactionDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

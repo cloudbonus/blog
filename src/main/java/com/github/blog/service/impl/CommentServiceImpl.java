@@ -1,10 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.repository.CommentDao;
 import com.github.blog.controller.dto.common.CommentDto;
-import com.github.blog.repository.dto.filter.CommentFilter;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
+import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.dto.filter.CommentFilter;
 import com.github.blog.service.CommentService;
 import com.github.blog.service.exception.CommentErrorResult;
 import com.github.blog.service.exception.impl.CommentException;
@@ -12,8 +13,6 @@ import com.github.blog.service.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -42,16 +41,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findAll(CommentDtoFilter requestFilter) {
+    @Transactional(readOnly = true)
+    public Page<CommentDto> findAll(CommentDtoFilter requestFilter) {
         CommentFilter dtoFilter = commentMapper.toDto(requestFilter);
 
-        List<Comment> comments = commentDao.findAll(dtoFilter);
+        Page<Comment> comments = commentDao.findAll(dtoFilter);
 
         if (comments.isEmpty()) {
             throw new CommentException(CommentErrorResult.COMMENTS_NOT_FOUND);
         }
 
-        return comments.stream().map(commentMapper::toDto).toList();
+        return comments.map(commentMapper::toDto);
     }
 
     @Override
