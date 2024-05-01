@@ -90,9 +90,9 @@ public class PostControllerTests {
     void find_findsAllPostsByLogin_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/posts").param("login", "kvossing0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].title").value("First Post"))
-                .andExpect(jsonPath("$[1].title").value("Second Post"));
+                .andExpect(jsonPath("$.length()").value(4))
+                .andExpect(jsonPath("$.content[0].title").value("First Post"))
+                .andExpect(jsonPath("$.content[1].title").value("Second Post"));
     }
 
     @Test
@@ -101,10 +101,10 @@ public class PostControllerTests {
     void find_findsAllPostsByTag_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/posts").param("tag", "news"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3))
-                .andExpect(jsonPath("$[0].title").value("First Post"))
-                .andExpect(jsonPath("$[0].tagIds.size()").value(1))
-                .andExpect(jsonPath("$[1].title").value("Second Post"))
-                .andExpect(jsonPath("$[2].title").value("Third Post"));
+                .andExpect(jsonPath("$.length()").value(4))
+                .andExpect(jsonPath("$.content[0].title").value("First Post"))
+                .andExpect(jsonPath("$.content[0].tagIds.size()").value(1))
+                .andExpect(jsonPath("$.content[1].title").value("Second Post"))
+                .andExpect(jsonPath("$.content[2].title").value("Third Post"));
     }
 }

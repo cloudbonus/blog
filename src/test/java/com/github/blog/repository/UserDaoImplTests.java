@@ -2,13 +2,15 @@ package com.github.blog.repository;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.repository.dto.filter.UserFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
+import com.github.blog.repository.dto.filter.UserFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,7 +18,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 @ExtendWith({SpringExtension.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
 public class UserDaoImplTests {
@@ -71,11 +73,11 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
 
-        List<User> filteredUserResult = userDao.findAll(filter);
+        Page<User> filteredUserResult = userDao.findAll(filter);
 
-        assertThat(filteredUserResult).isNotEmpty();
+        assertThat(filteredUserResult.getContent()).isNotEmpty();
 
-        User user = filteredUserResult.get(0);
+        User user = filteredUserResult.getContent().get(0);
         user.setLogin(expectedLogin);
         Long id = user.getId();
 
@@ -94,11 +96,11 @@ public class UserDaoImplTests {
 
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
-        List<User> filteredUserResult = userDao.findAll(filter);
+        Page<User> filteredUserResult = userDao.findAll(filter);
 
-        assertThat(filteredUserResult).isNotEmpty();
+        assertThat(filteredUserResult.getContent()).isNotEmpty();
 
-        userDao.delete(filteredUserResult.get(0));
+        userDao.delete(filteredUserResult.getContent().get(0));
 
         assertThat(userDao.findAll()).isNotEmpty().hasSize(1);
     }
@@ -112,7 +114,7 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setRole(role);
 
-        assertThat(userDao.findAll(filter)).isNotEmpty().hasSize(2);
+        assertThat(userDao.findAll(filter).getContent()).isNotEmpty().hasSize(2);
     }
 
     @Test
@@ -124,10 +126,10 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
 
-        List<User> filteredUserResult = userDao.findAll(filter);
+        Page<User> filteredUserResult = userDao.findAll(filter);
 
-        assertThat(filteredUserResult).isNotEmpty().hasSize(1);
-        assertThat(filteredUserResult.get(0).getLogin()).isEqualTo(login);
+        assertThat(filteredUserResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filteredUserResult.getContent().get(0).getLogin()).isEqualTo(login);
     }
 
     @Test
@@ -139,7 +141,7 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setJob(jobTitle);
 
-        assertThat(userDao.findAll(filter)).isNotEmpty().hasSize(1);
+        assertThat(userDao.findAll(filter).getContent()).isNotEmpty().hasSize(1);
     }
 
     @Test
@@ -151,6 +153,6 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setUniversity(university);
 
-        assertThat(userDao.findAll(filter)).isNotEmpty().hasSize(1);
+        assertThat(userDao.findAll(filter).getContent()).isNotEmpty().hasSize(1);
     }
 }

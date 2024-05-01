@@ -2,16 +2,18 @@ package com.github.blog.repository;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.repository.dto.filter.PostFilter;
-import com.github.blog.repository.dto.filter.UserFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.model.User;
+import com.github.blog.repository.dto.filter.PostFilter;
+import com.github.blog.repository.dto.filter.UserFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 @ExtendWith({SpringExtension.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
 public class PostDaoImplTests {
@@ -53,12 +56,12 @@ public class PostDaoImplTests {
 
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
-        List<User> filteredUserResult = userDao.findAll(filter);
+        Page<User> filteredUserResult = userDao.findAll(filter);
 
-        assertThat(filteredUserResult).isNotEmpty();
+        assertThat(filteredUserResult.getContent()).isNotEmpty();
 
         Post post = new Post();
-        post.setUser(filteredUserResult.get(0));
+        post.setUser(filteredUserResult.getContent().get(0));
         post.setTitle("First Post");
         post.setContent(content);
         post.setPublishedAt(OffsetDateTime.now());
@@ -82,11 +85,11 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
-        List<Post> filteredPostResult = postDao.findAll(filter);
+        Page<Post> filteredPostResult = postDao.findAll(filter);
 
-        assertThat(filteredPostResult).isNotEmpty().hasSize(1);
+        assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(1);
 
-        Post post = filteredPostResult.get(0);
+        Post post = filteredPostResult.getContent().get(0);
         String updatedContent = "Look at me i've made it!!!";
         OffsetDateTime updatedTime = OffsetDateTime.now();
 
@@ -109,11 +112,11 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
-        List<Post> filteredPostResult = postDao.findAll(filter);
+        Page<Post> filteredPostResult = postDao.findAll(filter);
 
-        assertThat(filteredPostResult).isNotEmpty().hasSize(1);
+        assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(1);
 
-        Post post = filteredPostResult.get(0);
+        Post post = filteredPostResult.getContent().get(0);
 
         postDao.delete(post);
 
@@ -134,9 +137,9 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
-        List<Post> filteredPostResult2 = postDao.findAll(filter);
+        Page<Post> filteredPostResult2 = postDao.findAll(filter);
 
-        assertThat(filteredPostResult2).isNotEmpty().hasSize(2);
+        assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(2);
     }
 
     @Test
@@ -148,12 +151,12 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
 
         filter.setTag(tag1);
-        List<Post> filteredPostResult1 = postDao.findAll(filter);
+        Page<Post> filteredPostResult1 = postDao.findAll(filter);
 
         filter.setTag(tag2);
-        List<Post> filteredPostResult2 = postDao.findAll(filter);
+        Page<Post> filteredPostResult2 = postDao.findAll(filter);
 
-        assertThat(filteredPostResult1).isNotEmpty().hasSize(3);
-        assertThat(filteredPostResult2).isNotEmpty().hasSize(1);
+        assertThat(filteredPostResult1.getContent()).isNotEmpty().hasSize(3);
+        assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(1);
     }
 }

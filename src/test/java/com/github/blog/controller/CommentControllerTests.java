@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,9 +111,9 @@ public class CommentControllerTests {
     @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void find_findsAllCommentsByLogin_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/comments").param("login", "kvossing0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].content").value("This is the content of the first comment."))
-                .andExpect(jsonPath("$[1].content").value("This is the content of the second comment."));
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$.length()").value(4))
+                .andExpect(jsonPath("$.content[0].content").value("This is the content of the first comment."))
+                .andExpect(jsonPath("$.content[1].content").value("This is the content of the second comment."));
     }
 }

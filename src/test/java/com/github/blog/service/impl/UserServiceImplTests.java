@@ -1,12 +1,14 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.repository.RoleDao;
-import com.github.blog.repository.UserDao;
 import com.github.blog.controller.dto.common.UserDto;
-import com.github.blog.repository.dto.filter.UserFilter;
 import com.github.blog.controller.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
+import com.github.blog.repository.RoleDao;
+import com.github.blog.repository.UserDao;
+import com.github.blog.repository.dto.filter.UserFilter;
 import com.github.blog.service.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -134,28 +136,32 @@ public class UserServiceImplTests {
     @DisplayName("user service: findAllByRole")
     void find_findsAllUsersByRole_whenDataIsValid() {
         String role = "ROLE_USER";
-        List<User> users = List.of(user);
         UserFilter dtoFilter = new UserFilter();
         dtoFilter.setRole(role);
 
         UserDtoFilter requestFilter = new UserDtoFilter();
         requestFilter.setRole(role);
 
+        Pageable pageable = new Pageable();
+        Page<User> users = new Page<>(List.of(user), pageable, 1L);
+
         when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
         when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
+        Page<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
-        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
-        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
     }
 
     @Test
     @DisplayName("user: findByLogin")
     void find_findsUserByLogin_whenDataIsValid() {
-        List<User> users = List.of(user);
+        Pageable pageable = new Pageable();
+        Page<User> users = new Page<>(List.of(user), pageable, 1L);
+
         UserFilter dtoFilter = new UserFilter();
         dtoFilter.setLogin(user.getLogin());
 
@@ -166,18 +172,19 @@ public class UserServiceImplTests {
         when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
+        Page<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
-        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
-        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
     }
 
     @Test
     @DisplayName("user service: findAllByJobTitle")
     void find_findsAllUsersByJobTitle_whenDataIsValid() {
         String jobTitle = "Software Engineer";
-        List<User> users = List.of(user);
+        Pageable pageable = new Pageable();
+        Page<User> users = new Page<>(List.of(user), pageable, 1L);
 
         UserFilter dtoFilter = new UserFilter();
         dtoFilter.setJob(jobTitle);
@@ -189,18 +196,19 @@ public class UserServiceImplTests {
         when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
+        Page<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
-        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
-        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
     }
 
     @Test
     @DisplayName("user service: findAllByUniversity")
     void find_findsAllUsersByUniversity_whenDataIsValid() {
         String university = "MIT";
-        List<User> users = List.of(user);
+        Pageable pageable = new Pageable();
+        Page<User> users = new Page<>(List.of(user), pageable, 1L);
 
         UserFilter dtoFilter = new UserFilter();
         dtoFilter.setUniversity(university);
@@ -212,10 +220,10 @@ public class UserServiceImplTests {
         when(userDao.findAll(dtoFilter)).thenReturn(users);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        List<UserDto> filterSearchResult = userService.findAll(requestFilter);
+        Page<UserDto> filterSearchResult = userService.findAll(requestFilter);
 
-        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult).extracting(UserDto::getLogin).containsExactly(login);
-        assertThat(filterSearchResult).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getLogin).containsExactly(login);
+        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
     }
 }

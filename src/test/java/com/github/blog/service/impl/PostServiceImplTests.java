@@ -1,12 +1,14 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.repository.PostDao;
 import com.github.blog.controller.dto.common.PostDto;
-import com.github.blog.repository.dto.filter.PostFilter;
 import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.model.User;
+import com.github.blog.repository.PostDao;
+import com.github.blog.repository.dto.filter.PostFilter;
 import com.github.blog.service.mapper.PostMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -143,7 +145,8 @@ public class PostServiceImplTests {
         PostFilter dtoFilter = new PostFilter();
         dtoFilter.setLogin("test login");
 
-        List<Post> posts = List.of(post);
+        Pageable pageable = new Pageable();
+        Page<Post> posts = new Page<>(List.of(post), pageable, 1L);
 
         PostDtoFilter requestFilter = new PostDtoFilter();
         requestFilter.setLogin("test login");
@@ -152,11 +155,11 @@ public class PostServiceImplTests {
         when(postDao.findAll(dtoFilter)).thenReturn(posts);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        List<PostDto> filterSearchResult = postService.findAll(requestFilter);
+        Page<PostDto> filterSearchResult = postService.findAll(requestFilter);
 
-        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult).extracting(PostDto::getTitle).containsExactly(title);
-        assertThat(filterSearchResult).extracting(PostDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.getContent()).extracting(PostDto::getTitle).containsExactly(title);
+        assertThat(filterSearchResult.getContent()).extracting(PostDto::getId).containsExactly(id);
     }
 
     @Test
@@ -165,7 +168,8 @@ public class PostServiceImplTests {
         PostFilter dtoFilter = new PostFilter();
         dtoFilter.setTag("news");
 
-        List<Post> posts = List.of(post);
+        Pageable pageable = new Pageable();
+        Page<Post> posts = new Page<>(List.of(post), pageable, 1L);
 
         PostDtoFilter requestFilter = new PostDtoFilter();
         requestFilter.setTag("news");
@@ -174,10 +178,10 @@ public class PostServiceImplTests {
         when(postDao.findAll(dtoFilter)).thenReturn(posts);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        List<PostDto> filterSearchResult = postService.findAll(requestFilter);
+        Page<PostDto> filterSearchResult = postService.findAll(requestFilter);
 
-        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult).extracting(PostDto::getTitle).containsExactly(title);
-        assertThat(filterSearchResult).extracting(PostDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.getContent()).extracting(PostDto::getTitle).containsExactly(title);
+        assertThat(filterSearchResult.getContent()).extracting(PostDto::getId).containsExactly(id);
     }
 }

@@ -96,9 +96,9 @@ public class UserControllerTests {
     void find_findsAllUsersByRole_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/users").param("role", "user"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].login").value("kvossing0"))
-                .andExpect(jsonPath("$[1].login").value("gmaccook1"));
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].login").value("kvossing0"))
+                .andExpect(jsonPath("$.content[1].login").value("gmaccook1"));
     }
 
     @Test
@@ -107,8 +107,8 @@ public class UserControllerTests {
     void find_findsUserByLogin_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/users").param("login", "kvossing0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].login").value("kvossing0"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].login").value("kvossing0"));
     }
 
     @Test
@@ -117,8 +117,9 @@ public class UserControllerTests {
     void find_findsAllUsersByJobTitle_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/users").param("job", "ai researcher"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].login").value("gmaccook1"));
+                .andExpect(jsonPath("$.length()").value(4))
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].login").value("gmaccook1"));
     }
 
     @Test
@@ -135,7 +136,7 @@ public class UserControllerTests {
     void find_findsAllUsersByUniversity_whenDataIsValid() throws Exception {
         mockMvc.perform(get("/users").param("university", "mit"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].login").value("gmaccook1"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content.[0].login").value("gmaccook1"));
     }
 }

@@ -1,12 +1,14 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.repository.CommentDao;
 import com.github.blog.controller.dto.common.CommentDto;
-import com.github.blog.repository.dto.filter.CommentFilter;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
+import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.dto.filter.CommentFilter;
 import com.github.blog.service.mapper.CommentMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -141,7 +143,8 @@ public class CommentServiceImplTests {
         CommentFilter dtoFilter = new CommentFilter();
         dtoFilter.setLogin("test login");
 
-        List<Comment> comments = List.of(comment);
+        Pageable pageable = new Pageable();
+        Page<Comment> comments = new Page<>(List.of(comment), pageable, 1L);
 
         CommentDtoFilter requestFilter = new CommentDtoFilter();
         requestFilter.setLogin("test login");
@@ -150,10 +153,10 @@ public class CommentServiceImplTests {
         when(commentDao.findAll(dtoFilter)).thenReturn(comments);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
 
-        List<CommentDto> filterSearchResult = commentService.findAll(requestFilter);
+        Page<CommentDto> filterSearchResult = commentService.findAll(requestFilter);
 
-        assertThat(filterSearchResult).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult).extracting(CommentDto::getContent).containsExactly(content);
-        assertThat(filterSearchResult).extracting(CommentDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.getContent()).extracting(CommentDto::getContent).containsExactly(content);
+        assertThat(filterSearchResult.getContent()).extracting(CommentDto::getId).containsExactly(id);
     }
 }
