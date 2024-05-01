@@ -1,13 +1,15 @@
 package com.github.blog.dto.common;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link com.github.blog.model.Comment}
  */
-@Data
+@Getter
+@Setter
 public class CommentDto {
     Long id;
     Long postId;

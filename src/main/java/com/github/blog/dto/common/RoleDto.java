@@ -1,11 +1,13 @@
 package com.github.blog.dto.common;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * DTO for {@link com.github.blog.model.Role}
  */
-@Data
+@Getter
+@Setter
 public class RoleDto {
     private Long id;
     private String roleName;

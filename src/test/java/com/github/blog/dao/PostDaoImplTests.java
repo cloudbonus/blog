@@ -2,8 +2,8 @@ package com.github.blog.dao;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.dto.filter.PostDtoFilter;
-import com.github.blog.dto.filter.UserDtoFilter;
+import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
@@ -51,7 +51,7 @@ public class PostDaoImplTests {
         String content = "This is the content of the first post.";
         String login = "kvossing0";
 
-        UserDtoFilter filter = new UserDtoFilter();
+        UserFilter filter = new UserFilter();
         filter.setLogin(login);
         List<User> filteredUserResult = userDao.findAll(filter);
 
@@ -79,7 +79,7 @@ public class PostDaoImplTests {
     @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql"})
     void update_returnsUpdatedPostDto_whenDataIsValid() {
         String login = "gmaccook1";
-        PostDtoFilter filter = new PostDtoFilter();
+        PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
         List<Post> filteredPostResult = postDao.findAll(filter);
@@ -106,7 +106,7 @@ public class PostDaoImplTests {
     @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void delete_deletesPost_whenDataIsValid() {
         String login = "gmaccook1";
-        PostDtoFilter filter = new PostDtoFilter();
+        PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
         List<Post> filteredPostResult = postDao.findAll(filter);
@@ -131,7 +131,7 @@ public class PostDaoImplTests {
     @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql"})
     void find_findsAllPostsByLogin_whenDataIsValid() {
         String login = "kvossing0";
-        PostDtoFilter filter = new PostDtoFilter();
+        PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
         List<Post> filteredPostResult2 = postDao.findAll(filter);
@@ -145,7 +145,7 @@ public class PostDaoImplTests {
     void find_findsAllPostsByTag_whenDataIsValid() {
         String tag1 = "news";
         String tag2 = "education";
-        PostDtoFilter filter = new PostDtoFilter();
+        PostFilter filter = new PostFilter();
 
         filter.setTag(tag1);
         List<Post> filteredPostResult1 = postDao.findAll(filter);

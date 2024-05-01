@@ -1,12 +1,15 @@
-package com.github.blog.dto.filter;
+package com.github.blog.dto.request;
 
-import lombok.Data;
+import com.github.blog.dto.GenericFilter;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Raman Haurylau
  */
-@Data
-public class UserDtoFilter {
+@Getter
+@Setter
+public class UserDtoFilter extends GenericFilter {
     private String login;
     private String role;
     private String firstname;

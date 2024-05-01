@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.CommentDao;
 import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.filter.CommentDtoFilter;
-import com.github.blog.dto.request.CommentRequestFilter;
+import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.request.CommentDtoFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
@@ -138,12 +138,12 @@ public class CommentServiceImplTests {
     @Test
     @DisplayName("comment service: findAllByLogin")
     void find_findsAllCommentsByLogin_whenDataIsValid() {
-        CommentDtoFilter dtoFilter = new CommentDtoFilter();
+        CommentFilter dtoFilter = new CommentFilter();
         dtoFilter.setLogin("test login");
 
         List<Comment> comments = List.of(comment);
 
-        CommentRequestFilter requestFilter = new CommentRequestFilter();
+        CommentDtoFilter requestFilter = new CommentDtoFilter();
         requestFilter.setLogin("test login");
 
         when(commentMapper.toDto(requestFilter)).thenReturn(dtoFilter);

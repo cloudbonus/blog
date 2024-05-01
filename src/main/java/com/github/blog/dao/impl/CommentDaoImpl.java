@@ -1,7 +1,7 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.CommentDao;
-import com.github.blog.dto.filter.CommentDtoFilter;
+import com.github.blog.dto.filter.CommentFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Comment_;
 import com.github.blog.model.User;
@@ -26,7 +26,7 @@ import java.util.List;
 public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements CommentDao {
 
     @Override
-    public List<Comment> findAll(CommentDtoFilter filter) {
+    public List<Comment> findAll(CommentFilter filter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Comment> cq = cb.createQuery(Comment.class);

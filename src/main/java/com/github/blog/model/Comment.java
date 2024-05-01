@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,4 +41,9 @@ public class Comment {
 
     @Column(nullable = false)
     private OffsetDateTime publishedAt;
+
+    @PrePersist
+    private void prePersist(){
+        publishedAt = OffsetDateTime.now();
+    }
 }

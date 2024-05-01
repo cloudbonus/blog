@@ -3,8 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserDtoFilter;
-import com.github.blog.dto.request.UserRequestFilter;
+import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.request.UserDtoFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.UserService;
@@ -39,9 +39,6 @@ public class UserServiceImpl implements UserService {
     public UserDto create(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
 
-        user.setCreatedAt(OffsetDateTime.now());
-        user.setLastLogin(OffsetDateTime.now());
-
         userDao.create(user);
 
         Role role = roleDao
@@ -67,8 +64,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll(UserRequestFilter requestFilter) {
-        UserDtoFilter dtoFilter = userMapper.toDto(requestFilter);
+    public List<UserDto> findAll(UserDtoFilter requestFilter) {
+        UserFilter dtoFilter = userMapper.toDto(requestFilter);
 
         List<User> users = userDao.findAll(dtoFilter);
 

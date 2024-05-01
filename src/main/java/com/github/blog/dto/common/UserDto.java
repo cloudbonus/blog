@@ -1,13 +1,15 @@
 package com.github.blog.dto.common;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link com.github.blog.model.User}
  */
-@Data
+@Getter
+@Setter
 public class UserDto {
     private Long id;
     private String login;

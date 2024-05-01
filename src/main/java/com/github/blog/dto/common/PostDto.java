@@ -1,6 +1,7 @@
 package com.github.blog.dto.common;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -8,7 +9,8 @@ import java.util.List;
 /**
  * DTO for {@link com.github.blog.model.Post}
  */
-@Data
+@Getter
+@Setter
 public class PostDto {
     Long id;
     Long userId;

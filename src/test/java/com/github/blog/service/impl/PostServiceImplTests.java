@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostDao;
 import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostDtoFilter;
-import com.github.blog.dto.request.PostRequestFilter;
+import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.request.PostDtoFilter;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.model.User;
@@ -140,12 +140,12 @@ public class PostServiceImplTests {
     @Test
     @DisplayName("post service: findAllByLogin")
     void find_findsAllPostsByLogin_whenDataIsValid() {
-        PostDtoFilter dtoFilter = new PostDtoFilter();
+        PostFilter dtoFilter = new PostFilter();
         dtoFilter.setLogin("test login");
 
         List<Post> posts = List.of(post);
 
-        PostRequestFilter requestFilter = new PostRequestFilter();
+        PostDtoFilter requestFilter = new PostDtoFilter();
         requestFilter.setLogin("test login");
 
         when(postMapper.toDto(requestFilter)).thenReturn(dtoFilter);
@@ -162,12 +162,12 @@ public class PostServiceImplTests {
     @Test
     @DisplayName("post service: findAllByLogin")
     void find_findsAllPostsByTag_whenDataIsValid() {
-        PostDtoFilter dtoFilter = new PostDtoFilter();
+        PostFilter dtoFilter = new PostFilter();
         dtoFilter.setTag("news");
 
         List<Post> posts = List.of(post);
 
-        PostRequestFilter requestFilter = new PostRequestFilter();
+        PostDtoFilter requestFilter = new PostDtoFilter();
         requestFilter.setTag("news");
 
         when(postMapper.toDto(requestFilter)).thenReturn(dtoFilter);

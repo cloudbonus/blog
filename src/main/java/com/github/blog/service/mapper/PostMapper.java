@@ -3,8 +3,8 @@ package com.github.blog.service.mapper;
 import com.github.blog.dao.CommentDao;
 import com.github.blog.dao.TagDao;
 import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostDtoFilter;
-import com.github.blog.dto.request.PostRequestFilter;
+import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.request.PostDtoFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
@@ -38,7 +38,7 @@ public abstract class PostMapper {
     @Mapping(target = "tagIds", source = "tags")
     public abstract PostDto toDto(Post post);
 
-    public abstract PostDtoFilter toDto(PostRequestFilter requestFilter);
+    public abstract PostFilter toDto(PostDtoFilter requestFilter);
 
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

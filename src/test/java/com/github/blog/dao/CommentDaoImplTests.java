@@ -2,9 +2,9 @@ package com.github.blog.dao;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.dto.filter.CommentDtoFilter;
-import com.github.blog.dto.filter.PostDtoFilter;
-import com.github.blog.dto.filter.UserDtoFilter;
+import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
@@ -48,14 +48,14 @@ public class CommentDaoImplTests {
     void create_returnsCommentDto_whenDataIsValid() {
         String login = "kvossing0";
 
-        UserDtoFilter userFilter = new UserDtoFilter();
+        UserFilter userFilter = new UserFilter();
         userFilter.setLogin(login);
 
         List<User> filteredUserResult = userDao.findAll(userFilter);
 
         assertThat(filteredUserResult).isNotEmpty();
 
-        PostDtoFilter postFilter = new PostDtoFilter();
+        PostFilter postFilter = new PostFilter();
         postFilter.setLogin(login);
 
         List<Post> filteredPostResult = postDao.findAll(postFilter);
@@ -80,7 +80,7 @@ public class CommentDaoImplTests {
     @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void update_returnsUpdatedCommentDto_whenDataIsValid() {
         String login = "kvossing0";
-        CommentDtoFilter filter = new CommentDtoFilter();
+        CommentFilter filter = new CommentFilter();
         filter.setLogin(login);
 
         List<Comment> filteredCommentResult = commentDao.findAll(filter);
@@ -108,7 +108,7 @@ public class CommentDaoImplTests {
     @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void delete_deletesComment_whenDataIsValid() {
         String login = "kvossing0";
-        CommentDtoFilter filter = new CommentDtoFilter();
+        CommentFilter filter = new CommentFilter();
         filter.setLogin(login);
 
         List<Comment> filteredCommentResult = commentDao.findAll(filter);
@@ -127,7 +127,7 @@ public class CommentDaoImplTests {
         String login1 = "kvossing0";
         String login2 = "gmaccook1";
 
-        CommentDtoFilter filter = new CommentDtoFilter();
+        CommentFilter filter = new CommentFilter();
         filter.setLogin(login1);
 
         List<Comment> filteredCommentResult1 = commentDao.findAll(filter);

@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.PostDao;
 import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostDtoFilter;
-import com.github.blog.dto.request.PostRequestFilter;
+import com.github.blog.dto.filter.PostFilter;
+import com.github.blog.dto.request.PostDtoFilter;
 import com.github.blog.model.Post;
 import com.github.blog.service.PostService;
 import com.github.blog.service.exception.PostErrorResult;
@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -30,7 +29,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto create(PostDto postDto) {
         Post post = postMapper.toEntity(postDto);
-        post.setPublishedAt(OffsetDateTime.now());
         return postMapper.toDto(postDao.create(post));
     }
 
@@ -44,8 +42,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> findAll(PostRequestFilter requestFilter) {
-        PostDtoFilter dtoFilter = postMapper.toDto(requestFilter);
+    public List<PostDto> findAll(PostDtoFilter requestFilter) {
+        PostFilter dtoFilter = postMapper.toDto(requestFilter);
 
         List<Post> posts = postDao.findAll(dtoFilter);
 

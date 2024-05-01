@@ -3,8 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.dao.RoleDao;
 import com.github.blog.dao.UserDao;
 import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserDtoFilter;
-import com.github.blog.dto.request.UserRequestFilter;
+import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.request.UserDtoFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.mapper.UserMapper;
@@ -135,10 +135,10 @@ public class UserServiceImplTests {
     void find_findsAllUsersByRole_whenDataIsValid() {
         String role = "ROLE_USER";
         List<User> users = List.of(user);
-        UserDtoFilter dtoFilter = new UserDtoFilter();
+        UserFilter dtoFilter = new UserFilter();
         dtoFilter.setRole(role);
 
-        UserRequestFilter requestFilter = new UserRequestFilter();
+        UserDtoFilter requestFilter = new UserDtoFilter();
         requestFilter.setRole(role);
 
         when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
@@ -156,10 +156,10 @@ public class UserServiceImplTests {
     @DisplayName("user: findByLogin")
     void find_findsUserByLogin_whenDataIsValid() {
         List<User> users = List.of(user);
-        UserDtoFilter dtoFilter = new UserDtoFilter();
+        UserFilter dtoFilter = new UserFilter();
         dtoFilter.setLogin(user.getLogin());
 
-        UserRequestFilter requestFilter = new UserRequestFilter();
+        UserDtoFilter requestFilter = new UserDtoFilter();
         requestFilter.setLogin(user.getLogin());
 
         when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
@@ -179,10 +179,10 @@ public class UserServiceImplTests {
         String jobTitle = "Software Engineer";
         List<User> users = List.of(user);
 
-        UserDtoFilter dtoFilter = new UserDtoFilter();
+        UserFilter dtoFilter = new UserFilter();
         dtoFilter.setJob(jobTitle);
 
-        UserRequestFilter requestFilter = new UserRequestFilter();
+        UserDtoFilter requestFilter = new UserDtoFilter();
         requestFilter.setJob(jobTitle);
 
         when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);
@@ -202,10 +202,10 @@ public class UserServiceImplTests {
         String university = "MIT";
         List<User> users = List.of(user);
 
-        UserDtoFilter dtoFilter = new UserDtoFilter();
+        UserFilter dtoFilter = new UserFilter();
         dtoFilter.setUniversity(university);
 
-        UserRequestFilter requestFilter = new UserRequestFilter();
+        UserDtoFilter requestFilter = new UserDtoFilter();
         requestFilter.setUniversity(university);
 
         when(userMapper.toDto(requestFilter)).thenReturn(dtoFilter);

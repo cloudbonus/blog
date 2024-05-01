@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.dao.CommentDao;
 import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.filter.CommentDtoFilter;
-import com.github.blog.dto.request.CommentRequestFilter;
+import com.github.blog.dto.filter.CommentFilter;
+import com.github.blog.dto.request.CommentDtoFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.service.CommentService;
 import com.github.blog.service.exception.CommentErrorResult;
@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -30,7 +29,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto create(CommentDto commentDto) {
         Comment comment = commentMapper.toEntity(commentDto);
-        comment.setPublishedAt(OffsetDateTime.now());
         return commentMapper.toDto(commentDao.create(comment));
     }
 
@@ -44,8 +42,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findAll(CommentRequestFilter requestFilter) {
-        CommentDtoFilter dtoFilter = commentMapper.toDto(requestFilter);
+    public List<CommentDto> findAll(CommentDtoFilter requestFilter) {
+        CommentFilter dtoFilter = commentMapper.toDto(requestFilter);
 
         List<Comment> comments = commentDao.findAll(dtoFilter);
 

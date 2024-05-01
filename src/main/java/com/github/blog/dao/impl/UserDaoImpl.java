@@ -1,7 +1,7 @@
 package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDao;
-import com.github.blog.dto.filter.UserDtoFilter;
+import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
@@ -30,13 +30,13 @@ import java.util.List;
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
     @Override
-    public List<User> findAll(UserDtoFilter filter) {
+    public List<User> findAll(UserFilter filter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<User> user = cq.from(User.class);
-        Join<User, UserDetail> userDetail = user.join(User_.userDetail, JoinType.LEFT);
-        Join<User, Role> role = user.join(User_.roles);
+        Root<User> userRoot = cq.from(User.class);
+        Join<User, UserDetail> userDetail = userRoot.join(User_.userDetail, JoinType.LEFT);
+        Join<User, Role> role = userRoot.join(User_.roles);
 
         List<Predicate> predicates = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         }
 
         if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.equal(cb.lower(user.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
+            predicates.add(cb.equal(cb.lower(userRoot.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
         }
 
         if (!ObjectUtils.isEmpty(filter.getRole())) {
@@ -73,11 +73,24 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
             predicates.add(cb.equal(cb.lower(role.get(Role_.roleName).as(String.class)), updatedRoleName.toLowerCase()));
         }
 
-        cq.orderBy(cb.asc(user.get(User_.id)));
+        cq.orderBy(cb.asc(userRoot.get(User_.id)));
 
         cq.where(cb.and(predicates.toArray(Predicate[]::new)));
-        TypedQuery<User> query = entityManager.createQuery(cq.select(user).distinct(true));
+        TypedQuery<User> query = entityManager.createQuery(cq.select(userRoot).distinct(true));
 
+//        Pageable pageable = PageRequest.of(filter.getPageNumber(), filter.getPageSize());
+//
+//        query.setFirstResult(Long.valueOf(pageable.getOffset()).intValue());
+//        query.setMaxResults(pageable.getPageSize());
+//
+//        CriteriaQuery<Long> countq = cb.createQuery(Long.class);
+//        Root<User> countRoot = countq.from(User.class);
+//        countq.select(cb.countDistinct(countRoot.get(User_.id)));
+//        countq.where(cb.and(predicates.toArray(Predicate[]::new)));
+//
+//        Long count = entityManager.createQuery(countq).getSingleResult();
+
+        //return new PageImpl<>(query.getResultList(), pageable, count);
         return query.getResultList();
     }
 }
