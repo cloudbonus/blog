@@ -2,6 +2,7 @@ package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,8 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -35,7 +34,7 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> findAll(PostDtoFilter requestFilter) {
+    public Page<PostDto> findAll(PostDtoFilter requestFilter) {
         return postService.findAll(requestFilter);
     }
 

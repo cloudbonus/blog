@@ -1,4 +1,4 @@
-package com.github.blog.controller.dto;
+package com.github.blog.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class Page<T> {
     }
 
     @JsonIgnore
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return content.isEmpty();
     }
 

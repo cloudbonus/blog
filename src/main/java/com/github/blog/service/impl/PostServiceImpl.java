@@ -1,10 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.repository.PostDao;
 import com.github.blog.controller.dto.common.PostDto;
-import com.github.blog.repository.dto.filter.PostFilter;
 import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Post;
+import com.github.blog.repository.PostDao;
+import com.github.blog.repository.dto.filter.PostFilter;
 import com.github.blog.service.PostService;
 import com.github.blog.service.exception.PostErrorResult;
 import com.github.blog.service.exception.impl.PostException;
@@ -12,8 +13,6 @@ import com.github.blog.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -42,16 +41,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> findAll(PostDtoFilter requestFilter) {
+    public Page<PostDto> findAll(PostDtoFilter requestFilter) {
         PostFilter dtoFilter = postMapper.toDto(requestFilter);
 
-        List<Post> posts = postDao.findAll(dtoFilter);
+        Page<Post> posts = postDao.findAll(dtoFilter);
 
         if (posts.isEmpty()) {
             throw new PostException(PostErrorResult.POSTS_NOT_FOUND);
         }
 
-        return posts.stream().map(postMapper::toDto).toList();
+        return posts.map(postMapper::toDto);
     }
 
     @Override

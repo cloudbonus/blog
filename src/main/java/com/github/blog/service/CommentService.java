@@ -2,14 +2,13 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
-
-import java.util.List;
+import com.github.blog.controller.dto.response.Page;
 
 /**
  * @author Raman Haurylau
  */
 public interface CommentService {
-    List<CommentDto> findAll(CommentDtoFilter requestFilter);
+    Page<CommentDto> findAll(CommentDtoFilter requestFilter);
 
     CommentDto create(CommentDto t);
 

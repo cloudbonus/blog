@@ -57,7 +57,7 @@ public class User {
     private List<Order> orders = new ArrayList<>();
 
     @PrePersist
-    private void prePersist(){
+    private void prePersist() {
         createdAt = OffsetDateTime.now();
         lastLogin = OffsetDateTime.now();
     }

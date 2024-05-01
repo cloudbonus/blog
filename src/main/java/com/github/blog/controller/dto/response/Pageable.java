@@ -1,4 +1,4 @@
-package com.github.blog.controller.dto;
+package com.github.blog.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -15,6 +15,6 @@ public class Pageable {
 
     @JsonIgnore
     public int getOffset() {
-        return  (pageNumber - 1) * pageSize;
+        return (pageNumber - 1) * pageSize;
     }
 }

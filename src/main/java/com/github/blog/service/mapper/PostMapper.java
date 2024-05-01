@@ -1,13 +1,13 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.repository.CommentDao;
-import com.github.blog.repository.TagDao;
 import com.github.blog.controller.dto.common.PostDto;
-import com.github.blog.repository.dto.filter.PostFilter;
 import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
+import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.TagDao;
+import com.github.blog.repository.dto.filter.PostFilter;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

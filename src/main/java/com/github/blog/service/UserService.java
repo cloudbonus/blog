@@ -2,7 +2,7 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.UserDtoFilter;
-import com.github.blog.controller.dto.Page;
+import com.github.blog.controller.dto.response.Page;
 
 
 /**

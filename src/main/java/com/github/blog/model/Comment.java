@@ -43,7 +43,7 @@ public class Comment {
     private OffsetDateTime publishedAt;
 
     @PrePersist
-    private void prePersist(){
+    private void prePersist() {
         publishedAt = OffsetDateTime.now();
     }
 }

@@ -2,14 +2,13 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PostDtoFilter;
-
-import java.util.List;
+import com.github.blog.controller.dto.response.Page;
 
 /**
  * @author Raman Haurylau
  */
 public interface PostService {
-    List<PostDto> findAll(PostDtoFilter requestFilter);
+    Page<PostDto> findAll(PostDtoFilter requestFilter);
 
     PostDto create(PostDto t);
 

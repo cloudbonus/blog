@@ -1,15 +1,15 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.dto.filter.UserFilter;
-import com.github.blog.controller.dto.Page;
-import com.github.blog.controller.dto.Pageable;
+import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
 import com.github.blog.model.UserDetail;
 import com.github.blog.model.UserDetail_;
 import com.github.blog.model.User_;
+import com.github.blog.repository.UserDao;
+import com.github.blog.repository.dto.filter.UserFilter;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -17,11 +17,13 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.Getter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,10 +37,10 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
     public Page<User> findAll(UserFilter filter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<User> userRoot = cq.from(User.class);
-        Join<User, UserDetail> userDetail = userRoot.join(User_.userDetail, JoinType.LEFT);
-        Join<User, Role> role = userRoot.join(User_.roles, JoinType.LEFT);
+        CriteriaQuery<UserBox> cq = cb.createQuery(UserBox.class);
+        Root<User> root = cq.from(User.class);
+        Join<User, UserDetail> userDetail = root.join(User_.userDetail, JoinType.LEFT);
+        Join<User, Role> role = root.join(User_.roles, JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 
@@ -67,7 +69,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         }
 
         if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.equal(cb.lower(userRoot.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
+            predicates.add(cb.equal(cb.lower(root.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
         }
 
         if (!ObjectUtils.isEmpty(filter.getRole())) {
@@ -75,10 +77,10 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
             predicates.add(cb.equal(cb.lower(role.get(Role_.roleName).as(String.class)), updatedRoleName.toLowerCase()));
         }
 
-        cq.orderBy(cb.asc(userRoot.get(User_.id)));
+        cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
+        cq.orderBy(cb.asc(root.get(User_.id)));
 
-        cq.where(cb.and(predicates.toArray(Predicate[]::new)));
-        TypedQuery<User> query = entityManager.createQuery(cq.select(userRoot).distinct(true));
+        TypedQuery<UserBox> query = entityManager.createQuery(cq);
 
         Pageable pageable = new Pageable();
         pageable.setPageNumber(filter.getPageNumber());
@@ -93,13 +95,32 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         query.setFirstResult(offset);
         query.setMaxResults(pageable.getPageSize());
 
-        CriteriaQuery<Long> countq = cb.createQuery(Long.class);
-        Root<User> countRoot = countq.from(User.class);
-        countq.select(cb.countDistinct(countRoot.get(User_.id)));
-        countq.where(cb.and(predicates.toArray(Predicate[]::new)));
+        List<User> results = query.getResultList().stream().map(UserBox::getEntity).toList();
 
-        Long count = entityManager.createQuery(countq).getSingleResult();
+        long count;
 
-        return new Page<>(query.getResultList(), pageable, count);
+        if (results.size() < pageable.getPageSize()) {
+            count = results.size();
+        } else {
+            cq.orderBy(Collections.emptyList());
+            cq.multiselect(cb.countDistinct(root.get(User_.id)));
+            count = entityManager.createQuery(cq).getSingleResult().getCount();
+        }
+
+        return new Page<>(results, pageable, count);
+    }
+}
+
+@Getter
+class UserBox {
+    long count;
+    User entity;
+
+    UserBox(long c) {
+        count = c;
+    }
+
+    UserBox(User e) {
+        entity = e;
     }
 }

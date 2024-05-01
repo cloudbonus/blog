@@ -1,9 +1,9 @@
 package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.CommentDto;
-import com.github.blog.repository.dto.filter.CommentFilter;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
 import com.github.blog.model.Comment;
+import com.github.blog.repository.dto.filter.CommentFilter;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,7 +23,6 @@ public interface CommentMapper {
     CommentDto toDto(Comment comment);
 
     CommentFilter toDto(CommentDtoFilter requestFilter);
-
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Comment partialUpdate(CommentDto commentDto, @MappingTarget Comment comment);
