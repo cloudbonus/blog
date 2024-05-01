@@ -2,6 +2,8 @@ package com.github.blog.dao.impl;
 
 import com.github.blog.dao.UserDao;
 import com.github.blog.dto.filter.UserFilter;
+import com.github.blog.dto.Page;
+import com.github.blog.dto.Pageable;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
@@ -17,6 +19,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -25,18 +28,18 @@ import java.util.List;
 /**
  * @author Raman Haurylau
  */
-@Log4j2
 @Repository
+@Transactional
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
     @Override
-    public List<User> findAll(UserFilter filter) {
+    public Page<User> findAll(UserFilter filter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<User> cq = cb.createQuery(User.class);
         Root<User> userRoot = cq.from(User.class);
         Join<User, UserDetail> userDetail = userRoot.join(User_.userDetail, JoinType.LEFT);
-        Join<User, Role> role = userRoot.join(User_.roles);
+        Join<User, Role> role = userRoot.join(User_.roles, JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 
@@ -78,19 +81,26 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         cq.where(cb.and(predicates.toArray(Predicate[]::new)));
         TypedQuery<User> query = entityManager.createQuery(cq.select(userRoot).distinct(true));
 
-//        Pageable pageable = PageRequest.of(filter.getPageNumber(), filter.getPageSize());
-//
-//        query.setFirstResult(Long.valueOf(pageable.getOffset()).intValue());
-//        query.setMaxResults(pageable.getPageSize());
-//
-//        CriteriaQuery<Long> countq = cb.createQuery(Long.class);
-//        Root<User> countRoot = countq.from(User.class);
-//        countq.select(cb.countDistinct(countRoot.get(User_.id)));
-//        countq.where(cb.and(predicates.toArray(Predicate[]::new)));
-//
-//        Long count = entityManager.createQuery(countq).getSingleResult();
+        Pageable pageable = new Pageable();
+        pageable.setPageNumber(filter.getPageNumber());
+        pageable.setPageSize(filter.getPageSize());
 
-        //return new PageImpl<>(query.getResultList(), pageable, count);
-        return query.getResultList();
+        int offset = Long.valueOf(pageable.getOffset()).intValue();
+
+        if (offset < 0) {
+            throw new RuntimeException("first-result value should be positive");
+        }
+
+        query.setFirstResult(offset);
+        query.setMaxResults(pageable.getPageSize());
+
+        CriteriaQuery<Long> countq = cb.createQuery(Long.class);
+        Root<User> countRoot = countq.from(User.class);
+        countq.select(cb.countDistinct(countRoot.get(User_.id)));
+        countq.where(cb.and(predicates.toArray(Predicate[]::new)));
+
+        Long count = entityManager.createQuery(countq).getSingleResult();
+
+        return new Page<>(query.getResultList(), pageable, count);
     }
 }

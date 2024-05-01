@@ -2,15 +2,14 @@ package com.github.blog.service;
 
 import com.github.blog.dto.common.UserDto;
 import com.github.blog.dto.request.UserDtoFilter;
-
-import java.util.List;
+import com.github.blog.dto.Page;
 
 
 /**
  * @author Raman Haurylau
  */
 public interface UserService {
-    List<UserDto> findAll(UserDtoFilter requestFilter);
+    Page<UserDto> findAll(UserDtoFilter requestFilter);
 
     UserDto create(UserDto t);
 

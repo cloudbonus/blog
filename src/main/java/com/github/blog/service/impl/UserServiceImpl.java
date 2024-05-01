@@ -5,6 +5,7 @@ import com.github.blog.dao.UserDao;
 import com.github.blog.dto.common.UserDto;
 import com.github.blog.dto.filter.UserFilter;
 import com.github.blog.dto.request.UserDtoFilter;
+import com.github.blog.dto.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.UserService;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -64,16 +64,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll(UserDtoFilter requestFilter) {
+    public Page<UserDto> findAll(UserDtoFilter requestFilter) {
         UserFilter dtoFilter = userMapper.toDto(requestFilter);
 
-        List<User> users = userDao.findAll(dtoFilter);
+        Page<User> users = userDao.findAll(dtoFilter);
 
         if (users.isEmpty()) {
             throw new UserException(UserErrorResult.USERS_NOT_FOUND);
         }
 
-        return users.stream().map(userMapper::toDto).toList();
+        return users.map(userMapper::toDto);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.github.blog.dto.request.UserDtoFilter;
 import com.github.blog.model.User;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;

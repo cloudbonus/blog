@@ -14,5 +14,6 @@ public abstract class GenericFilter {
 
     public GenericFilter() {
         this.pageSize = Integer.MAX_VALUE;
+        this.pageNumber = 1;
     }
 }
