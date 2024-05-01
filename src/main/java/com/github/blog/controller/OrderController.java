@@ -1,6 +1,6 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.common.OrderDto;
+import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;

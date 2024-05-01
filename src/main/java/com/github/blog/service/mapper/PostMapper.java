@@ -1,10 +1,10 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dao.CommentDao;
-import com.github.blog.dao.TagDao;
-import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostFilter;
-import com.github.blog.dto.request.PostDtoFilter;
+import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.TagDao;
+import com.github.blog.controller.dto.common.PostDto;
+import com.github.blog.repository.dto.filter.PostFilter;
+import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;

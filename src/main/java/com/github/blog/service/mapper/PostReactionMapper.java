@@ -1,6 +1,6 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dto.common.PostReactionDto;
+import com.github.blog.controller.dto.common.PostReactionDto;
 import com.github.blog.model.PostReaction;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

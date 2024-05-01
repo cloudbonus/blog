@@ -1,8 +1,8 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.request.UserDtoFilter;
-import com.github.blog.dto.Page;
+import com.github.blog.controller.dto.common.UserDto;
+import com.github.blog.controller.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.Page;
 
 
 /**

@@ -1,6 +1,6 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.common.RoleDto;
+import com.github.blog.controller.dto.common.RoleDto;
 
 /**
  * @author Raman Haurylau

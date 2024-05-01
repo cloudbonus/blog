@@ -1,6 +1,6 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dto.common.OrderDto;
+import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.model.Order;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

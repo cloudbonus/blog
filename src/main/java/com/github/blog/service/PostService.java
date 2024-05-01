@@ -1,7 +1,7 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.common.PostDto;
+import com.github.blog.controller.dto.request.PostDtoFilter;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dto.common.UserDetailDto;
+import com.github.blog.controller.dto.common.UserDetailDto;
 import com.github.blog.model.UserDetail;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

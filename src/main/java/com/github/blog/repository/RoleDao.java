@@ -1,0 +1,12 @@
+package com.github.blog.repository;
+
+import com.github.blog.model.Role;
+
+import java.util.Optional;
+
+/**
+ * @author Raman Haurylau
+ */
+public interface RoleDao extends CrudDao<Role, Long> {
+    Optional<Role> findByName(String name);
+}

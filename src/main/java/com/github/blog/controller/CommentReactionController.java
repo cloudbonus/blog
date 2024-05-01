@@ -1,6 +1,6 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.common.CommentReactionDto;
+import com.github.blog.controller.dto.common.CommentReactionDto;
 import com.github.blog.service.CommentReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;

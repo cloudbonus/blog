@@ -1,9 +1,9 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.dao.PostDao;
-import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.filter.PostFilter;
-import com.github.blog.dto.request.PostDtoFilter;
+import com.github.blog.repository.PostDao;
+import com.github.blog.controller.dto.common.PostDto;
+import com.github.blog.repository.dto.filter.PostFilter;
+import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.model.User;

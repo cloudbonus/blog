@@ -1,12 +1,11 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserFilter;
-import com.github.blog.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.common.UserDto;
+import com.github.blog.repository.dto.filter.UserFilter;
+import com.github.blog.controller.dto.request.UserDtoFilter;
 import com.github.blog.model.User;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;

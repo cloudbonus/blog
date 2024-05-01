@@ -1,8 +1,8 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.filter.CommentFilter;
-import com.github.blog.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.common.CommentDto;
+import com.github.blog.repository.dto.filter.CommentFilter;
+import com.github.blog.controller.dto.request.CommentDtoFilter;
 import com.github.blog.model.Comment;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

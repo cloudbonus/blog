@@ -1,10 +1,10 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.dao.RoleDao;
-import com.github.blog.dao.UserDao;
-import com.github.blog.dto.common.UserDto;
-import com.github.blog.dto.filter.UserFilter;
-import com.github.blog.dto.request.UserDtoFilter;
+import com.github.blog.repository.RoleDao;
+import com.github.blog.repository.UserDao;
+import com.github.blog.controller.dto.common.UserDto;
+import com.github.blog.repository.dto.filter.UserFilter;
+import com.github.blog.controller.dto.request.UserDtoFilter;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.service.mapper.UserMapper;

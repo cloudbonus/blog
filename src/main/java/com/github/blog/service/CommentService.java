@@ -1,7 +1,7 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.common.CommentDto;
-import com.github.blog.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.common.CommentDto;
+import com.github.blog.controller.dto.request.CommentDtoFilter;
 
 import java.util.List;
 

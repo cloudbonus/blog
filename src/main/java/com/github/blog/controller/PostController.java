@@ -1,7 +1,7 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.common.PostDto;
-import com.github.blog.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.common.PostDto;
+import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;

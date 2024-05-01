@@ -1,7 +1,7 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.dao.OrderDao;
-import com.github.blog.dto.common.OrderDto;
+import com.github.blog.repository.OrderDao;
+import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.model.Order;
 import com.github.blog.service.OrderService;
 import com.github.blog.service.exception.OrderErrorResult;

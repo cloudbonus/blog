@@ -1,6 +1,6 @@
 package com.github.blog.controller;
 
-import com.github.blog.dto.common.RoleDto;
+import com.github.blog.controller.dto.common.RoleDto;
 import com.github.blog.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
