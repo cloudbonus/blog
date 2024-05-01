@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements CommentDao {
 
     @Override
