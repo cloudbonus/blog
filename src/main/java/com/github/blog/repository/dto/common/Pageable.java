@@ -1,4 +1,4 @@
-package com.github.blog.controller.dto.response;
+package com.github.blog.repository.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

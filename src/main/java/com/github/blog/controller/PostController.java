@@ -1,6 +1,7 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.PostDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.controller.dto.response.Page;
@@ -35,8 +36,8 @@ public class PostController {
     }
 
     @GetMapping
-    public Page<PostDto> findAll(PostDtoFilter requestFilter) {
-        return postService.findAll(requestFilter);
+    public Page<PostDto> findAll(PostDtoFilter requestFilter, PageableRequest pageableRequest) {
+        return postService.findAll(requestFilter, pageableRequest);
     }
 
     @PutMapping("{id}")

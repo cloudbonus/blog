@@ -1,6 +1,5 @@
 package com.github.blog.controller.dto.request;
 
-import com.github.blog.controller.dto.GenericFilter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +8,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CommentDtoFilter extends GenericFilter {
+public class CommentDtoFilter {
     private String login;
 }

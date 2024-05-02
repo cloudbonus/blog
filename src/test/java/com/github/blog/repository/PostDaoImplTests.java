@@ -7,8 +7,10 @@ import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.model.User;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.PostFilter;
 import com.github.blog.repository.dto.filter.UserFilter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
-public class PostDaoImplTests {
+class PostDaoImplTests {
 
     @Autowired
     private PostDao postDao;
@@ -47,6 +49,15 @@ public class PostDaoImplTests {
     @Autowired
     private CommentDao commentDao;
 
+    private static Pageable pageable;
+
+    @BeforeAll
+    public static void setUp() {
+        pageable = new Pageable();
+        pageable.setPageSize(Integer.MAX_VALUE);
+        pageable.setPageNumber(1);
+    }
+
     @Test
     @DisplayName("post dao: create")
     @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql"})
@@ -56,7 +67,8 @@ public class PostDaoImplTests {
 
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
-        Page<User> filteredUserResult = userDao.findAll(filter);
+
+        Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty();
 
@@ -85,7 +97,7 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
-        Page<Post> filteredPostResult = postDao.findAll(filter);
+        Page<Post> filteredPostResult = postDao.findAll(filter, pageable);
 
         assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(1);
 
@@ -112,7 +124,7 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
-        Page<Post> filteredPostResult = postDao.findAll(filter);
+        Page<Post> filteredPostResult = postDao.findAll(filter, pageable);
 
         assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(1);
 
@@ -137,7 +149,7 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setLogin(login);
 
-        Page<Post> filteredPostResult2 = postDao.findAll(filter);
+        Page<Post> filteredPostResult2 = postDao.findAll(filter, pageable);
 
         assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(2);
     }
@@ -151,10 +163,10 @@ public class PostDaoImplTests {
         PostFilter filter = new PostFilter();
 
         filter.setTag(tag1);
-        Page<Post> filteredPostResult1 = postDao.findAll(filter);
+        Page<Post> filteredPostResult1 = postDao.findAll(filter, pageable);
 
         filter.setTag(tag2);
-        Page<Post> filteredPostResult2 = postDao.findAll(filter);
+        Page<Post> filteredPostResult2 = postDao.findAll(filter, pageable);
 
         assertThat(filteredPostResult1.getContent()).isNotEmpty().hasSize(3);
         assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(1);

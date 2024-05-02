@@ -5,7 +5,9 @@ import com.github.blog.config.PersistenceJPAConfig;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.UserFilter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,15 @@ public class UserDaoImplTests {
 
     @Autowired
     private UserDao userDao;
+
+    private static Pageable pageable;
+
+    @BeforeAll
+    public static void setUp() {
+        pageable = new Pageable();
+        pageable.setPageSize(Integer.MAX_VALUE);
+        pageable.setPageNumber(1);
+    }
 
     @Test
     @DisplayName("user dao: create")
@@ -73,7 +84,7 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
 
-        Page<User> filteredUserResult = userDao.findAll(filter);
+        Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty();
 
@@ -96,7 +107,7 @@ public class UserDaoImplTests {
 
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
-        Page<User> filteredUserResult = userDao.findAll(filter);
+        Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty();
 
@@ -114,7 +125,7 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setRole(role);
 
-        assertThat(userDao.findAll(filter).getContent()).isNotEmpty().hasSize(2);
+        assertThat(userDao.findAll(filter, pageable).getContent()).isNotEmpty().hasSize(2);
     }
 
     @Test
@@ -126,7 +137,7 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setLogin(login);
 
-        Page<User> filteredUserResult = userDao.findAll(filter);
+        Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty().hasSize(1);
         assertThat(filteredUserResult.getContent().get(0).getLogin()).isEqualTo(login);
@@ -141,7 +152,7 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setJob(jobTitle);
 
-        assertThat(userDao.findAll(filter).getContent()).isNotEmpty().hasSize(1);
+        assertThat(userDao.findAll(filter, pageable).getContent()).isNotEmpty().hasSize(1);
     }
 
     @Test
@@ -153,6 +164,6 @@ public class UserDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setUniversity(university);
 
-        assertThat(userDao.findAll(filter).getContent()).isNotEmpty().hasSize(1);
+        assertThat(userDao.findAll(filter, pageable).getContent()).isNotEmpty().hasSize(1);
     }
 }

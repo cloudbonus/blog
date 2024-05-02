@@ -1,7 +1,6 @@
 package com.github.blog.repository.impl;
 
 import com.github.blog.controller.dto.response.Page;
-import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Post;
 import com.github.blog.model.Post_;
 import com.github.blog.model.Tag;
@@ -9,6 +8,7 @@ import com.github.blog.model.Tag_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.PostDao;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.PostFilter;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -34,7 +34,7 @@ import java.util.List;
 public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
 
     @Override
-    public Page<Post> findAll(PostFilter filter) {
+    public Page<Post> findAll(PostFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<PostBox> cq = cb.createQuery(PostBox.class);
@@ -56,10 +56,6 @@ public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
         cq.orderBy(cb.asc(root.get(Post_.id)));
 
         TypedQuery<PostBox> query = entityManager.createQuery(cq);
-
-        Pageable pageable = new Pageable();
-        pageable.setPageNumber(filter.getPageNumber());
-        pageable.setPageSize(filter.getPageSize());
 
         int offset = Long.valueOf(pageable.getOffset()).intValue();
 

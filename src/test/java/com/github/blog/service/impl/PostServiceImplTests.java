@@ -1,16 +1,19 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.PostDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.controller.dto.response.Page;
-import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.model.User;
 import com.github.blog.repository.PostDao;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.PostFilter;
+import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.PostMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +40,8 @@ public class PostServiceImplTests {
     private PostDao postDao;
     @Mock
     private PostMapper postMapper;
+    @Mock
+    private PageableMapper pageableMapper;
     @InjectMocks
     private PostServiceImpl postService;
 
@@ -46,6 +51,18 @@ public class PostServiceImplTests {
 
     private final Long id = 1L;
     private final String title = "test title";
+
+    private static Pageable pageable;
+    private static PageableRequest pageableRequest;
+
+    @BeforeAll
+    public static void setUpPageable() {
+        pageableRequest = new PageableRequest();
+
+        pageable = new Pageable();
+        pageable.setPageSize(Integer.MAX_VALUE);
+        pageable.setPageNumber(1);
+    }
 
     @BeforeEach
     void setUp() {
@@ -145,17 +162,17 @@ public class PostServiceImplTests {
         PostFilter dtoFilter = new PostFilter();
         dtoFilter.setLogin("test login");
 
-        Pageable pageable = new Pageable();
         Page<Post> posts = new Page<>(List.of(post), pageable, 1L);
 
         PostDtoFilter requestFilter = new PostDtoFilter();
         requestFilter.setLogin("test login");
 
         when(postMapper.toDto(requestFilter)).thenReturn(dtoFilter);
-        when(postDao.findAll(dtoFilter)).thenReturn(posts);
+        when(pageableMapper.toDto(pageableRequest)).thenReturn(pageable);
+        when(postDao.findAll(dtoFilter, pageable)).thenReturn(posts);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        Page<PostDto> filterSearchResult = postService.findAll(requestFilter);
+        Page<PostDto> filterSearchResult = postService.findAll(requestFilter, pageableRequest);
 
         assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult.getContent()).extracting(PostDto::getTitle).containsExactly(title);
@@ -168,17 +185,17 @@ public class PostServiceImplTests {
         PostFilter dtoFilter = new PostFilter();
         dtoFilter.setTag("news");
 
-        Pageable pageable = new Pageable();
         Page<Post> posts = new Page<>(List.of(post), pageable, 1L);
 
         PostDtoFilter requestFilter = new PostDtoFilter();
         requestFilter.setTag("news");
 
         when(postMapper.toDto(requestFilter)).thenReturn(dtoFilter);
-        when(postDao.findAll(dtoFilter)).thenReturn(posts);
+        when(pageableMapper.toDto(pageableRequest)).thenReturn(pageable);
+        when(postDao.findAll(dtoFilter, pageable)).thenReturn(posts);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        Page<PostDto> filterSearchResult = postService.findAll(requestFilter);
+        Page<PostDto> filterSearchResult = postService.findAll(requestFilter, pageableRequest);
 
         assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult.getContent()).extracting(PostDto::getTitle).containsExactly(title);

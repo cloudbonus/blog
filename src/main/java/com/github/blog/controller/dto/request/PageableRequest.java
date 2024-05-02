@@ -1,4 +1,4 @@
-package com.github.blog.controller.dto;
+package com.github.blog.controller.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +8,11 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public abstract class GenericFilter {
-    private int pageSize;
-    private int pageNumber;
+public class PageableRequest {
+    int pageSize;
+    int pageNumber;
 
-    public GenericFilter() {
+    public PageableRequest() {
         this.pageSize = Integer.MAX_VALUE;
         this.pageNumber = 1;
     }

@@ -3,6 +3,7 @@ package com.github.blog.controller;
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
 import com.github.blog.controller.dto.request.CommentRequest;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +36,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public Page<CommentDto> findAll(CommentDtoFilter requestFilter) {
-        return commentService.findAll(requestFilter);
+    public Page<CommentDto> findAll(CommentDtoFilter requestFilter, PageableRequest pageableRequest) {
+        return commentService.findAll(requestFilter, pageableRequest);
     }
 
     @PutMapping("{id}")

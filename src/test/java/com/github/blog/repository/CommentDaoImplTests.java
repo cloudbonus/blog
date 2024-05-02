@@ -6,6 +6,7 @@ import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.CommentFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -110,10 +111,14 @@ public class CommentDaoImplTests {
         CommentFilter filter = new CommentFilter();
         filter.setLogin(login1);
 
-        Page<Comment> filteredCommentResult1 = commentDao.findAll(filter);
+        Pageable pageable = new Pageable();
+        pageable.setPageSize(Integer.MAX_VALUE);
+        pageable.setPageNumber(1);
+
+        Page<Comment> filteredCommentResult1 = commentDao.findAll(filter, pageable);
 
         filter.setLogin(login2);
-        Page<Comment> filteredCommentResult2 = commentDao.findAll(filter);
+        Page<Comment> filteredCommentResult2 = commentDao.findAll(filter, pageable);
 
         assertThat(filteredCommentResult1.getContent()).isNotEmpty().hasSize(2);
         assertThat(filteredCommentResult2.getContent()).isNotEmpty().hasSize(1);

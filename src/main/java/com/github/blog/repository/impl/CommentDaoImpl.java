@@ -1,12 +1,12 @@
 package com.github.blog.repository.impl;
 
 import com.github.blog.controller.dto.response.Page;
-import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Comment_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.CommentFilter;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -33,7 +33,7 @@ import java.util.List;
 public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements CommentDao {
 
     @Override
-    public Page<Comment> findAll(CommentFilter filter) {
+    public Page<Comment> findAll(CommentFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<CommentBox> cq = cb.createQuery(CommentBox.class);
@@ -50,10 +50,6 @@ public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements Com
         cq.orderBy(cb.asc(root.get(Comment_.id)));
 
         TypedQuery<CommentBox> query = entityManager.createQuery(cq);
-
-        Pageable pageable = new Pageable();
-        pageable.setPageNumber(filter.getPageNumber());
-        pageable.setPageSize(filter.getPageSize());
 
         int offset = Long.valueOf(pageable.getOffset()).intValue();
 

@@ -3,14 +3,16 @@ package com.github.blog.service.impl;
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
 import com.github.blog.controller.dto.request.CommentRequest;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.response.Page;
-import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
 import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.CommentFilter;
 import com.github.blog.service.mapper.CommentMapper;
+import com.github.blog.service.mapper.PageableMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,11 +36,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceImplTests {
     @Mock
-    CommentDao commentDao;
+    private CommentDao commentDao;
     @Mock
-    CommentMapper commentMapper;
+    private PageableMapper pageableMapper;
+    @Mock
+    private CommentMapper commentMapper;
     @InjectMocks
-    CommentServiceImpl commentService;
+    private CommentServiceImpl commentService;
 
     private CommentRequest request;
     private CommentDto returnedCommentDto;
@@ -143,17 +147,23 @@ public class CommentServiceImplTests {
         CommentFilter dtoFilter = new CommentFilter();
         dtoFilter.setLogin("test login");
 
+        PageableRequest pageableRequest = new PageableRequest();
+
         Pageable pageable = new Pageable();
+        pageable.setPageSize(Integer.MAX_VALUE);
+        pageable.setPageNumber(1);
+
         Page<Comment> comments = new Page<>(List.of(comment), pageable, 1L);
 
         CommentDtoFilter requestFilter = new CommentDtoFilter();
         requestFilter.setLogin("test login");
 
         when(commentMapper.toDto(requestFilter)).thenReturn(dtoFilter);
-        when(commentDao.findAll(dtoFilter)).thenReturn(comments);
+        when(pageableMapper.toDto(pageableRequest)).thenReturn(pageable);
+        when(commentDao.findAll(dtoFilter, pageable)).thenReturn(comments);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
 
-        Page<CommentDto> filterSearchResult = commentService.findAll(requestFilter);
+        Page<CommentDto> filterSearchResult = commentService.findAll(requestFilter, pageableRequest);
 
         assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
         assertThat(filterSearchResult.getContent()).extracting(CommentDto::getContent).containsExactly(content);

@@ -1,6 +1,7 @@
 package com.github.blog.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.blog.repository.dto.common.Pageable;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,7 +1,6 @@
 package com.github.blog.repository.impl;
 
 import com.github.blog.controller.dto.response.Page;
-import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
@@ -9,6 +8,7 @@ import com.github.blog.model.UserDetail;
 import com.github.blog.model.UserDetail_;
 import com.github.blog.model.User_;
 import com.github.blog.repository.UserDao;
+import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.UserFilter;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -34,7 +34,7 @@ import java.util.List;
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
     @Override
-    public Page<User> findAll(UserFilter filter) {
+    public Page<User> findAll(UserFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<UserBox> cq = cb.createQuery(UserBox.class);
@@ -69,7 +69,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         }
 
         if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.equal(cb.lower(root.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
+            predicates.add(cb.like(cb.lower(root.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
         }
 
         if (!ObjectUtils.isEmpty(filter.getRole())) {
@@ -81,10 +81,6 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         cq.orderBy(cb.asc(root.get(User_.id)));
 
         TypedQuery<UserBox> query = entityManager.createQuery(cq);
-
-        Pageable pageable = new Pageable();
-        pageable.setPageNumber(filter.getPageNumber());
-        pageable.setPageSize(filter.getPageSize());
 
         int offset = Long.valueOf(pageable.getOffset()).intValue();
 
