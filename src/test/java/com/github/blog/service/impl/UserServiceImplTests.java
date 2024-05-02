@@ -2,6 +2,7 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Role;
@@ -43,7 +44,7 @@ public class UserServiceImplTests {
 
     private User user;
     private UserDto returnedUserDto;
-    private UserDto userDto;
+    private UserRequest request;
 
     private final Long id = 1L;
     private final String login = "test login";
@@ -71,12 +72,10 @@ public class UserServiceImplTests {
         returnedUserDto.setCreatedAt(createdAt);
         returnedUserDto.setLastLogin(updatedAt);
 
-        userDto = new UserDto();
-        userDto.setLogin(login);
-        userDto.setPassword(password);
-        userDto.setEmail(email);
-        userDto.setCreatedAt(createdAt);
-        userDto.setLastLogin(updatedAt);
+        request = new UserRequest();
+        request.setLogin(login);
+        request.setPassword(password);
+        request.setEmail(email);
     }
 
     @Test
@@ -88,12 +87,12 @@ public class UserServiceImplTests {
         role.setRoleName(roleName);
         Optional<Role> optionalRole = Optional.of(role);
 
-        when(userMapper.toEntity(userDto)).thenReturn(user);
+        when(userMapper.toEntity(request)).thenReturn(user);
         when(userDao.create(user)).thenReturn(user);
         when(roleDao.findByName(roleName)).thenReturn(optionalRole);
         when(userDao.update(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
-        UserDto createdUserDto = userService.create(userDto);
+        UserDto createdUserDto = userService.create(request);
 
         assertThat(createdUserDto).isNotNull();
         assertThat(createdUserDto.getId()).isEqualTo(id);
@@ -106,10 +105,10 @@ public class UserServiceImplTests {
         Optional<User> optionalUser = Optional.of(user);
 
         when(userDao.findById(id)).thenReturn(optionalUser);
-        when(userMapper.partialUpdate(userDto, user)).thenReturn(user);
+        when(userMapper.partialUpdate(request, user)).thenReturn(user);
         when(userDao.update(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
-        UserDto updatedUserDto = userService.update(id, userDto);
+        UserDto updatedUserDto = userService.update(id, request);
 
         assertThat(updatedUserDto).isNotNull();
         assertThat(updatedUserDto.getId()).isEqualTo(id);

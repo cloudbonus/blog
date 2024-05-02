@@ -2,6 +2,7 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Post;
@@ -39,7 +40,7 @@ public class PostServiceImplTests {
     @InjectMocks
     private PostServiceImpl postService;
 
-    private PostDto postDto;
+    private PostRequest request;
     private PostDto returnedPostDto;
     private Post post;
 
@@ -67,11 +68,10 @@ public class PostServiceImplTests {
         tag.setTagName("news");
         tag.setId(id);
 
-        postDto = new PostDto();
-        postDto.setUserId(id);
-        postDto.setContent(content);
-        postDto.setTitle(title);
-        postDto.setPublishedAt(createdAt);
+        request = new PostRequest();
+        request.setUserId(id);
+        request.setContent(content);
+        request.setTitle(title);
 
         post = new Post();
         post.setUser(user);
@@ -95,11 +95,11 @@ public class PostServiceImplTests {
     @Test
     @DisplayName("post service: create")
     void create_returnsPostDto_whenDataIsValid() {
-        when(postMapper.toEntity(postDto)).thenReturn(post);
+        when(postMapper.toEntity(request)).thenReturn(post);
         when(postDao.create(post)).thenReturn(post);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        PostDto createdPostDto = postService.create(postDto);
+        PostDto createdPostDto = postService.create(request);
 
         assertThat(createdPostDto).isNotNull();
         assertThat(createdPostDto.getId()).isEqualTo(id);
@@ -112,11 +112,11 @@ public class PostServiceImplTests {
         Optional<Post> optionalPost = Optional.of(post);
 
         when(postDao.findById(id)).thenReturn(optionalPost);
-        when(postMapper.partialUpdate(postDto, post)).thenReturn(post);
+        when(postMapper.partialUpdate(request, post)).thenReturn(post);
         when(postDao.update(post)).thenReturn(post);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
-        PostDto updatedPostDto = postService.update(id, postDto);
+        PostDto updatedPostDto = postService.update(id, request);
 
         assertThat(updatedPostDto).isNotNull();
         assertThat(updatedPostDto.getId()).isEqualTo(id);

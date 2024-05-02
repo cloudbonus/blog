@@ -2,6 +2,7 @@ package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto create(@RequestBody UserDto userDto) {
-        return userService.create(userDto);
+    public UserDto create(@RequestBody UserRequest request) {
+        return userService.create(request);
     }
 
     @GetMapping("{id}")
@@ -39,8 +40,8 @@ public class UserController {
     }
 
     @PutMapping("{id}")
-    public UserDto update(@PathVariable("id") Long id, @RequestBody UserDto userDto) {
-        return userService.update(id, userDto);
+    public UserDto update(@PathVariable("id") Long id, @RequestBody UserRequest request) {
+        return userService.update(id, request);
     }
 
     @DeleteMapping("{id}")

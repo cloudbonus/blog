@@ -45,9 +45,7 @@ public class UserControllerTests {
                                 {
                                 "login": "test login",
                                 "password": "test password",
-                                "email": "test email",
-                                "createdAt": 1714320006.512803000,
-                                "lastLogin": 1714320006.512803000
+                                "email": "test email"
                                 }
                                 """))
                 .andExpect(status().isOk())

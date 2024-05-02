@@ -2,6 +2,7 @@ package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.request.CommentRequest;
 import com.github.blog.model.Comment;
 import com.github.blog.repository.dto.filter.CommentFilter;
 import org.mapstruct.BeanMapping;
@@ -16,7 +17,7 @@ import org.mapstruct.ReportingPolicy;
 public interface CommentMapper {
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "postId", target = "post.id")
-    Comment toEntity(CommentDto commentDto);
+    Comment toEntity(CommentRequest request);
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "postId", source = "post.id")
@@ -25,5 +26,5 @@ public interface CommentMapper {
     CommentFilter toDto(CommentDtoFilter requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Comment partialUpdate(CommentDto commentDto, @MappingTarget Comment comment);
+    Comment partialUpdate(CommentRequest request, @MappingTarget Comment comment);
 }

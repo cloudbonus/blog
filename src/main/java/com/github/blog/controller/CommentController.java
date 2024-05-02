@@ -2,6 +2,7 @@ package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.request.CommentRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public CommentDto create(@RequestBody CommentDto commentDto) {
-        return commentService.create(commentDto);
+    public CommentDto create(@RequestBody CommentRequest request) {
+        return commentService.create(request);
     }
 
     @GetMapping("{id}")
@@ -39,8 +40,8 @@ public class CommentController {
     }
 
     @PutMapping("{id}")
-    public CommentDto update(@PathVariable("id") Long id, @RequestBody CommentDto commentDto) {
-        return commentService.update(id, commentDto);
+    public CommentDto update(@PathVariable("id") Long id, @RequestBody CommentRequest request) {
+        return commentService.update(id, request);
     }
 
     @DeleteMapping("{id}")

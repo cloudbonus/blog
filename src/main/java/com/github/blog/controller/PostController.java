@@ -2,6 +2,7 @@ package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public PostDto create(@RequestBody PostDto postDto) {
-        return postService.create(postDto);
+    public PostDto create(@RequestBody PostRequest request) {
+        return postService.create(request);
     }
 
     @GetMapping("{id}")
@@ -39,8 +40,8 @@ public class PostController {
     }
 
     @PutMapping("{id}")
-    public PostDto update(@PathVariable("id") Long id, @RequestBody PostDto postDto) {
-        return postService.update(id, postDto);
+    public PostDto update(@PathVariable("id") Long id, @RequestBody PostRequest request) {
+        return postService.update(id, request);
     }
 
     @DeleteMapping("{id}")

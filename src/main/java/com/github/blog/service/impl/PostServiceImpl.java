@@ -2,6 +2,7 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Post;
 import com.github.blog.repository.PostDao;
@@ -26,8 +27,8 @@ public class PostServiceImpl implements PostService {
     private final PostMapper postMapper;
 
     @Override
-    public PostDto create(PostDto postDto) {
-        Post post = postMapper.toEntity(postDto);
+    public PostDto create(PostRequest request) {
+        Post post = postMapper.toEntity(request);
         return postMapper.toDto(postDao.create(post));
     }
 
@@ -54,12 +55,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto update(Long id, PostDto postDto) {
+    public PostDto update(Long id, PostRequest request) {
         Post post = postDao
                 .findById(id)
                 .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND));
 
-        post = postMapper.partialUpdate(postDto, post);
+        post = postMapper.partialUpdate(request, post);
         post = postDao.update(post);
 
         return postMapper.toDto(post);

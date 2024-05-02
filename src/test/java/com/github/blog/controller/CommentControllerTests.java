@@ -46,8 +46,7 @@ public class CommentControllerTests {
                                 {
                                 "postId": 1,
                                 "userId": 1,
-                                "content": "Hello World!",
-                                "publishedAt": 1714320006.512803000
+                                "content": "Hello World!"
                                 }
                                 """))
                 .andExpect(status().isOk())

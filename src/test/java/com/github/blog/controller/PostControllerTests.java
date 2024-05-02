@@ -45,8 +45,7 @@ public class PostControllerTests {
                                 {
                                 "userId": 1,
                                 "title": "test title",
-                                "content": "test content",
-                                "publishedAt": 1714320006.512803000
+                                "content": "test content"
                                 }
                                 """))
                 .andExpect(status().isOk())

@@ -2,6 +2,7 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.request.CommentRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
 import com.github.blog.repository.CommentDao;
@@ -26,8 +27,8 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
 
     @Override
-    public CommentDto create(CommentDto commentDto) {
-        Comment comment = commentMapper.toEntity(commentDto);
+    public CommentDto create(CommentRequest request) {
+        Comment comment = commentMapper.toEntity(request);
         return commentMapper.toDto(commentDao.create(comment));
     }
 
@@ -55,12 +56,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto update(Long id, CommentDto commentDto) {
+    public CommentDto update(Long id, CommentRequest request) {
         Comment comment = commentDao
                 .findById(id)
                 .orElseThrow(() -> new CommentException(CommentErrorResult.COMMENT_NOT_FOUND));
 
-        comment = commentMapper.partialUpdate(commentDto, comment);
+        comment = commentMapper.partialUpdate(request, comment);
         comment = commentDao.update(comment);
 
         return commentMapper.toDto(comment);

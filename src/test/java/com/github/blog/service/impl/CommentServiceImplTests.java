@@ -2,6 +2,7 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.request.CommentRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.controller.dto.response.Pageable;
 import com.github.blog.model.Comment;
@@ -39,7 +40,7 @@ public class CommentServiceImplTests {
     @InjectMocks
     CommentServiceImpl commentService;
 
-    private CommentDto commentDto;
+    private CommentRequest request;
     private CommentDto returnedCommentDto;
     private Comment comment;
 
@@ -70,11 +71,10 @@ public class CommentServiceImplTests {
         post.setTitle(title);
         post.setPublishedAt(createdAt);
 
-        commentDto = new CommentDto();
-        commentDto.setUserId(id);
-        commentDto.setPostId(id);
-        commentDto.setContent(content);
-        commentDto.setPublishedAt(createdAt);
+        request = new CommentRequest();
+        request.setUserId(id);
+        request.setPostId(id);
+        request.setContent(content);
 
         comment = new Comment();
         comment.setId(id);
@@ -94,11 +94,11 @@ public class CommentServiceImplTests {
     @Test
     @DisplayName("comment service: create")
     void create_returnsCommentDto_whenDataIsValid() {
-        when(commentMapper.toEntity(commentDto)).thenReturn(comment);
+        when(commentMapper.toEntity(request)).thenReturn(comment);
         when(commentDao.create(comment)).thenReturn(comment);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
 
-        CommentDto createdCommentDto = commentService.create(commentDto);
+        CommentDto createdCommentDto = commentService.create(request);
 
         assertThat(createdCommentDto).isNotNull();
         assertThat(createdCommentDto.getId()).isEqualTo(id);
@@ -111,10 +111,10 @@ public class CommentServiceImplTests {
         Optional<Comment> optionalComment = Optional.of(comment);
 
         when(commentDao.findById(id)).thenReturn(optionalComment);
-        when(commentMapper.partialUpdate(commentDto, comment)).thenReturn(comment);
+        when(commentMapper.partialUpdate(request, comment)).thenReturn(comment);
         when(commentDao.update(comment)).thenReturn(comment);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
-        CommentDto updatedCommentDto = commentService.update(id, commentDto);
+        CommentDto updatedCommentDto = commentService.update(id, request);
 
         assertThat(updatedCommentDto).isNotNull();
         assertThat(updatedCommentDto.getId()).isEqualTo(id);

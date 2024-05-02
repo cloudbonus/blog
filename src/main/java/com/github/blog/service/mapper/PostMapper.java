@@ -2,6 +2,7 @@ package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
@@ -28,10 +29,9 @@ public abstract class PostMapper {
     @Autowired
     protected CommentDao commentDao;
 
-    @Mapping(source = "commentIds", target = "comments")
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "tagIds", target = "tags")
-    public abstract Post toEntity(PostDto postDto);
+    public abstract Post toEntity(PostRequest request);
 
     @Mapping(target = "commentIds", source = "comments")
     @Mapping(target = "userId", source = "user.id")
@@ -42,7 +42,7 @@ public abstract class PostMapper {
 
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    public abstract Post partialUpdate(PostDto postDto, @MappingTarget Post post);
+    public abstract Post partialUpdate(PostRequest request, @MappingTarget Post post);
 
     public List<Tag> listToTagEntity(List<Long> ids) {
         if (ids == null) {

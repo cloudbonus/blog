@@ -2,6 +2,7 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.request.CommentRequest;
 import com.github.blog.controller.dto.response.Page;
 
 /**
@@ -10,11 +11,11 @@ import com.github.blog.controller.dto.response.Page;
 public interface CommentService {
     Page<CommentDto> findAll(CommentDtoFilter requestFilter);
 
-    CommentDto create(CommentDto t);
+    CommentDto create(CommentRequest t);
 
     CommentDto findById(Long id);
 
-    CommentDto update(Long id, CommentDto t);
+    CommentDto update(Long id, CommentRequest t);
 
     CommentDto delete(Long id);
 }

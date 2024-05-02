@@ -2,6 +2,7 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
@@ -36,8 +37,8 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto create(UserDto userDto) {
-        User user = userMapper.toEntity(userDto);
+    public UserDto create(UserRequest request) {
+        User user = userMapper.toEntity(request);
 
         userDao.create(user);
 
@@ -77,12 +78,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(Long id, UserDto userDto) {
+    public UserDto update(Long id, UserRequest request) {
         User user = userDao
                 .findById(id)
                 .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
 
-        user = userMapper.partialUpdate(userDto, user);
+        user = userMapper.partialUpdate(request, user);
         user = userDao.update(user);
 
         return userMapper.toDto(user);
