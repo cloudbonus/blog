@@ -1,40 +1,50 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
-import com.github.blog.dto.PostReactionDto;
+import com.github.blog.controller.dto.common.PostReactionDto;
 import com.github.blog.service.PostReactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("post-reactions")
 @RequiredArgsConstructor
 public class PostReactionController {
     private final PostReactionService postReactionService;
-    private final JsonMapper jsonMapper;
 
-    public String create(PostReactionDto postReactionDto) {
-        return jsonMapper.convertToJson(postReactionService.create(postReactionDto));
+    @PostMapping
+    public PostReactionDto create(@RequestBody PostReactionDto postReactionDto) {
+        return postReactionService.create(postReactionDto);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(postReactionService.findById(id));
+    @GetMapping("{id}")
+    public PostReactionDto findById(@PathVariable("id") Long id) {
+        return postReactionService.findById(id);
     }
 
-    public String findAll() {
-        List<PostReactionDto> postReactions = postReactionService.findAll();
-        return jsonMapper.convertToJson(postReactions);
+    @GetMapping
+    public List<PostReactionDto> findAll() {
+        return postReactionService.findAll();
     }
 
-    public String update(Long id, PostReactionDto postReactionDto) {
-        return jsonMapper.convertToJson(postReactionService.update(id, postReactionDto));
+    @PutMapping("{id}")
+    public PostReactionDto update(@PathVariable("id") Long id, @RequestBody PostReactionDto postReactionDto) {
+        return postReactionService.update(id, postReactionDto);
     }
 
-    public void delete(Long id) {
-        postReactionService.delete(id);
+    @DeleteMapping("{id}")
+    public PostReactionDto delete(@PathVariable("id") Long id) {
+        return postReactionService.delete(id);
     }
 }

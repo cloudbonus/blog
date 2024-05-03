@@ -1,20 +1,23 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.UserDetailDto;
-import com.github.blog.dto.UserDto;
-
-import java.util.List;
+import com.github.blog.controller.dto.common.UserDto;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.request.UserRequest;
+import com.github.blog.controller.dto.response.Page;
 
 
 /**
  * @author Raman Haurylau
  */
-public interface UserService extends CrudService<UserDto, Long> {
-    List<UserDto> findAllByUniversity(UserDetailDto userDetailsDto);
+public interface UserService {
+    Page<UserDto> findAll(UserDtoFilter requestFilter, PageableRequest pageableRequest);
 
-    List<UserDto> findAllByRole(String role);
+    UserDto create(UserRequest t);
 
-    List<UserDto> findAllByJobTitle(UserDetailDto userDetailsDto);
+    UserDto findById(Long id);
 
-    UserDto findByLogin(UserDto userDto);
+    UserDto update(Long id, UserRequest t);
+
+    UserDto delete(Long id);
 }

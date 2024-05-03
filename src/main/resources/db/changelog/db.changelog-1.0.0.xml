@@ -109,6 +109,10 @@
         <sqlFile encoding="utf8" path="../migration/14.insert-values-into-tag-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-7-replace-type-varchar-to-varchar_ignorecase" author="Raman Haurylau" dbms="h2">
+        <sqlFile encoding="utf8" path="../migration/14.replace-type-varchar-to-varchar_ignorecase-in-tables.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
     <changeSet id="homework-2-create-idx-in-post" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/15.create-idx-in-post-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
@@ -207,5 +211,9 @@
 
     <changeSet id="homework-6-drop-null-in-order" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/39.drop-null-in-order-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="homework-7-add-case-insensitive-unique-constraints-in-tables" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/40.add-case-insensitive-unique-constraints-in-tables.sql" relativeToChangelogFile="true"/>
     </changeSet>
 </databaseChangeLog>

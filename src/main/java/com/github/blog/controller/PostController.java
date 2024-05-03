@@ -1,40 +1,52 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
-import com.github.blog.dto.PostDto;
+import com.github.blog.controller.dto.common.PostDto;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.PostDtoFilter;
+import com.github.blog.controller.dto.request.PostRequest;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final JsonMapper jsonMapper;
 
-    public String create(PostDto postDto) {
-        return jsonMapper.convertToJson(postService.create(postDto));
+    @PostMapping
+    public PostDto create(@RequestBody PostRequest request) {
+        return postService.create(request);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(postService.findById(id));
+    @GetMapping("{id}")
+    public PostDto findById(@PathVariable Long id) {
+        return postService.findById(id);
     }
 
-    public String findAll() {
-        List<PostDto> posts = postService.findAll();
-        return jsonMapper.convertToJson(posts);
+    @GetMapping
+    public Page<PostDto> findAll(PostDtoFilter requestFilter, PageableRequest pageableRequest) {
+        return postService.findAll(requestFilter, pageableRequest);
     }
 
-    public String update(Long id, PostDto postDto) {
-        return jsonMapper.convertToJson(postService.update(id, postDto));
+    @PutMapping("{id}")
+    public PostDto update(@PathVariable("id") Long id, @RequestBody PostRequest request) {
+        return postService.update(id, request);
     }
 
-    public void delete(Long id) {
-        postService.delete(id);
+    @DeleteMapping("{id}")
+    public PostDto delete(@PathVariable("id") Long id) {
+        return postService.delete(id);
     }
 }

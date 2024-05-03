@@ -1,9 +1,11 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.dao.RoleDao;
-import com.github.blog.dto.RoleDto;
+import com.github.blog.controller.dto.common.RoleDto;
 import com.github.blog.model.Role;
+import com.github.blog.repository.RoleDao;
 import com.github.blog.service.RoleService;
+import com.github.blog.service.exception.RoleErrorResult;
+import com.github.blog.service.exception.impl.RoleException;
 import com.github.blog.service.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,40 +32,42 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleDto findById(Long id) {
-        Role role = roleDao.findById(id);
-        if (role == null) {
-            throw new RuntimeException("Role not found");
-        }
+        Role role = roleDao
+                .findById(id)
+                .orElseThrow(() -> new RoleException(RoleErrorResult.ROLE_NOT_FOUND));
+
         return roleMapper.toDto(role);
     }
 
     @Override
     public List<RoleDto> findAll() {
         List<Role> roles = roleDao.findAll();
+
         if (roles.isEmpty()) {
-            throw new RuntimeException("Cannot find any roles");
+            throw new RoleException(RoleErrorResult.ROLES_NOT_FOUND);
         }
+
         return roles.stream().map(roleMapper::toDto).toList();
     }
 
     @Override
     public RoleDto update(Long id, RoleDto roleDto) {
-        Role role = roleDao.findById(id);
+        Role role = roleDao
+                .findById(id)
+                .orElseThrow(() -> new RoleException(RoleErrorResult.ROLE_NOT_FOUND));
 
-        if (role == null) {
-            throw new RuntimeException("Role not found");
-        }
+        role = roleMapper.partialUpdate(roleDto, role);
+        role = roleDao.update(role);
 
-        Role updatedRole = roleMapper.toEntity(roleDto);
-
-        updatedRole.setId(role.getId());
-        updatedRole = roleDao.update(updatedRole);
-
-        return roleMapper.toDto(updatedRole);
+        return roleMapper.toDto(role);
     }
 
     @Override
-    public void delete(Long id) {
-        roleDao.deleteById(id);
+    public RoleDto delete(Long id) {
+        Role role = roleDao
+                .findById(id)
+                .orElseThrow(() -> new RoleException(RoleErrorResult.ROLE_NOT_FOUND));
+        roleDao.delete(role);
+        return roleMapper.toDto(role);
     }
 }

@@ -1,41 +1,51 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
-import com.github.blog.dto.OrderDto;
+import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("orders")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-    private final JsonMapper jsonMapper;
 
-    public String create(OrderDto orderDto) {
-        return jsonMapper.convertToJson(orderService.create(orderDto));
+    @PostMapping
+    public OrderDto create(@RequestBody OrderDto orderDto) {
+        return orderService.create(orderDto);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(orderService.findById(id));
+    @GetMapping("{id}")
+    public OrderDto findById(@PathVariable("id") Long id) {
+        return orderService.findById(id);
     }
 
-    public String findAll() {
-        List<OrderDto> orders = orderService.findAll();
-        return jsonMapper.convertToJson(orders);
+    @GetMapping
+    public List<OrderDto> findAll() {
+        return orderService.findAll();
     }
 
-    public OrderDto update(Long id, OrderDto orderDto) {
+    @PutMapping("{id}")
+    public OrderDto update(@PathVariable("id") Long id, @RequestBody OrderDto orderDto) {
         return orderService.update(id, orderDto);
     }
 
-    public void delete(Long id) {
-        orderService.delete(id);
+    @DeleteMapping("{id}")
+    public OrderDto delete(@PathVariable("id") Long id) {
+        return orderService.findById(id);
     }
 }
 

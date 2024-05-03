@@ -1,6 +1,6 @@
 package com.github.blog.service;
 
-import com.github.blog.dto.UserDetailDto;
+import com.github.blog.controller.dto.common.UserDetailDto;
 
 
 /**

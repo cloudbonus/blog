@@ -1,40 +1,50 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
-import com.github.blog.dto.TagDto;
+import com.github.blog.controller.dto.common.TagDto;
 import com.github.blog.service.TagService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("tags")
 @RequiredArgsConstructor
 public class TagController {
     private final TagService tagService;
-    private final JsonMapper jsonMapper;
 
-    public String create(TagDto tagDto) {
-        return jsonMapper.convertToJson(tagService.create(tagDto));
+    @PostMapping
+    public TagDto create(@RequestBody TagDto tagDto) {
+        return tagService.create(tagDto);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(tagService.findById(id));
+    @GetMapping("{id}")
+    public TagDto findById(@PathVariable("id") Long id) {
+        return tagService.findById(id);
     }
 
-    public String findAll() {
-        List<TagDto> tags = tagService.findAll();
-        return jsonMapper.convertToJson(tags);
+    @GetMapping
+    public List<TagDto> findAll() {
+        return tagService.findAll();
     }
 
-    public String update(Long id, TagDto tagDto) {
-        return jsonMapper.convertToJson(tagService.update(id, tagDto));
+    @PutMapping("{id}")
+    public TagDto update(@PathVariable("id") Long id, @RequestBody TagDto tagDto) {
+        return tagService.update(id, tagDto);
     }
 
-    public void delete(Long id) {
-        tagService.delete(id);
+    @DeleteMapping("{id}")
+    public TagDto delete(@PathVariable("id") Long id) {
+        return tagService.delete(id);
     }
 }

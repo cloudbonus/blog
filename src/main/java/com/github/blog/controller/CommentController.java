@@ -1,41 +1,53 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
-import com.github.blog.dto.CommentDto;
+import com.github.blog.controller.dto.common.CommentDto;
+import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.request.CommentRequest;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
-    private final JsonMapper jsonMapper;
 
-    public String create(CommentDto commentDto) {
-        return jsonMapper.convertToJson(commentService.create(commentDto));
+    @PostMapping
+    public CommentDto create(@RequestBody CommentRequest request) {
+        return commentService.create(request);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(commentService.findById(id));
+    @GetMapping("{id}")
+    public CommentDto findById(@PathVariable("id") Long id) {
+        return commentService.findById(id);
     }
 
-    public String findAll() {
-        List<CommentDto> comments = commentService.findAll();
-        return jsonMapper.convertToJson(comments);
+    @GetMapping
+    public Page<CommentDto> findAll(CommentDtoFilter requestFilter, PageableRequest pageableRequest) {
+        return commentService.findAll(requestFilter, pageableRequest);
     }
 
-    public String update(Long id, CommentDto commentDto) {
-        return jsonMapper.convertToJson(commentService.update(id, commentDto));
+    @PutMapping("{id}")
+    public CommentDto update(@PathVariable("id") Long id, @RequestBody CommentRequest request) {
+        return commentService.update(id, request);
     }
 
-    public void delete(Long id) {
-        commentService.delete(id);
+    @DeleteMapping("{id}")
+    public CommentDto delete(@PathVariable("id") Long id) {
+        return commentService.delete(id);
     }
 }
 

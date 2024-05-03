@@ -1,61 +1,52 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.mapper.JsonMapper;
-import com.github.blog.dto.UserDetailDto;
-import com.github.blog.dto.UserDto;
+import com.github.blog.controller.dto.common.UserDto;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.UserDtoFilter;
+import com.github.blog.controller.dto.request.UserRequest;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Raman Haurylau
  */
-@Controller
+@RestController
+@RequestMapping("users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final JsonMapper jsonMapper;
 
-    public String create(UserDto userDto) {
-        return jsonMapper.convertToJson(userService.create(userDto));
+    @PostMapping
+    public UserDto create(@RequestBody UserRequest request) {
+        return userService.create(request);
     }
 
-    public String findById(Long id) {
-        return jsonMapper.convertToJson(userService.findById(id));
+    @GetMapping("{id}")
+    public UserDto findById(@PathVariable("id") Long id) {
+        return userService.findById(id);
     }
 
-    public String findAll() {
-        List<UserDto> users = userService.findAll();
-        return jsonMapper.convertToJson(users);
+    @GetMapping
+    public Page<UserDto> findAll(UserDtoFilter requestFilter, PageableRequest pageableRequest) {
+        return userService.findAll(requestFilter, pageableRequest);
     }
 
-    public String findAllByUniversity(UserDetailDto userDetailsDto) {
-        List<UserDto> users = userService.findAllByUniversity(userDetailsDto);
-        return jsonMapper.convertToJson(users);
+    @PutMapping("{id}")
+    public UserDto update(@PathVariable("id") Long id, @RequestBody UserRequest request) {
+        return userService.update(id, request);
     }
 
-    public String findAllByRole(String role) {
-        List<UserDto> users = userService.findAllByRole(role);
-        return jsonMapper.convertToJson(users);
-    }
-
-    public String findAllByJobTitle(UserDetailDto userDetailsDto) {
-        List<UserDto> users = userService.findAllByJobTitle(userDetailsDto);
-        return jsonMapper.convertToJson(users);
-    }
-
-    public String findByLogin(UserDto userDto) {
-        UserDto user = userService.findByLogin(userDto);
-        return jsonMapper.convertToJson(user);
-    }
-
-    public String update(Long id, UserDto userDto) {
-        return jsonMapper.convertToJson(userService.update(id, userDto));
-    }
-
-    public void delete(Long id) {
-        userService.delete(id);
+    @DeleteMapping("{id}")
+    public UserDto delete(@PathVariable("id") Long id) {
+        return userService.delete(id);
     }
 }

@@ -1,16 +1,22 @@
 package com.github.blog.service.impl;
 
-import com.github.blog.dao.CommentDao;
-import com.github.blog.dto.CommentDto;
+import com.github.blog.controller.dto.common.CommentDto;
+import com.github.blog.controller.dto.request.CommentDtoFilter;
+import com.github.blog.controller.dto.request.CommentRequest;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
+import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.dto.common.Pageable;
+import com.github.blog.repository.dto.filter.CommentFilter;
 import com.github.blog.service.CommentService;
+import com.github.blog.service.exception.CommentErrorResult;
+import com.github.blog.service.exception.impl.CommentException;
 import com.github.blog.service.mapper.CommentMapper;
+import com.github.blog.service.mapper.PageableMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.OffsetDateTime;
-import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -22,58 +28,57 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;
     private final CommentMapper commentMapper;
-
+    private final PageableMapper pageableMapper;
 
     @Override
-    public CommentDto create(CommentDto commentDto) {
-        Comment comment = commentMapper.toEntity(commentDto);
-        enrichComment(comment);
+    public CommentDto create(CommentRequest request) {
+        Comment comment = commentMapper.toEntity(request);
         return commentMapper.toDto(commentDao.create(comment));
     }
 
     @Override
     public CommentDto findById(Long id) {
-        Comment comment = commentDao.findById(id);
-        if (comment == null) {
-            throw new RuntimeException("Comment not found");
-        }
+        Comment comment = commentDao
+                .findById(id)
+                .orElseThrow(() -> new CommentException(CommentErrorResult.COMMENT_NOT_FOUND));
+
         return commentMapper.toDto(comment);
     }
 
     @Override
-    public List<CommentDto> findAll() {
-        List<Comment> comments = commentDao.findAll();
+    @Transactional(readOnly = true)
+    public Page<CommentDto> findAll(CommentDtoFilter requestFilter, PageableRequest pageableRequest) {
+        CommentFilter dtoFilter = commentMapper.toDto(requestFilter);
+        Pageable pageable = pageableMapper.toDto(pageableRequest);
+
+        Page<Comment> comments = commentDao.findAll(dtoFilter, pageable);
+
         if (comments.isEmpty()) {
-            throw new RuntimeException("Cannot find any comments");
+            throw new CommentException(CommentErrorResult.COMMENTS_NOT_FOUND);
         }
-        return comments.stream().map(commentMapper::toDto).toList();
+
+        return comments.map(commentMapper::toDto);
     }
 
     @Override
-    public CommentDto update(Long id, CommentDto commentDto) {
-        Comment comment = commentDao.findById(id);
+    public CommentDto update(Long id, CommentRequest request) {
+        Comment comment = commentDao
+                .findById(id)
+                .orElseThrow(() -> new CommentException(CommentErrorResult.COMMENT_NOT_FOUND));
 
-        if (comment == null) {
-            throw new RuntimeException("Comment not found");
-        }
+        comment = commentMapper.partialUpdate(request, comment);
+        comment = commentDao.update(comment);
 
-        Comment updatedComment = commentMapper.toEntity(commentDto);
-
-        updatedComment.setId(comment.getId());
-        updatedComment.setPublishedAt(comment.getPublishedAt());
-
-        updatedComment = commentDao.update(updatedComment);
-
-        return commentMapper.toDto(updatedComment);
+        return commentMapper.toDto(comment);
     }
 
     @Override
-    public void delete(Long id) {
-        commentDao.deleteById(id);
-    }
-
-    private void enrichComment(Comment comment) {
-        comment.setPublishedAt(OffsetDateTime.now());
+    public CommentDto delete(Long id) {
+        Comment comment = commentDao
+                .findById(id)
+                .orElseThrow(() -> new CommentException(CommentErrorResult.COMMENT_NOT_FOUND));
+        commentDao.delete(comment);
+        return commentMapper.toDto(comment);
     }
 }
 
