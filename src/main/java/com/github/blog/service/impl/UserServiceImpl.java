@@ -20,6 +20,7 @@ import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleDao roleDao;
     private final PageableMapper pageableMapper;
-
 
     @Override
     public UserDto create(UserRequest request) {
@@ -101,5 +101,15 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
         userDao.delete(user);
         return userMapper.toDto(user);
+    }
+
+    public User getByUsername(String username) {
+        return userDao.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
+
+    }
+
+    public UserDetailsService userDetailsService() {
+        return this::getByUsername;
     }
 }

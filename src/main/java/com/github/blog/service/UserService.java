@@ -5,6 +5,7 @@ import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.UserDtoFilter;
 import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.Page;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 /**
@@ -20,4 +21,6 @@ public interface UserService {
     UserDto update(Long id, UserRequest t);
 
     UserDto delete(Long id);
+
+    UserDetailsService userDetailsService();
 }

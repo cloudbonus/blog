@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,7 +34,15 @@ public class UserControllerTests {
 
     @BeforeEach
     void setup(WebApplicationContext wac) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
+    }
+
+    @Test
+    @WithMockUser(username = "kvossing0", authorities = {"ROLE_USER"})
+    @DisplayName("auth controller: test")
+    void test() throws Exception {
+        mockMvc.perform(post("/auth/user"))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -43,14 +53,14 @@ public class UserControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "login": "test login",
+                                "username": "test login",
                                 "password": "test password",
                                 "email": "test email"
                                 }
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3))
-                .andExpect(jsonPath("$.login").value("test login"));
+                .andExpect(jsonPath("$.username").value("test login"));
     }
 
     @Test
@@ -67,7 +77,7 @@ public class UserControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("updated email"))
-                .andExpect(jsonPath("$.login").value("kvossing0"));
+                .andExpect(jsonPath("$.username").value("kvossing0"));
     }
 
     @Test
@@ -77,7 +87,7 @@ public class UserControllerTests {
         mockMvc.perform(delete("/users/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.login").value("kvossing0"));
+                .andExpect(jsonPath("$.username").value("kvossing0"));
     }
 
     @Test
@@ -95,8 +105,8 @@ public class UserControllerTests {
         mockMvc.perform(get("/users").param("role", "user"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.content[0].login").value("kvossing0"))
-                .andExpect(jsonPath("$.content[1].login").value("gmaccook1"));
+                .andExpect(jsonPath("$.content[0].username").value("kvossing0"))
+                .andExpect(jsonPath("$.content[1].username").value("gmaccook1"));
     }
 
     @Test
@@ -106,7 +116,7 @@ public class UserControllerTests {
         mockMvc.perform(get("/users").param("login", "kvossing0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].login").value("kvossing0"));
+                .andExpect(jsonPath("$.content[0].username").value("kvossing0"));
     }
 
     @Test
@@ -117,7 +127,7 @@ public class UserControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(4))
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].login").value("gmaccook1"));
+                .andExpect(jsonPath("$.content[0].username").value("gmaccook1"));
     }
 
     @Test
@@ -135,6 +145,6 @@ public class UserControllerTests {
         mockMvc.perform(get("/users").param("university", "mit"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content.[0].login").value("gmaccook1"));
+                .andExpect(jsonPath("$.content.[0].username").value("gmaccook1"));
     }
 }

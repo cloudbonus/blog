@@ -1,7 +1,7 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.dto.common.UserDetailDto;
-import com.github.blog.service.UserDetailService;
+import com.github.blog.controller.dto.common.UserInfoDto;
+import com.github.blog.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,31 +20,31 @@ import java.util.List;
 @RestController
 @RequestMapping("user-details")
 @RequiredArgsConstructor
-public class UserDetailController {
-    private final UserDetailService userDetailService;
+public class UserInfoController {
+    private final UserInfoService userInfoService;
 
     @PostMapping
-    public UserDetailDto create(@RequestBody UserDetailDto userDetails) {
-        return userDetailService.create(userDetails);
+    public UserInfoDto create(@RequestBody UserInfoDto userDetails) {
+        return userInfoService.create(userDetails);
     }
 
     @GetMapping("{id}")
-    public UserDetailDto findById(@PathVariable("id") Long id) {
-        return userDetailService.findById(id);
+    public UserInfoDto findById(@PathVariable("id") Long id) {
+        return userInfoService.findById(id);
     }
 
     @GetMapping
-    public List<UserDetailDto> findAll() {
-        return userDetailService.findAll();
+    public List<UserInfoDto> findAll() {
+        return userInfoService.findAll();
     }
 
     @PutMapping("{id}")
-    public UserDetailDto update(@PathVariable("id") Long id, @RequestBody UserDetailDto userDetailsDto) {
-        return userDetailService.update(id, userDetailsDto);
+    public UserInfoDto update(@PathVariable("id") Long id, @RequestBody UserInfoDto userDetailsDto) {
+        return userInfoService.update(id, userDetailsDto);
     }
 
     @DeleteMapping("{id}")
-    public UserDetailDto delete(@PathVariable("id") Long id) {
-        return userDetailService.delete(id);
+    public UserInfoDto delete(@PathVariable("id") Long id) {
+        return userInfoService.delete(id);
     }
 }

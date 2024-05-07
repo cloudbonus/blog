@@ -62,7 +62,7 @@ public class CommentServiceImplTests {
 
         User user = new User();
         user.setId(id);
-        user.setLogin(login);
+        user.setUsername(login);
         user.setPassword(password);
         user.setEmail(email);
         user.setCreatedAt(createdAt);

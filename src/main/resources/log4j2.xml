@@ -8,6 +8,7 @@
     <Loggers>
         <Logger name="org.hibernate.SQL" level="DEBUG"/>
         <Logger name="com.github.blog" level="DEBUG"/>
+        <Logger name="org.springframework.security" level="DEBUG" />
 
         <Root level="info">
             <AppenderRef ref="Console"/>

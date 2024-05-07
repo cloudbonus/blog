@@ -45,7 +45,7 @@ public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.equal(cb.lower(user.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
+            predicates.add(cb.equal(cb.lower(user.get(User_.username).as(String.class)), filter.getLogin().toLowerCase()));
         }
 
         if (!ObjectUtils.isEmpty(filter.getTag())) {

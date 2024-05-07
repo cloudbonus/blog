@@ -12,7 +12,7 @@ import java.time.OffsetDateTime;
 @Setter
 public class UserDto {
     private Long id;
-    private String login;
+    private String username;
     private String password;
     private String email;
     private OffsetDateTime createdAt;

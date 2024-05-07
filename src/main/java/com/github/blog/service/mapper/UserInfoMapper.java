@@ -1,7 +1,7 @@
 package com.github.blog.service.mapper;
 
-import com.github.blog.controller.dto.common.UserDetailDto;
-import com.github.blog.model.UserDetail;
+import com.github.blog.controller.dto.common.UserInfoDto;
+import com.github.blog.model.UserInfo;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
@@ -10,11 +10,11 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {UserMapper.class})
-public interface UserDetailMapper {
-    UserDetail toEntity(UserDetailDto userDetailDto);
+public interface UserInfoMapper {
+    UserInfo toEntity(UserInfoDto userInfoDto);
 
-    UserDetailDto toDto(UserDetail userDetail);
+    UserInfoDto toDto(UserInfo userInfo);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    UserDetail partialUpdate(UserDetailDto userDetailDto, @MappingTarget UserDetail userDetail);
+    UserInfo partialUpdate(UserInfoDto userInfoDto, @MappingTarget UserInfo userInfo);
 }
