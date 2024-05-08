@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,4 +42,9 @@ public class Order {
 
     @Column(nullable = false, length = Integer.MAX_VALUE)
     private String status;
+
+    @PrePersist
+    private void prePersist() {
+        orderedAt = OffsetDateTime.now();
+    }
 }
