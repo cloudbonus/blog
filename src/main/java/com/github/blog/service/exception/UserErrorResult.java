@@ -11,7 +11,12 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum UserErrorResult {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
-    USERS_NOT_FOUND(HttpStatus.NOT_FOUND, "No users could be found");
+    USERS_NOT_FOUND(HttpStatus.NOT_FOUND, "No users could be found"),
+    UNAUTHORIZED_DELETION_ATTEMPT(HttpStatus.FORBIDDEN, "User can only DELETE themself"),
+    UNAUTHORIZED_UPDATE_ATTEMPT(HttpStatus.FORBIDDEN, "User can only UPDATE themself"),
+    UNAUTHORIZED_CREATE_ATTEMPT(HttpStatus.FORBIDDEN, "User can only CREATE themself"),
+    UNAUTHORIZED_READ_ATTEMPT(HttpStatus.FORBIDDEN, "User can only READ themself"),
+    BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "You have entered either the Username and/or Password incorrectly");
 
     private final HttpStatus status;
     private final String message;
