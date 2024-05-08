@@ -1,12 +1,13 @@
-package com.github.blog.config.security.jwt;
+package com.github.blog.service.security.impl;
 
-import com.github.blog.service.security.impl.UserDetailsImpl;
+import com.github.blog.service.security.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -17,9 +18,13 @@ import java.util.function.Function;
 /**
  * @author Raman Haurylau
  */
-@Component
-public class JwtUtils {
-    public static final String jwtSigningKey = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+@Service
+public class JwtServiceImpl implements JwtService {
+    @Value("${com.github.blog.jwtSecret}")
+    public String jwtSecret;
+
+    @Value("${com.github.blog.jwtExpirationMs}")
+    public int jwtExpirationMs;
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -38,7 +43,7 @@ public class JwtUtils {
                 .header().type("JWT").and()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -74,7 +79,7 @@ public class JwtUtils {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

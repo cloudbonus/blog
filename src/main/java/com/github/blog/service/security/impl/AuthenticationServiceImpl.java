@@ -1,12 +1,12 @@
 package com.github.blog.service.security.impl;
 
-import com.github.blog.config.security.jwt.JwtUtils;
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.AuthenticationRequest;
 import com.github.blog.controller.dto.request.RegistrationRequest;
 import com.github.blog.controller.dto.response.JwtResponse;
 import com.github.blog.service.UserService;
 import com.github.blog.service.security.AuthenticationService;
+import com.github.blog.service.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserService userService;
-    private final JwtUtils jwtUtils;
+    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsServiceImpl userDetailsService;
@@ -36,12 +36,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public JwtResponse signIn(AuthenticationRequest request) {
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+        if (auth == null || !auth.isAuthenticated()) {
+            auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
         UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
 
-        String jwt = jwtUtils.generateToken(user);
+        String jwt = jwtService.generateToken(user);
 
         return new JwtResponse(jwt, user.getUsername());
     }
