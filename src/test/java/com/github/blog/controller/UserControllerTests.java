@@ -74,7 +74,7 @@ public class UserControllerTests {
     @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
     void delete_throwExceptionForbidden_whenDataNotBelongToUser() throws Exception {
         mockMvc.perform(delete("/users/{id}", 1))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

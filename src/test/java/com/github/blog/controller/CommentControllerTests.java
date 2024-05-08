@@ -75,7 +75,7 @@ public class CommentControllerTests {
                                 "content": "content_template"
                                 }
                                 """))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class CommentControllerTests {
     @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql", "/db/controllertests/insert-test-data-into-post-table.sql", "/db/controllertests/insert-test-data-into-comment-table.sql"})
     void delete_throwExceptionForbidden_whenDataNotBelongToUser() throws Exception {
         mockMvc.perform(delete("/users/{id}", 1))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

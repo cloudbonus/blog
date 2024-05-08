@@ -6,12 +6,9 @@ import com.github.blog.controller.dto.request.RegistrationRequest;
 import com.github.blog.controller.dto.request.filter.UserDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.UserService;
-import com.github.blog.service.exception.UserErrorResult;
-import com.github.blog.service.exception.impl.UserException;
-import com.github.blog.service.security.impl.UserDetailsImpl;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,18 +37,14 @@ public class UserController {
     }
 
     @PutMapping("{id}")
-    public UserDto update(@PathVariable("id") Long id, @RequestBody RegistrationRequest request,  HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!HttpRequest.isUserInRole("ROLE_ADMIN") && !userDetails.getId().equals(id)) {
-            throw new UserException(UserErrorResult.UNAUTHORIZED_UPDATE_ATTEMPT);
-        }
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public UserDto update(@PathVariable("id") @P("id") Long id, @RequestBody RegistrationRequest request) {
         return userService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public UserDto delete(@PathVariable("id") Long id, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
-            throw new UserException(UserErrorResult.UNAUTHORIZED_DELETION_ATTEMPT);
-        }
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public UserDto delete(@PathVariable("id") @P("id") Long id) {
         return userService.delete(id);
     }
 }

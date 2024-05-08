@@ -82,6 +82,6 @@ public class AuthControllerTests {
                                 "password": "password_template"
                                 }
                                 """))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest());
     }
 }

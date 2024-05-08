@@ -6,12 +6,9 @@ import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.filter.CommentDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.CommentService;
-import com.github.blog.service.exception.UserErrorResult;
-import com.github.blog.service.exception.impl.UserException;
-import com.github.blog.service.security.impl.UserDetailsImpl;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,10 +28,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public CommentDto create(@RequestBody CommentRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.getId().equals(request.getUserId())) {
-            throw new UserException(UserErrorResult.UNAUTHORIZED_CREATE_ATTEMPT);
-        }
+    @PreAuthorize("#r.userId == authentication.principal.id")
+    public CommentDto create(@RequestBody @P("r") CommentRequest request) {
         return commentService.create(request);
     }
 
@@ -49,18 +44,14 @@ public class CommentController {
     }
 
     @PutMapping("{id}")
-    public CommentDto update(@PathVariable("id") Long id, @RequestBody CommentRequest request, HttpServletRequest HttpRequest,@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
-            throw new UserException(UserErrorResult.UNAUTHORIZED_UPDATE_ATTEMPT);
-        }
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public CommentDto update(@PathVariable("id") @P("id") Long id, @RequestBody CommentRequest request) {
         return commentService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public CommentDto delete(@PathVariable("id") Long id, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
-            throw new UserException(UserErrorResult.UNAUTHORIZED_DELETION_ATTEMPT);
-        }
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public CommentDto delete(@PathVariable("id") @P("id") Long id) {
         return commentService.delete(id);
     }
 }

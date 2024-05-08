@@ -5,6 +5,8 @@ import com.github.blog.controller.dto.request.AuthenticationRequest;
 import com.github.blog.controller.dto.request.RegistrationRequest;
 import com.github.blog.controller.dto.response.JwtResponse;
 import com.github.blog.service.UserService;
+import com.github.blog.service.exception.UserErrorResult;
+import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.security.AuthenticationService;
 import com.github.blog.service.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +38,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public JwtResponse signIn(AuthenticationRequest request) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated()) {
-            auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        if(!auth.isAuthenticated()) {
+            throw new UserException(UserErrorResult.AUTHENTICATION_FAILED);
         }
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
 
         String jwt = jwtService.generateToken(user);

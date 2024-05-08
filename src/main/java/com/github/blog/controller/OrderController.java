@@ -3,12 +3,9 @@ package com.github.blog.controller;
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.service.OrderService;
-import com.github.blog.service.exception.UserErrorResult;
-import com.github.blog.service.exception.impl.UserException;
-import com.github.blog.service.security.impl.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,10 +27,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public OrderDto create(@RequestBody OrderRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.getId().equals(request.getUserId())) {
-            throw new UserException(UserErrorResult.UNAUTHORIZED_CREATE_ATTEMPT);
-        }
+    @PreAuthorize("#r.userId == authentication.principal.id")
+    public OrderDto create(@RequestBody @P("r") OrderRequest request) {
         return orderService.create(request);
     }
 

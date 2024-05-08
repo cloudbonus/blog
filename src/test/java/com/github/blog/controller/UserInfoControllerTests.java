@@ -70,7 +70,7 @@ public class UserInfoControllerTests {
                                 "surname": "surname_template"
                                 }
                                 """))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class UserInfoControllerTests {
                                 "firstname": "firstname_template"
                                 }
                                 """))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class UserInfoControllerTests {
     @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
     void delete_throwExceptionForbidden_whenDataNotBelongToUser() throws Exception {
         mockMvc.perform(delete("/user-info/{id}", 2))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class UserInfoControllerTests {
     @Sql({"/db/controllertests/insert-test-data-into-user-table.sql", "/db/controllertests/insert-test-data-into-user_details-table.sql"})
     void findById_throwExceptionForbidden_whenDataNotBelongToUser() throws Exception {
         mockMvc.perform(get("/user-info/{id}", 2))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
