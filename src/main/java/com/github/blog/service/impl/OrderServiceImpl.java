@@ -1,6 +1,7 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.OrderDto;
+import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.model.Order;
 import com.github.blog.repository.OrderDao;
 import com.github.blog.service.OrderService;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -26,9 +26,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
 
     @Override
-    public OrderDto create(OrderDto orderDto) {
-        Order order = orderMapper.toEntity(orderDto);
-        order.setOrderedAt(OffsetDateTime.now());
+    public OrderDto create(OrderRequest request) {
+        Order order = orderMapper.toEntity(request);
         return orderMapper.toDto(orderDao.create(order));
     }
 
@@ -53,12 +52,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto update(Long id, OrderDto orderDto) {
+    public OrderDto update(Long id, OrderRequest request) {
         Order order = orderDao
                 .findById(id)
                 .orElseThrow(() -> new OrderException(OrderErrorResult.ORDER_NOT_FOUND));
 
-        order = orderMapper.partialUpdate(orderDto, order);
+        order = orderMapper.partialUpdate(request, order);
         order = orderDao.update(order);
 
         return orderMapper.toDto(order);

@@ -29,8 +29,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final UserInfoMapper detailMapper;
 
     @Override
-    public UserInfoDto create(UserInfoDto userDetailsDto) {
-        UserInfo userInfo = detailMapper.toEntity(userDetailsDto);
+    public UserInfoDto create(UserInfoDto request) {
+        UserInfo userInfo = detailMapper.toEntity(request);
 
         User user = userDao
                 .findById(userInfo.getId())
@@ -64,12 +64,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserInfoDto update(Long id, UserInfoDto userDetailsDto) {
+    public UserInfoDto update(Long id, UserInfoDto request) {
         UserInfo userInfo = userInfoDao
                 .findById(id)
                 .orElseThrow(() -> new UserDetailException(UserDetailErrorResult.USER_DETAIL_NOT_FOUND));
 
-        userInfo = detailMapper.partialUpdate(userDetailsDto, userInfo);
+        userInfo = detailMapper.partialUpdate(request, userInfo);
         userInfo = userInfoDao.update(userInfo);
 
         return detailMapper.toDto(userInfo);

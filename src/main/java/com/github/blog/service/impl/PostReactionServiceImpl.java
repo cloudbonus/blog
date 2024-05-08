@@ -1,6 +1,7 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.PostReactionDto;
+import com.github.blog.controller.dto.request.PostReactionRequest;
 import com.github.blog.model.PostReaction;
 import com.github.blog.repository.PostReactionDao;
 import com.github.blog.service.PostReactionService;
@@ -25,8 +26,8 @@ public class PostReactionServiceImpl implements PostReactionService {
     private final PostReactionMapper postReactionMapper;
 
     @Override
-    public PostReactionDto create(PostReactionDto postReactionDto) {
-        PostReaction postReaction = postReactionMapper.toEntity(postReactionDto);
+    public PostReactionDto create(PostReactionRequest request) {
+        PostReaction postReaction = postReactionMapper.toEntity(request);
         return postReactionMapper.toDto(postReactionDao.create(postReaction));
     }
 
@@ -51,12 +52,12 @@ public class PostReactionServiceImpl implements PostReactionService {
     }
 
     @Override
-    public PostReactionDto update(Long id, PostReactionDto postReactionDto) {
+    public PostReactionDto update(Long id, PostReactionRequest request) {
         PostReaction postReaction = postReactionDao
                 .findById(id)
                 .orElseThrow(() -> new PostReactionException(PostReactionErrorResult.POST_REACTION_NOT_FOUND));
 
-        postReaction = postReactionMapper.partialUpdate(postReactionDto, postReaction);
+        postReaction = postReactionMapper.partialUpdate(request, postReaction);
         postReaction = postReactionDao.update(postReaction);
 
         return postReactionMapper.toDto(postReaction);

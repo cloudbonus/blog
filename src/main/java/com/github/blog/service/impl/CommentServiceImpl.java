@@ -1,9 +1,9 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.CommentDto;
-import com.github.blog.controller.dto.request.CommentDtoFilter;
 import com.github.blog.controller.dto.request.CommentRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.filter.CommentDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
 import com.github.blog.repository.CommentDao;

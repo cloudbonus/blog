@@ -1,6 +1,7 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.CommentReactionDto;
+import com.github.blog.controller.dto.request.CommentReactionRequest;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.repository.CommentReactionDao;
 import com.github.blog.service.CommentReactionService;
@@ -25,8 +26,8 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     private final CommentReactionMapper commentReactionMapper;
 
     @Override
-    public CommentReactionDto create(CommentReactionDto commentReactionDto) {
-        CommentReaction commentReaction = commentReactionMapper.toEntity(commentReactionDto);
+    public CommentReactionDto create(CommentReactionRequest request) {
+        CommentReaction commentReaction = commentReactionMapper.toEntity(request);
         return commentReactionMapper.toDto(commentReactionDao.create(commentReaction));
     }
 
@@ -51,12 +52,12 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     }
 
     @Override
-    public CommentReactionDto update(Long id, CommentReactionDto commentReactionDto) {
+    public CommentReactionDto update(Long id, CommentReactionRequest request) {
         CommentReaction commentReaction = commentReactionDao
                 .findById(id)
                 .orElseThrow(() -> new CommentReactionException(CommentReactionErrorResult.COMMENT_REACTION_NOT_FOUND));
 
-        commentReaction = commentReactionMapper.partialUpdate(commentReactionDto, commentReaction);
+        commentReaction = commentReactionMapper.partialUpdate(request, commentReaction);
         commentReaction = commentReactionDao.update(commentReaction);
 
         return commentReactionMapper.toDto(commentReaction);

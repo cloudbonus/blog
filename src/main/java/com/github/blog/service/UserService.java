@@ -2,10 +2,9 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.UserDtoFilter;
-import com.github.blog.controller.dto.request.UserRequest;
+import com.github.blog.controller.dto.request.RegistrationRequest;
+import com.github.blog.controller.dto.request.filter.UserDtoFilter;
 import com.github.blog.controller.dto.response.Page;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 /**
@@ -14,13 +13,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface UserService {
     Page<UserDto> findAll(UserDtoFilter requestFilter, PageableRequest pageableRequest);
 
-    UserDto create(UserRequest t);
+    UserDto create(RegistrationRequest t);
 
     UserDto findById(Long id);
 
-    UserDto update(Long id, UserRequest t);
+    UserDto update(Long id, RegistrationRequest t);
 
     UserDto delete(Long id);
-
-    UserDetailsService userDetailsService();
 }

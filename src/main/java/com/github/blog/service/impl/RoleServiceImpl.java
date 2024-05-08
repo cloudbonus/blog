@@ -1,6 +1,7 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.RoleDto;
+import com.github.blog.controller.dto.request.RoleRequest;
 import com.github.blog.model.Role;
 import com.github.blog.repository.RoleDao;
 import com.github.blog.service.RoleService;
@@ -25,8 +26,8 @@ public class RoleServiceImpl implements RoleService {
     private final RoleMapper roleMapper;
 
     @Override
-    public RoleDto create(RoleDto roleDto) {
-        Role role = roleMapper.toEntity(roleDto);
+    public RoleDto create(RoleRequest request) {
+        Role role = roleMapper.toEntity(request);
         return roleMapper.toDto(roleDao.create(role));
     }
 
@@ -51,12 +52,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleDto update(Long id, RoleDto roleDto) {
+    public RoleDto update(Long id, RoleRequest request) {
         Role role = roleDao
                 .findById(id)
                 .orElseThrow(() -> new RoleException(RoleErrorResult.ROLE_NOT_FOUND));
 
-        role = roleMapper.partialUpdate(roleDto, role);
+        role = roleMapper.partialUpdate(request, role);
         role = roleDao.update(role);
 
         return roleMapper.toDto(role);

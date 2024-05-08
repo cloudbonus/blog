@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.UserDtoFilter;
-import com.github.blog.controller.dto.request.UserRequest;
+import com.github.blog.controller.dto.request.RegistrationRequest;
+import com.github.blog.controller.dto.request.filter.UserDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
@@ -20,7 +20,6 @@ import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +40,7 @@ public class UserServiceImpl implements UserService {
     private final PageableMapper pageableMapper;
 
     @Override
-    public UserDto create(UserRequest request) {
+    public UserDto create(RegistrationRequest request) {
         User user = userMapper.toEntity(request);
 
         userDao.create(user);
@@ -83,7 +82,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(Long id, UserRequest request) {
+    public UserDto update(Long id, RegistrationRequest request) {
         User user = userDao
                 .findById(id)
                 .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
@@ -101,15 +100,5 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
         userDao.delete(user);
         return userMapper.toDto(user);
-    }
-
-    public User getByUsername(String username) {
-        return userDao.findByUsername(username)
-                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
-
-    }
-
-    public UserDetailsService userDetailsService() {
-        return this::getByUsername;
     }
 }
