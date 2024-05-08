@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,10 +38,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public JwtResponse signIn(AuthenticationRequest request) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+
         if(!auth.isAuthenticated()) {
             throw new UserException(UserErrorResult.AUTHENTICATION_FAILED);
         }
-        SecurityContextHolder.getContext().setAuthentication(auth);
 
         UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
 
