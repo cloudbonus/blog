@@ -1,8 +1,11 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.CommentReactionDto;
+import com.github.blog.controller.dto.request.CommentReactionRequest;
 import com.github.blog.service.CommentReactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +27,9 @@ public class CommentReactionController {
     private final CommentReactionService commentReactionService;
 
     @PostMapping
-    public CommentReactionDto create(@RequestBody CommentReactionDto commentReactionDto) {
-        return commentReactionService.create(commentReactionDto);
+    @PreAuthorize("#r.userId == authentication.principal.id")
+    public CommentReactionDto create(@RequestBody @P("r") CommentReactionRequest request) {
+        return commentReactionService.create(request);
     }
 
     @GetMapping("{id}")
@@ -39,12 +43,14 @@ public class CommentReactionController {
     }
 
     @PutMapping("{id}")
-    public CommentReactionDto update(@PathVariable("id") Long id, @RequestBody CommentReactionDto commentReactionDto) {
-        return commentReactionService.update(id, commentReactionDto);
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public CommentReactionDto update(@PathVariable("id") @P("id") Long id, @RequestBody CommentReactionRequest request) {
+        return commentReactionService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public CommentReactionDto delete(@PathVariable("id") Long id) {
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public CommentReactionDto delete(@PathVariable("id") @P("id") Long id) {
         return commentReactionService.delete(id);
     }
 }

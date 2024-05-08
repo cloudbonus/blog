@@ -31,8 +31,8 @@ public class User {
     @Column(name = "user_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false, length = Integer.MAX_VALUE)
-    private String login;
+    @Column(name = "login", nullable = false, length = Integer.MAX_VALUE)
+    private String username;
 
     @Column(nullable = false, length = Integer.MAX_VALUE)
     private String password;
@@ -51,7 +51,7 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     @OneToOne(mappedBy = "user")
-    private UserDetail userDetail;
+    private UserInfo userInfo;
 
     @OneToMany(mappedBy = "user")
     private List<Order> orders = new ArrayList<>();

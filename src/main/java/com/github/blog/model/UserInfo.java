@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @Entity
 @Table(name = "user_details", schema = "blogging_platform")
-public class UserDetail {
+public class UserInfo {
     @Id
     @Column(name = "user_id", nullable = false)
     private Long id;

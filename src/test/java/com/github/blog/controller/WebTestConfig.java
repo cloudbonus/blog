@@ -35,4 +35,22 @@ public class WebTestConfig {
         dataSource.setPassword(container.getPassword());
         return dataSource;
     }
+
+//    @Bean
+//    @Primary
+//    UserDetailsService userDetailsService() {
+//        UserDetails kvossing0 = User.builder()
+//                .username("kvossing0")
+//                .password("123")
+//                .authorities("ROLE_USER")
+//                .build();
+//
+//        UserDetails gmaccook1 = User.builder()
+//                .username("gmaccook1")
+//                .password("123")
+//                .authorities("ROLE_USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(kvossing0, gmaccook1);
+//    }
 }

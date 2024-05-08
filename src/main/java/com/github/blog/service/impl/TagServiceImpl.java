@@ -1,6 +1,7 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.TagDto;
+import com.github.blog.controller.dto.request.TagRequest;
 import com.github.blog.model.Tag;
 import com.github.blog.repository.TagDao;
 import com.github.blog.service.TagService;
@@ -25,8 +26,8 @@ public class TagServiceImpl implements TagService {
     private final TagMapper tagMapper;
 
     @Override
-    public TagDto create(TagDto tagDto) {
-        Tag tag = tagMapper.toEntity(tagDto);
+    public TagDto create(TagRequest request) {
+        Tag tag = tagMapper.toEntity(request);
         return tagMapper.toDto(tagDao.create(tag));
     }
 
@@ -51,12 +52,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagDto update(Long id, TagDto tagDto) {
+    public TagDto update(Long id, TagRequest request) {
         Tag tag = tagDao
                 .findById(id)
                 .orElseThrow(() -> new TagException(TagErrorResult.TAG_NOT_FOUND));
 
-        tag = tagMapper.partialUpdate(tagDto, tag);
+        tag = tagMapper.partialUpdate(request, tag);
         tag = tagDao.update(tag);
 
         return tagMapper.toDto(tag);

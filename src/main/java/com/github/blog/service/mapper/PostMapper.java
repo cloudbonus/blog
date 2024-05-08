@@ -1,8 +1,8 @@
 package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.PostDto;
-import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.controller.dto.request.PostRequest;
+import com.github.blog.controller.dto.request.filter.PostDtoFilter;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;

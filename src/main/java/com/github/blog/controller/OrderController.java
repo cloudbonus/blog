@@ -1,8 +1,11 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.OrderDto;
+import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +27,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public OrderDto create(@RequestBody OrderDto orderDto) {
-        return orderService.create(orderDto);
+    @PreAuthorize("#r.userId == authentication.principal.id")
+    public OrderDto create(@RequestBody @P("r") OrderRequest request) {
+        return orderService.create(request);
     }
 
     @GetMapping("{id}")
@@ -39,11 +43,13 @@ public class OrderController {
     }
 
     @PutMapping("{id}")
-    public OrderDto update(@PathVariable("id") Long id, @RequestBody OrderDto orderDto) {
-        return orderService.update(id, orderDto);
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public OrderDto update(@PathVariable("id") Long id, @RequestBody OrderRequest request) {
+        return orderService.update(id, request);
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public OrderDto delete(@PathVariable("id") Long id) {
         return orderService.findById(id);
     }

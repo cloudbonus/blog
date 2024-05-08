@@ -1,8 +1,11 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.PostReactionDto;
+import com.github.blog.controller.dto.request.PostReactionRequest;
 import com.github.blog.service.PostReactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +27,9 @@ public class PostReactionController {
     private final PostReactionService postReactionService;
 
     @PostMapping
-    public PostReactionDto create(@RequestBody PostReactionDto postReactionDto) {
-        return postReactionService.create(postReactionDto);
+    @PreAuthorize("#r.userId == authentication.principal.id")
+    public PostReactionDto create(@RequestBody @P("r") PostReactionRequest request) {
+        return postReactionService.create(request);
     }
 
     @GetMapping("{id}")
@@ -39,12 +43,14 @@ public class PostReactionController {
     }
 
     @PutMapping("{id}")
-    public PostReactionDto update(@PathVariable("id") Long id, @RequestBody PostReactionDto postReactionDto) {
-        return postReactionService.update(id, postReactionDto);
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public PostReactionDto update(@PathVariable("id") @P("id") Long id, @RequestBody PostReactionRequest request) {
+        return postReactionService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public PostReactionDto delete(@PathVariable("id") Long id) {
+    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    public PostReactionDto delete(@PathVariable("id") @P("id") Long id) {
         return postReactionService.delete(id);
     }
 }

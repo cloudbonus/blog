@@ -13,18 +13,22 @@ ext {
     mapStructVersion = "1.5.5.Final"
     lombokVersion = "1.18.32"
     hibernateVersion = "6.4.4.Final"
+    jsonWebtokenVersion = "0.12.5"
 }
 
 dependencies {
     implementation "org.apache.commons:commons-compress:1.26.1"
     implementation(platform("org.springframework:spring-framework-bom:6.1.6"))
+    implementation(platform('org.springframework.security:spring-security-bom:6.2.4'))
     implementation(platform("org.apache.logging.log4j:log4j-bom:2.23.1"))
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.17.0"))
+    implementation(platform('com.fasterxml.jackson:jackson-bom:2.17.1'))
     implementation(platform("org.hibernate.orm:hibernate-platform:${hibernateVersion}"))
     implementation("org.springframework:spring-webmvc")
-    //implementation("org.springframework.data:spring-data-rest-webmvc:4.2.5")
+    implementation("org.springframework.security:spring-security-web")
+    implementation("org.springframework.security:spring-security-config")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-orm")
+    implementation("io.jsonwebtoken:jjwt-api:${jsonWebtokenVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.apache.logging.log4j:log4j-api")
@@ -35,6 +39,8 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-core")
     runtimeOnly("org.postgresql:postgresql:42.7.3")
     runtimeOnly("org.apache.logging.log4j:log4j-core")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:${jsonWebtokenVersion}")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${jsonWebtokenVersion}")
     providedCompile("jakarta.servlet:jakarta.servlet-api:6.0.0")
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     compileOnly("org.hibernate.orm:hibernate-jpamodelgen")
@@ -47,6 +53,7 @@ dependencies {
     testImplementation(platform("org.mockito:mockito-bom:5.11.0"))
     testImplementation("org.apache.logging.log4j:log4j-slf4j2-impl")
     testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework:spring-test")
@@ -55,6 +62,12 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testRuntimeOnly("com.jayway.jsonpath:json-path:2.9.0")
     testRuntimeOnly("com.h2database:h2:2.2.224")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 tasks.named('test') {

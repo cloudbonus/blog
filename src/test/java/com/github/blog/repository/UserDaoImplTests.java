@@ -54,7 +54,7 @@ public class UserDaoImplTests {
     @Sql("/db/daotests/insert-test-data-into-user-table.sql")
     void create_returnsUserDto_whenDataIsValid() {
         User user = new User();
-        user.setLogin("login1");
+        user.setUsername("login1");
         user.setEmail("temp1@test.by");
         user.setPassword("123");
         user.setLastLogin(OffsetDateTime.now());
@@ -89,14 +89,14 @@ public class UserDaoImplTests {
         assertThat(filteredUserResult.getContent()).isNotEmpty();
 
         User user = filteredUserResult.getContent().get(0);
-        user.setLogin(expectedLogin);
+        user.setUsername(expectedLogin);
         Long id = user.getId();
 
         user = userDao.update(user);
 
         assertThat(user).isNotNull();
         assertThat(user.getId()).isEqualTo(id);
-        assertThat(user.getLogin()).isEqualTo(expectedLogin);
+        assertThat(user.getUsername()).isEqualTo(expectedLogin);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class UserDaoImplTests {
         Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filteredUserResult.getContent().get(0).getLogin()).isEqualTo(login);
+        assertThat(filteredUserResult.getContent().get(0).getUsername()).isEqualTo(login);
     }
 
     @Test

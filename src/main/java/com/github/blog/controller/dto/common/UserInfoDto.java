@@ -1,14 +1,15 @@
 package com.github.blog.controller.dto.common;
 
+import com.github.blog.model.UserInfo;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * DTO for {@link com.github.blog.model.UserDetail}
+ * DTO for {@link UserInfo}
  */
 @Getter
 @Setter
-public class UserDetailDto {
+public class UserInfoDto {
     private Long id;
     private String firstname;
     private String surname;

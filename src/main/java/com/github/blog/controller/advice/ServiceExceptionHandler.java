@@ -115,6 +115,6 @@ public class ServiceExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getMessage(), System.currentTimeMillis()));
     }
 
-    public record ErrorResponse(String code, String message, Long timestamp) {
+    public record ErrorResponse(String status, String message, Long timestamp) {
     }
 }

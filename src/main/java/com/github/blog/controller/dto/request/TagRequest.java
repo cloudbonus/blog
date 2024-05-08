@@ -8,7 +8,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PostDtoFilter {
-    private String login;
-    private String tag;
+public class TagRequest {
+    String tagName;
 }

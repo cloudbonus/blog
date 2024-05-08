@@ -43,7 +43,7 @@ public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements Com
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.equal(cb.lower(user.get(User_.login).as(String.class)), filter.getLogin().toLowerCase()));
+            predicates.add(cb.equal(cb.lower(user.get(User_.username).as(String.class)), filter.getLogin().toLowerCase()));
         }
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));

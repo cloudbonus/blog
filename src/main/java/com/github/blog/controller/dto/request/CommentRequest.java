@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CommentRequest {
-    Long postId;
-    Long userId;
-    String content;
+    private Long postId;
+    private Long userId;
+    private String content;
 }

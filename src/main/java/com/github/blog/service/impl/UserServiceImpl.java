@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.UserDtoFilter;
-import com.github.blog.controller.dto.request.UserRequest;
+import com.github.blog.controller.dto.request.RegistrationRequest;
+import com.github.blog.controller.dto.request.filter.UserDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
@@ -39,9 +39,8 @@ public class UserServiceImpl implements UserService {
     private final RoleDao roleDao;
     private final PageableMapper pageableMapper;
 
-
     @Override
-    public UserDto create(UserRequest request) {
+    public UserDto create(RegistrationRequest request) {
         User user = userMapper.toEntity(request);
 
         userDao.create(user);
@@ -83,7 +82,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(Long id, UserRequest request) {
+    public UserDto update(Long id, RegistrationRequest request) {
         User user = userDao
                 .findById(id)
                 .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_FOUND));
