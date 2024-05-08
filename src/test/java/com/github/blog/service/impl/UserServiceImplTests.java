@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.UserDtoFilter;
-import com.github.blog.controller.dto.request.UserRequest;
+import com.github.blog.controller.dto.request.RegistrationRequest;
+import com.github.blog.controller.dto.request.filter.UserDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
@@ -49,7 +49,7 @@ public class UserServiceImplTests {
 
     private User user;
     private UserDto returnedUserDto;
-    private UserRequest request;
+    private RegistrationRequest request;
 
     private final Long id = 1L;
     private final String login = "test login";
@@ -84,12 +84,11 @@ public class UserServiceImplTests {
         returnedUserDto = new UserDto();
         returnedUserDto.setId(id);
         returnedUserDto.setUsername(login);
-        returnedUserDto.setPassword(password);
         returnedUserDto.setEmail(email);
         returnedUserDto.setCreatedAt(createdAt);
         returnedUserDto.setLastLogin(updatedAt);
 
-        request = new UserRequest();
+        request = new RegistrationRequest();
         request.setUsername(login);
         request.setPassword(password);
         request.setEmail(email);

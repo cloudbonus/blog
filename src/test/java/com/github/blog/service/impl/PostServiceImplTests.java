@@ -2,8 +2,8 @@ package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.PostDtoFilter;
 import com.github.blog.controller.dto.request.PostRequest;
+import com.github.blog.controller.dto.request.filter.PostDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
