@@ -111,6 +111,8 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> cq = cb.createQuery(User.class);
         Root<User> root = cq.from(User.class);
+        root.fetch(User_.roles, JoinType.LEFT);
+
         cq.select(root).where(cb.like(cb.lower(root.get(User_.username).as(String.class)), username.toLowerCase()));
         TypedQuery<User> query = entityManager.createQuery(cq);
 

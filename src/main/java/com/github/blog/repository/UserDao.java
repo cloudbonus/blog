@@ -12,5 +12,6 @@ import java.util.Optional;
  */
 public interface UserDao extends CrudDao<User, Long> {
     Page<User> findAll(UserFilter filter, Pageable pageable);
+
     Optional<User> findByUsername(String username);
 }
