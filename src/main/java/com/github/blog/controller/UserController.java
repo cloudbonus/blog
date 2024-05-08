@@ -9,6 +9,7 @@ import com.github.blog.service.UserService;
 import com.github.blog.service.exception.UserErrorResult;
 import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.security.impl.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,16 +40,16 @@ public class UserController {
     }
 
     @PutMapping("{id}")
-    public UserDto update(@PathVariable("id") Long id, @RequestBody RegistrationRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public UserDto update(@PathVariable("id") Long id, @RequestBody RegistrationRequest request,  HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ROLE_ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_UPDATE_ATTEMPT);
         }
         return userService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public UserDto delete(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public UserDto delete(@PathVariable("id") Long id, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_DELETION_ATTEMPT);
         }
         return userService.delete(id);

@@ -26,31 +26,31 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public RoleDto create(@RequestBody RoleRequest request) {
         return roleService.create(request);
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public RoleDto findById(@PathVariable("id") Long id) {
         return roleService.findById(id);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<RoleDto> findAll() {
         return roleService.findAll();
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public RoleDto update(@PathVariable("id") Long id, @RequestBody RoleRequest request) {
         return roleService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public RoleDto delete(@PathVariable("id") Long id) {
         return roleService.delete(id);
     }

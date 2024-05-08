@@ -9,6 +9,7 @@ import com.github.blog.service.PostService;
 import com.github.blog.service.exception.UserErrorResult;
 import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.security.impl.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,16 +50,16 @@ public class PostController {
     }
 
     @PutMapping("{id}")
-    public PostDto update(@PathVariable("id") Long id, @RequestBody PostRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public PostDto update(@PathVariable("id") Long id, @RequestBody PostRequest request, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_UPDATE_ATTEMPT);
         }
         return postService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public PostDto delete(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public PostDto delete(@PathVariable("id") Long id, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_DELETION_ATTEMPT);
         }
         return postService.delete(id);

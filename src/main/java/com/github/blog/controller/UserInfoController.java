@@ -5,6 +5,7 @@ import com.github.blog.service.UserInfoService;
 import com.github.blog.service.exception.UserErrorResult;
 import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.security.impl.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,30 +38,30 @@ public class UserInfoController {
     }
 
     @GetMapping("{id}")
-    public UserInfoDto findById(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public UserInfoDto findById(@PathVariable("id") Long id, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_READ_ATTEMPT);
         }
         return userInfoService.findById(id);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserInfoDto> findAll() {
         return userInfoService.findAll();
     }
 
     @PutMapping("{id}")
-    public UserInfoDto update(@PathVariable("id") Long id, @RequestBody UserInfoDto request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public UserInfoDto update(@PathVariable("id") Long id, @RequestBody UserInfoDto request, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_UPDATE_ATTEMPT);
         }
         return userInfoService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public UserInfoDto delete(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public UserInfoDto delete(@PathVariable("id") Long id, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_DELETION_ATTEMPT);
         }
         return userInfoService.delete(id);

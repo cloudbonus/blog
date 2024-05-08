@@ -20,8 +20,4 @@ public class UserDetailsImpl extends User {
         super(username, password, authorities);
         this.id = id;
     }
-
-    public boolean isAdmin() {
-        return this.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-    }
 }

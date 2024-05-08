@@ -26,31 +26,31 @@ public class TagController {
     private final TagService tagService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TagDto create(@RequestBody TagRequest request) {
         return tagService.create(request);
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TagDto findById(@PathVariable("id") Long id) {
         return tagService.findById(id);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<TagDto> findAll() {
         return tagService.findAll();
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TagDto update(@PathVariable("id") Long id, @RequestBody TagRequest request) {
         return tagService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TagDto delete(@PathVariable("id") Long id) {
         return tagService.delete(id);
     }

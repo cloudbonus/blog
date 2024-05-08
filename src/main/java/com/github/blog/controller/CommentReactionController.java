@@ -6,6 +6,7 @@ import com.github.blog.service.CommentReactionService;
 import com.github.blog.service.exception.UserErrorResult;
 import com.github.blog.service.exception.impl.UserException;
 import com.github.blog.service.security.impl.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,16 +48,16 @@ public class CommentReactionController {
     }
 
     @PutMapping("{id}")
-    public CommentReactionDto update(@PathVariable("id") Long id, @RequestBody CommentReactionRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public CommentReactionDto update(@PathVariable("id") Long id, @RequestBody CommentReactionRequest request, HttpServletRequest HttpRequest,@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_UPDATE_ATTEMPT);
         }
         return commentReactionService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public CommentReactionDto delete(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+    public CommentReactionDto delete(@PathVariable("id") Long id, HttpServletRequest HttpRequest, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!HttpRequest.isUserInRole("ADMIN") && !userDetails.getId().equals(id)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_DELETION_ATTEMPT);
         }
         return commentReactionService.delete(id);
