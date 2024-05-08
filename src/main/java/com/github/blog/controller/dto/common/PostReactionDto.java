@@ -1,14 +1,16 @@
 package com.github.blog.controller.dto.common;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * DTO for {@link com.github.blog.model.PostReaction}
  */
-@Value
+@Getter
+@Setter
 public class PostReactionDto {
     Long id;
-    PostDto post;
-    UserDto user;
+    Long postId;
+    Long userId;
     String reactionType;
 }

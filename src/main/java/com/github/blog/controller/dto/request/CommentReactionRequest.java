@@ -6,10 +6,11 @@ import lombok.Setter;
 /**
  * @author Raman Haurylau
  */
+
 @Getter
 @Setter
-public class CommentRequest {
-    private Long postId;
-    private Long userId;
-    private String content;
+public class CommentReactionRequest {
+    Long commentId;
+    Long userId;
+    String reactionType;
 }

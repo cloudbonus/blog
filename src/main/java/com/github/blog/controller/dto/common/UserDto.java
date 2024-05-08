@@ -1,5 +1,6 @@
 package com.github.blog.controller.dto.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.time.OffsetDateTime;
 public class UserDto {
     private Long id;
     private String username;
+    @JsonIgnore
     private String password;
     private String email;
     private OffsetDateTime createdAt;

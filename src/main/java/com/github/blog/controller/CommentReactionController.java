@@ -1,8 +1,13 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.CommentReactionDto;
+import com.github.blog.controller.dto.request.CommentReactionRequest;
 import com.github.blog.service.CommentReactionService;
+import com.github.blog.service.exception.UserErrorResult;
+import com.github.blog.service.exception.impl.UserException;
+import com.github.blog.service.security.impl.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +29,11 @@ public class CommentReactionController {
     private final CommentReactionService commentReactionService;
 
     @PostMapping
-    public CommentReactionDto create(@RequestBody CommentReactionDto commentReactionDto) {
-        return commentReactionService.create(commentReactionDto);
+    public CommentReactionDto create(@RequestBody CommentReactionRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!userDetails.getId().equals(request.getUserId())) {
+            throw new UserException(UserErrorResult.UNAUTHORIZED_CREATE_ATTEMPT);
+        }
+        return commentReactionService.create(request);
     }
 
     @GetMapping("{id}")
@@ -39,12 +47,18 @@ public class CommentReactionController {
     }
 
     @PutMapping("{id}")
-    public CommentReactionDto update(@PathVariable("id") Long id, @RequestBody CommentReactionDto commentReactionDto) {
-        return commentReactionService.update(id, commentReactionDto);
+    public CommentReactionDto update(@PathVariable("id") Long id, @RequestBody CommentReactionRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+            throw new UserException(UserErrorResult.UNAUTHORIZED_UPDATE_ATTEMPT);
+        }
+        return commentReactionService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    public CommentReactionDto delete(@PathVariable("id") Long id) {
+    public CommentReactionDto delete(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (!userDetails.isAdmin() && !userDetails.getId().equals(id)) {
+            throw new UserException(UserErrorResult.UNAUTHORIZED_DELETION_ATTEMPT);
+        }
         return commentReactionService.delete(id);
     }
 }

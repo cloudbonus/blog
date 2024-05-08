@@ -1,17 +1,19 @@
 package com.github.blog.controller.dto.common;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link com.github.blog.model.Order}
  */
-@Value
+@Getter
+@Setter
 public class OrderDto {
     Long id;
-    PostDto post;
-    UserDto user;
+    Long postId;
+    Long userId;
     OffsetDateTime orderedAt;
     String message;
     String status;
