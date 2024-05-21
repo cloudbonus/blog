@@ -13,7 +13,6 @@ import java.util.Collection;
 @Getter
 @Setter
 public class UserDetailsImpl extends User {
-
     private final Long id;
 
     public UserDetailsImpl(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
