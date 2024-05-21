@@ -2,7 +2,7 @@ package com.github.blog.service.security.impl;
 
 import com.github.blog.model.User;
 import com.github.blog.repository.UserDao;
-import com.github.blog.service.exception.UserErrorResult;
+import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) {
-        User user = userDao.findByUsername(username).orElseThrow(() -> new UserException(UserErrorResult.BAD_CREDENTIALS));
+        User user = userDao.findByUsername(username).orElseThrow(() -> new UserException(ExceptionEnum.BAD_CREDENTIALS));
 
         Collection<? extends GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
 

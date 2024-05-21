@@ -12,4 +12,6 @@ public interface AuthenticationService {
     UserDto signUp(RegistrationRequest request);
 
     JwtResponse signIn(AuthenticationRequest request);
+
+    UserDto update(Long id, RegistrationRequest request);
 }

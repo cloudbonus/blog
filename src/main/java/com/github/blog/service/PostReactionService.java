@@ -1,15 +1,16 @@
 package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.PostReactionDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.PostReactionRequest;
-
-import java.util.List;
+import com.github.blog.controller.dto.request.filter.PostReactionDtoFilter;
+import com.github.blog.controller.dto.response.Page;
 
 /**
  * @author Raman Haurylau
  */
 public interface PostReactionService {
-    List<PostReactionDto> findAll();
+    Page<PostReactionDto> findAll(PostReactionDtoFilter filterRequest, PageableRequest pageableRequest);
 
     PostReactionDto create(PostReactionRequest t);
 
