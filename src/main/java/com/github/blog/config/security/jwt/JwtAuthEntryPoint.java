@@ -25,7 +25,6 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
         body.put("error", "Unauthorized");
         body.put("message", authException.getMessage());
         body.put("timestamp", System.currentTimeMillis());
-
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
     }
