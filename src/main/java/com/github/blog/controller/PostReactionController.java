@@ -1,7 +1,10 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.PostReactionDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.PostReactionRequest;
+import com.github.blog.controller.dto.request.filter.PostReactionDtoFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.PostReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,8 +17,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -38,8 +39,8 @@ public class PostReactionController {
     }
 
     @GetMapping
-    public List<PostReactionDto> findAll() {
-        return postReactionService.findAll();
+    public Page<PostReactionDto> findAll(PostReactionDtoFilter filterRequest, PageableRequest pageableRequest) {
+        return postReactionService.findAll(filterRequest, pageableRequest);
     }
 
     @PutMapping("{id}")

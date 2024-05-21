@@ -1,11 +1,10 @@
 package com.github.blog.controller;
 
-import com.github.blog.controller.dto.common.RoleDto;
+import com.github.blog.controller.dto.common.ReactionDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.RoleRequest;
-import com.github.blog.controller.dto.request.filter.RoleDtoFilter;
+import com.github.blog.controller.dto.request.ReactionRequest;
 import com.github.blog.controller.dto.response.Page;
-import com.github.blog.service.RoleService;
+import com.github.blog.service.ReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,39 +20,38 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Raman Haurylau
  */
 @RestController
-@RequestMapping("roles")
+@RequestMapping("reactions")
 @RequiredArgsConstructor
-public class RoleController {
-    private final RoleService roleService;
+public class ReactionController {
+    private final ReactionService reactionService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public RoleDto create(@RequestBody RoleRequest request) {
-        return roleService.create(request);
+    public ReactionDto create(@RequestBody ReactionRequest request) {
+        return reactionService.create(request);
     }
 
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public RoleDto findById(@PathVariable("id") Long id) {
-        return roleService.findById(id);
+    public ReactionDto findById(@PathVariable("id") Long id) {
+        return reactionService.findById(id);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<RoleDto> findAll(RoleDtoFilter filterRequest, PageableRequest pageableRequest) {
-        return roleService.findAll(filterRequest, pageableRequest);
+    public Page<ReactionDto> findAll(PageableRequest pageableRequest) {
+        return reactionService.findAll(pageableRequest);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public RoleDto update(@PathVariable("id") Long id, @RequestBody RoleRequest request) {
-        return roleService.update(id, request);
+    public ReactionDto update(@PathVariable("id") Long id, @RequestBody ReactionRequest request) {
+        return reactionService.update(id, request);
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public RoleDto delete(@PathVariable("id") Long id) {
-        return roleService.delete(id);
+    public ReactionDto delete(@PathVariable("id") Long id) {
+        return reactionService.delete(id);
     }
 }
-

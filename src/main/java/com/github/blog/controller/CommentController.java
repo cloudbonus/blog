@@ -2,6 +2,7 @@ package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.CommentDto;
 import com.github.blog.controller.dto.request.CommentRequest;
+import com.github.blog.controller.dto.request.CommentUpdateRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.filter.CommentDtoFilter;
 import com.github.blog.controller.dto.response.Page;
@@ -28,8 +29,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    @PreAuthorize("#r.userId == authentication.principal.id")
-    public CommentDto create(@RequestBody @P("r") CommentRequest request) {
+    @PreAuthorize("#request.userId == authentication.principal.id and @commentAccess.verifyPostPurchase(#request.postId)")
+    public CommentDto create(@RequestBody @P("request") CommentRequest request) {
         return commentService.create(request);
     }
 
@@ -44,13 +45,13 @@ public class CommentController {
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
-    public CommentDto update(@PathVariable("id") @P("id") Long id, @RequestBody CommentRequest request) {
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    public CommentDto update(@PathVariable("id") @P("id") Long id, @RequestBody CommentUpdateRequest request) {
         return commentService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public CommentDto delete(@PathVariable("id") @P("id") Long id) {
         return commentService.delete(id);
     }

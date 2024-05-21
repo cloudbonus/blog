@@ -2,6 +2,9 @@ package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.CommentReactionDto;
 import com.github.blog.controller.dto.request.CommentReactionRequest;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.filter.CommentReactionDtoFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.CommentReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * @author Raman Haurylau
  */
@@ -27,8 +28,8 @@ public class CommentReactionController {
     private final CommentReactionService commentReactionService;
 
     @PostMapping
-    @PreAuthorize("#r.userId == authentication.principal.id")
-    public CommentReactionDto create(@RequestBody @P("r") CommentReactionRequest request) {
+    @PreAuthorize("#request.userId == authentication.principal.id")
+    public CommentReactionDto create(@RequestBody @P("request") CommentReactionRequest request) {
         return commentReactionService.create(request);
     }
 
@@ -38,18 +39,18 @@ public class CommentReactionController {
     }
 
     @GetMapping
-    public List<CommentReactionDto> findAll() {
-        return commentReactionService.findAll();
+    public Page<CommentReactionDto> findAll(CommentReactionDtoFilter requestFilter, PageableRequest pageableRequest) {
+        return commentReactionService.findAll(requestFilter, pageableRequest);
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public CommentReactionDto update(@PathVariable("id") @P("id") Long id, @RequestBody CommentReactionRequest request) {
         return commentReactionService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public CommentReactionDto delete(@PathVariable("id") @P("id") Long id) {
         return commentReactionService.delete(id);
     }

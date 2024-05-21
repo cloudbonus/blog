@@ -1,7 +1,10 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.TagDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.TagRequest;
+import com.github.blog.controller.dto.request.filter.TagDtoFilter;
+import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,8 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -39,8 +40,8 @@ public class TagController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<TagDto> findAll() {
-        return tagService.findAll();
+    public Page<TagDto> findAll(TagDtoFilter filterRequest, PageableRequest pageableRequest) {
+        return tagService.findAll(filterRequest, pageableRequest);
     }
 
     @PutMapping("{id}")

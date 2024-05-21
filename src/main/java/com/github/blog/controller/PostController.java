@@ -28,29 +28,31 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    @PreAuthorize("#r.userId == authentication.principal.id")
-    public PostDto create(@RequestBody @P("r") PostRequest request) {
+    @PreAuthorize("hasAnyRole('STUDENT', 'COMPANY') and #request.userId == authentication.principal.id")
+    public PostDto create(@RequestBody @P("request") PostRequest request) {
         return postService.create(request);
     }
 
     @GetMapping("{id}")
-    public PostDto findById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN') or @postAccess.verifyPostPurchase(#id)")
+    public PostDto findById(@PathVariable @P("id") Long id) {
         return postService.findById(id);
     }
 
     @GetMapping
-    public Page<PostDto> findAll(PostDtoFilter requestFilter, PageableRequest pageableRequest) {
+    @PreAuthorize("hasRole('ADMIN') or @postAccess.canFilter(#request)")
+    public Page<PostDto> findAll(@P("request") PostDtoFilter requestFilter, PageableRequest pageableRequest) {
         return postService.findAll(requestFilter, pageableRequest);
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public PostDto update(@PathVariable("id") @P("id") Long id, @RequestBody PostRequest request) {
         return postService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public PostDto delete(@PathVariable("id") @P("id") Long id) {
         return postService.delete(id);
     }

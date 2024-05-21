@@ -6,6 +6,7 @@ import com.github.blog.controller.dto.request.RegistrationRequest;
 import com.github.blog.controller.dto.request.filter.UserDtoFilter;
 import com.github.blog.controller.dto.response.Page;
 import com.github.blog.service.UserService;
+import com.github.blog.service.security.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final AuthenticationService authenticationService;
 
     @GetMapping("{id}")
     public UserDto findById(@PathVariable("id") Long id) {
@@ -37,13 +39,13 @@ public class UserController {
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public UserDto update(@PathVariable("id") @P("id") Long id, @RequestBody RegistrationRequest request) {
-        return userService.update(id, request);
+        return authenticationService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public UserDto delete(@PathVariable("id") @P("id") Long id) {
         return userService.delete(id);
     }
