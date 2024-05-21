@@ -2,7 +2,9 @@ package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
+import com.github.blog.controller.dto.request.filter.OrderDtoFilter;
 import com.github.blog.model.Order;
+import com.github.blog.repository.dto.filter.OrderFilter;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,6 +22,8 @@ public interface OrderMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "postId", source = "post.id")
     OrderDto toDto(Order order);
+
+    OrderFilter toDto(OrderDtoFilter requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Order partialUpdate(OrderRequest request, @MappingTarget Order order);
