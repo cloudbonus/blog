@@ -44,4 +44,10 @@ public class UserInfo {
 
     @Column(length = Integer.MAX_VALUE)
     private String jobTitle;
+
+    @Column(nullable = false)
+    private String state;
+
+    @Column(length = Integer.MAX_VALUE)
+    private String stateContext;
 }

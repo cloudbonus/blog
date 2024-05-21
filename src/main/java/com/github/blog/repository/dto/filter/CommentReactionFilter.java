@@ -1,4 +1,4 @@
-package com.github.blog.controller.dto.request;
+package com.github.blog.repository.dto.filter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,11 +6,10 @@ import lombok.Setter;
 /**
  * @author Raman Haurylau
  */
-
 @Getter
 @Setter
-public class CommentReactionRequest {
+public class CommentReactionFilter {
     private Long commentId;
-    private Long userId;
     private Long reactionId;
+    private String username;
 }

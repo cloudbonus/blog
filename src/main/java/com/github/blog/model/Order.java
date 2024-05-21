@@ -2,6 +2,8 @@ package com.github.blog.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,6 +23,7 @@ import java.time.OffsetDateTime;
 @Table(name = "\"order\"", schema = "blogging_platform")
 public class Order {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id", nullable = false)
     private Long id;
 
@@ -37,11 +40,11 @@ public class Order {
     @Column(nullable = false)
     private OffsetDateTime orderedAt;
 
-    @Column(length = Integer.MAX_VALUE)
-    private String message;
+    @Column(nullable = false)
+    private String state;
 
-    @Column(nullable = false, length = Integer.MAX_VALUE)
-    private String status;
+    @Column(length = Integer.MAX_VALUE)
+    private String stateContext;
 
     @PrePersist
     private void prePersist() {

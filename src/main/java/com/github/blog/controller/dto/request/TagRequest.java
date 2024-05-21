@@ -9,5 +9,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TagRequest {
-    String tagName;
+    private String tagName;
 }

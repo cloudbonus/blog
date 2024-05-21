@@ -8,8 +8,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PostFilter {
+public class PostReactionFilter {
+    private Long postId;
+    private Long reactionId;
     private String username;
-    private Long tagId;
-    private String state;
 }

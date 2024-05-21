@@ -12,11 +12,11 @@ import java.util.List;
 @Getter
 @Setter
 public class PostDto {
-    Long id;
-    Long userId;
-    String title;
-    String content;
-    OffsetDateTime publishedAt;
-    List<Long> tagIds;
-    List<Long> commentIds;
+    private Long id;
+    private Long userId;
+    private String title;
+    private String content;
+    private OffsetDateTime publishedAt;
+    private List<Long> tagIds;
+    private List<Long> commentIds;
 }

@@ -4,11 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * DTO for {@link com.github.blog.model.Tag}
+ * @author Raman Haurylau
  */
 @Getter
 @Setter
-public class TagDto {
+public class ReactionDto {
     private Long id;
-    private String tagName;
+    private String reactionName;
 }

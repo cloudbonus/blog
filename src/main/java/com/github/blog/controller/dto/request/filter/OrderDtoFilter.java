@@ -8,6 +8,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CommentDtoFilter {
+public class OrderDtoFilter {
     private String username;
+    private Long postId;
+    private Long userId;
 }

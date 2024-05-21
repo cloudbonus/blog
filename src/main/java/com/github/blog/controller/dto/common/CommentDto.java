@@ -11,9 +11,9 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 public class CommentDto {
-    Long id;
-    Long postId;
-    Long userId;
-    String content;
-    OffsetDateTime publishedAt;
+    private Long id;
+    private Long postId;
+    private Long userId;
+    private String content;
+    private OffsetDateTime publishedAt;
 }

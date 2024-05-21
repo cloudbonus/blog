@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class Page<T> {
-    List<T> content;
-    Pageable pageable;
-    Long totalNumberOfEntities;
+    private List<T> content;
+    private Pageable pageable;
+    private Long totalNumberOfEntities;
 
     public Page(List<T> content, Pageable pageable, Long count) {
         this.content = content;

@@ -33,6 +33,8 @@ public class CommentReaction {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false, length = Integer.MAX_VALUE)
-    private String reactionType;
+    @OneToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "reaction_id")
+    private Reaction reaction;
 }

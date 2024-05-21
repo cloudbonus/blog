@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CommentReactionDto {
-    Long id;
-    Long commentId;
-    Long userId;
-    String reactionType;
+    private Long id;
+    private Long commentId;
+    private Long userId;
+    private Long reactionId;
 }

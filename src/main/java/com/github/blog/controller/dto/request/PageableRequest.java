@@ -9,11 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PageableRequest {
-    int pageSize;
-    int pageNumber;
+    private int pageSize;
+    private int pageNumber;
+    private String orderBy;
 
     public PageableRequest() {
         this.pageSize = Integer.MAX_VALUE;
         this.pageNumber = 1;
+        this.orderBy = "ASC";
     }
 }

@@ -1,5 +1,6 @@
 package com.github.blog.controller.dto.request.filter;
 
+import com.github.blog.service.statemachine.state.OrderState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostDtoFilter {
-    private String login;
-    private String tag;
+    private String username;
+    private Long tagId;
+    private String state;
+
+    public PostDtoFilter() {
+        this.state = OrderState.COMPLETED.name();
+    }
 }

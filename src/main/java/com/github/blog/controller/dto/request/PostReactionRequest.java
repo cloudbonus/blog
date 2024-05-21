@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostReactionRequest {
-    Long postId;
-    Long userId;
-    String reactionType;
+    private Long postId;
+    private Long userId;
+    private Long reactionId;
 }

@@ -11,10 +11,9 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 public class OrderDto {
-    Long id;
-    Long postId;
-    Long userId;
-    OffsetDateTime orderedAt;
-    String message;
-    String status;
+    private Long id;
+    private Long postId;
+    private Long userId;
+    private OffsetDateTime orderedAt;
+    private String state;
 }

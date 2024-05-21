@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDtoFilter {
-    private String login;
-    private String role;
+    private String username;
+    private Long roleId;
     private String firstname;
     private String surname;
     private String university;
