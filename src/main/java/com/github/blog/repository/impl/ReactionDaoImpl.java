@@ -1,49 +1,42 @@
 package com.github.blog.repository.impl;
 
 import com.github.blog.controller.dto.response.Page;
-import com.github.blog.model.UserInfo;
-import com.github.blog.model.UserInfo_;
-import com.github.blog.repository.UserInfoDao;
+import com.github.blog.model.Reaction;
+import com.github.blog.model.Reaction_;
+import com.github.blog.repository.ReactionDao;
 import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.UserInfoFilter;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Raman Haurylau
+ */
 @Repository
-public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements UserInfoDao {
+public class ReactionDaoImpl extends AbstractJpaDao<Reaction, Long> implements ReactionDao {
     @Override
     @Transactional
-    public Page<UserInfo> findAll(UserInfoFilter filter, Pageable pageable) {
+    public Page<Reaction> findAll(Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserInfoBox> cq = cb.createQuery(UserInfoBox.class);
-        Root<UserInfo> root = cq.from(UserInfo.class);
+        CriteriaQuery<ReactionBox> cq = cb.createQuery(ReactionBox.class);
+        Root<Reaction> root = cq.from(Reaction.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-
-        if (!ObjectUtils.isEmpty(filter.getUserId())) {
-            predicates.add(cb.equal(root.get(UserInfo_.id), filter.getUserId()));
-        }
-
-        cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
+        cq.multiselect(root).distinct(true);
 
         if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
-            cq.orderBy(cb.asc(root.get(UserInfo_.id)));
+            cq.orderBy(cb.asc(root.get(Reaction_.id)));
         } else {
-            cq.orderBy(cb.desc(root.get(UserInfo_.id)));
+            cq.orderBy(cb.desc(root.get(Reaction_.id)));
         }
 
-        TypedQuery<UserInfoBox> query = entityManager.createQuery(cq);
+        TypedQuery<ReactionBox> query = entityManager.createQuery(cq);
 
         int offset = Long.valueOf(pageable.getOffset()).intValue();
 
@@ -54,7 +47,7 @@ public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements U
         query.setFirstResult(offset);
         query.setMaxResults(pageable.getPageSize());
 
-        List<UserInfo> results = query.getResultList().stream().map(UserInfoBox::getEntity).toList();
+        List<Reaction> results = query.getResultList().stream().map(ReactionBox::getEntity).toList();
 
         long count;
 
@@ -62,7 +55,7 @@ public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements U
             count = results.size();
         } else {
             cq.orderBy(Collections.emptyList());
-            cq.multiselect(cb.countDistinct(root.get(UserInfo_.id)));
+            cq.multiselect(cb.countDistinct(root.get(Reaction_.id)));
             count = entityManager.createQuery(cq).getSingleResult().getCount();
         }
 
@@ -71,15 +64,15 @@ public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements U
 }
 
 @Getter
-class UserInfoBox {
+class ReactionBox {
     long count;
-    UserInfo entity;
+    Reaction entity;
 
-    UserInfoBox(long c) {
+    ReactionBox(long c) {
         count = c;
     }
 
-    UserInfoBox(UserInfo e) {
+    ReactionBox(Reaction e) {
         entity = e;
     }
 }

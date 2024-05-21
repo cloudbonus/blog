@@ -31,55 +31,59 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Repository
-@Transactional
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
     @Override
+    @Transactional
     public Page<User> findAll(UserFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<UserBox> cq = cb.createQuery(UserBox.class);
         Root<User> root = cq.from(User.class);
-        Join<User, UserInfo> userDetail = root.join(User_.userInfo, JoinType.LEFT);
+        Join<User, UserInfo> userInfo = root.join(User_.userInfo, JoinType.LEFT);
         Join<User, Role> role = root.join(User_.roles, JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 
         if (!ObjectUtils.isEmpty(filter.getFirstname())) {
-            predicates.add(cb.like(cb.lower(userDetail.get(UserInfo_.firstname).as(String.class)), filter.getFirstname().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.firstname).as(String.class)), filter.getFirstname().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getSurname())) {
-            predicates.add(cb.like(cb.lower(userDetail.get(UserInfo_.surname).as(String.class)), filter.getSurname().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.surname).as(String.class)), filter.getSurname().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getUniversity())) {
-            predicates.add(cb.like(cb.lower(userDetail.get(UserInfo_.universityName).as(String.class)), filter.getUniversity().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.universityName).as(String.class)), filter.getUniversity().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getMajor())) {
-            predicates.add(cb.like(cb.lower(userDetail.get(UserInfo_.majorName).as(String.class)), filter.getMajor().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.majorName).as(String.class)), filter.getMajor().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getCompany())) {
-            predicates.add(cb.like(cb.lower(userDetail.get(UserInfo_.companyName).as(String.class)), filter.getCompany().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.companyName).as(String.class)), filter.getCompany().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getJob())) {
-            predicates.add(cb.like(cb.lower(userDetail.get(UserInfo_.jobTitle).as(String.class)), filter.getJob().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.jobTitle).as(String.class)), filter.getJob().toLowerCase().concat("%")));
         }
 
-        if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.like(cb.lower(root.get(User_.username).as(String.class)), filter.getLogin().toLowerCase()));
+        if (!ObjectUtils.isEmpty(filter.getUsername())) {
+            predicates.add(cb.like(cb.lower(root.get(User_.username).as(String.class)), filter.getUsername().toLowerCase().concat("%")));
         }
 
-        if (!ObjectUtils.isEmpty(filter.getRole())) {
-            String updatedRoleName = "role_" + filter.getRole();
-            predicates.add(cb.equal(cb.lower(role.get(Role_.roleName).as(String.class)), updatedRoleName.toLowerCase()));
+        if (!ObjectUtils.isEmpty(filter.getRoleId())) {
+            predicates.add(cb.equal(role.get(Role_.roleName), filter.getRoleId()));
         }
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
-        cq.orderBy(cb.asc(root.get(User_.id)));
+
+        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+            cq.orderBy(cb.asc(root.get(User_.id)));
+        } else {
+            cq.orderBy(cb.desc(root.get(User_.id)));
+        }
 
         TypedQuery<UserBox> query = entityManager.createQuery(cq);
 
@@ -107,6 +111,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         return new Page<>(results, pageable, count);
     }
 
+    @Transactional
     public Optional<User> findByUsername(String username) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> cq = cb.createQuery(User.class);

@@ -33,6 +33,7 @@ import java.util.List;
 public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements CommentDao {
 
     @Override
+    @Transactional
     public Page<Comment> findAll(CommentFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
@@ -42,11 +43,18 @@ public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements Com
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.equal(cb.lower(user.get(User_.username).as(String.class)), filter.getLogin().toLowerCase()));
+        if (!ObjectUtils.isEmpty(filter.getUsername())) {
+            predicates.add(cb.like(cb.lower(user.get(User_.username).as(String.class)), filter.getUsername().toLowerCase().concat("%")));
         }
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
+
+        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+            cq.orderBy(cb.asc(root.get(Comment_.id)));
+        } else {
+            cq.orderBy(cb.desc(root.get(Comment_.id)));
+        }
+
         cq.orderBy(cb.asc(root.get(Comment_.id)));
 
         TypedQuery<CommentBox> query = entityManager.createQuery(cq);
