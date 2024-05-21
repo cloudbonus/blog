@@ -216,4 +216,20 @@
     <changeSet id="homework-7-add-case-insensitive-unique-constraints-in-tables" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/40.add-case-insensitive-unique-constraints-in-tables.sql" relativeToChangelogFile="true"/>
     </changeSet>
+
+    <changeSet id="homework-9-add-column-into-order-table" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/41.add-column-into-order-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-9-insert-values-into-role-table" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/42.insert-values-into-role-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-9-add-column-into-user_details-table" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/43.add-column-into-user_details-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-9-create-reaction-tables" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/44.create-reaction-tables.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>
