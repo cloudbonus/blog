@@ -1,6 +1,7 @@
 package com.github.blog.service.exception.impl;
 
-import com.github.blog.service.exception.RoleErrorResult;
+import com.github.blog.service.exception.CustomEntityException;
+import com.github.blog.service.exception.ExceptionEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +10,6 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class RoleException extends RuntimeException {
-    private final RoleErrorResult errorResult;
+public class RoleException extends RuntimeException implements CustomEntityException {
+    private final ExceptionEnum exceptionEnum;
 }

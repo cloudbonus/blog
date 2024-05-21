@@ -1,6 +1,7 @@
 package com.github.blog.service.exception.impl;
 
-import com.github.blog.service.exception.CommentReactionErrorResult;
+import com.github.blog.service.exception.CustomEntityException;
+import com.github.blog.service.exception.ExceptionEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +10,6 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class CommentReactionException extends RuntimeException {
-    private final CommentReactionErrorResult errorResult;
+public class CommentReactionException extends RuntimeException implements CustomEntityException {
+    private final ExceptionEnum exceptionEnum;
 }

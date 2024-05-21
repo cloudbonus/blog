@@ -1,6 +1,7 @@
 package com.github.blog.service.exception.impl;
 
-import com.github.blog.service.exception.OrderErrorResult;
+import com.github.blog.service.exception.CustomEntityException;
+import com.github.blog.service.exception.ExceptionEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +10,6 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class OrderException extends RuntimeException {
-    private final OrderErrorResult errorResult;
+public class OrderException extends RuntimeException implements CustomEntityException {
+    private final ExceptionEnum exceptionEnum;
 }

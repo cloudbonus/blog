@@ -10,6 +10,6 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class PostReactionException extends RuntimeException implements CustomEntityException {
+public class ReactionException extends RuntimeException implements CustomEntityException {
     private final ExceptionEnum exceptionEnum;
 }
