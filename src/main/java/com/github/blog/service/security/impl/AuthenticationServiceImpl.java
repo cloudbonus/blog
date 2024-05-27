@@ -1,28 +1,26 @@
 package com.github.blog.service.security.impl;
 
 import com.github.blog.controller.dto.common.UserDto;
-import com.github.blog.controller.dto.request.AuthenticationRequest;
-import com.github.blog.controller.dto.request.RegistrationRequest;
+import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.JwtResponse;
 import com.github.blog.service.UserService;
 import com.github.blog.service.exception.ExceptionEnum;
-import com.github.blog.service.exception.impl.UserException;
+import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.security.AuthenticationService;
 import com.github.blog.service.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Raman Haurylau
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserService userService;
@@ -31,16 +29,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsServiceImpl userDetailsService;
 
-    public UserDto signUp(RegistrationRequest request) {
+    @Override
+    public UserDto signUp(UserRequest request) {
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         return userService.create(request);
     }
 
-    public JwtResponse signIn(AuthenticationRequest request) {
+    @Override
+    public JwtResponse signIn(UserRequest request) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         if (!auth.isAuthenticated()) {
-            throw new UserException(ExceptionEnum.AUTHENTICATION_FAILED);
+            throw new CustomException(ExceptionEnum.AUTHENTICATION_FAILED);
         }
 
         UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
@@ -50,8 +50,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new JwtResponse(jwt, user.getUsername());
     }
 
-    public UserDto update(Long id, RegistrationRequest request) {
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
+    @Override
+    public UserDto update(Long id, UserRequest request) {
+        if (!StringUtils.isBlank(request.getPassword())) {
+            request.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         return userService.update(id, request);
     }
 }

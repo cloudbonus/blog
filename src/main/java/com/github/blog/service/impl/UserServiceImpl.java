@@ -1,21 +1,21 @@
 package com.github.blog.service.impl;
 
 import com.github.blog.controller.dto.common.UserDto;
-import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.RegistrationRequest;
-import com.github.blog.controller.dto.request.filter.UserDtoFilter;
-import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.request.UserRequest;
+import com.github.blog.controller.dto.request.etc.PageableRequest;
+import com.github.blog.controller.dto.request.filter.UserFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.model.util.RoleEnum;
 import com.github.blog.repository.RoleDao;
 import com.github.blog.repository.UserDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.UserFilter;
 import com.github.blog.service.UserService;
 import com.github.blog.service.exception.ExceptionEnum;
-import com.github.blog.service.exception.impl.RoleException;
-import com.github.blog.service.exception.impl.UserException;
+import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -32,17 +32,18 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
-    private final UserMapper userMapper;
     private final RoleDao roleDao;
+
+    private final UserMapper userMapper;
     private final PageableMapper pageableMapper;
 
     @Override
-    public UserDto create(RegistrationRequest request) {
+    public UserDto create(UserRequest request) {
         User user = userMapper.toEntity(request);
 
         Role role = roleDao
                 .findByName(RoleEnum.ROLE_USER.name())
-                .orElseThrow(() -> new RoleException(ExceptionEnum.ROLE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
         user.getRoles().add(role);
 
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService {
     public UserDto findById(Long id) {
         User user = userDao
                 .findById(id)
-                .orElseThrow(() -> new UserException(ExceptionEnum.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         user.setLastLogin(OffsetDateTime.now());
 
@@ -63,24 +64,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDto> findAll(UserDtoFilter requestFilter, PageableRequest pageableRequest) {
+    public PageResponse<UserDto> findAll(UserFilterRequest requestFilter, PageableRequest pageableRequest) {
         UserFilter dtoFilter = userMapper.toDto(requestFilter);
 
-        Pageable pageable = pageableMapper.toDto(pageableRequest);
+        Pageable pageable = pageableMapper.toEntity(pageableRequest);
         Page<User> users = userDao.findAll(dtoFilter, pageable);
 
         if (users.isEmpty()) {
-            throw new UserException(ExceptionEnum.USERS_NOT_FOUND);
+            throw new CustomException(ExceptionEnum.USERS_NOT_FOUND);
         }
 
-        return users.map(userMapper::toDto);
+        return userMapper.toDto(users);
     }
 
     @Override
-    public UserDto update(Long id, RegistrationRequest request) {
+    public UserDto update(Long id, UserRequest request) {
         User user = userDao
                 .findById(id)
-                .orElseThrow(() -> new UserException(ExceptionEnum.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         user = userMapper.partialUpdate(request, user);
 
@@ -91,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public UserDto delete(Long id) {
         User user = userDao
                 .findById(id)
-                .orElseThrow(() -> new UserException(ExceptionEnum.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         userDao.delete(user);
 

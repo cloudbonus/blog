@@ -2,16 +2,16 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
-import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.filter.OrderDtoFilter;
-import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.request.etc.PageableRequest;
+import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 
 
 /**
  * @author Raman Haurylau
  */
 public interface OrderService {
-    Page<OrderDto> findAll(OrderDtoFilter requestFilter, PageableRequest pageableRequest);
+    PageResponse<OrderDto> findAll(OrderFilterRequest requestFilter, PageableRequest pageableRequest);
 
     OrderDto reserve(Long id);
 

@@ -1,16 +1,16 @@
 package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.TagDto;
-import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.TagRequest;
-import com.github.blog.controller.dto.request.filter.TagDtoFilter;
-import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.request.etc.PageableRequest;
+import com.github.blog.controller.dto.request.filter.TagFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 
 /**
  * @author Raman Haurylau
  */
 public interface TagService {
-    Page<TagDto> findAll(TagDtoFilter filterRequest, PageableRequest pageableRequest);
+    PageResponse<TagDto> findAll(TagFilterRequest filterRequest, PageableRequest pageableRequest);
 
     TagDto create(TagRequest t);
 
