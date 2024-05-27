@@ -11,5 +11,6 @@ import java.util.Optional;
  */
 public interface ReactionDao extends CrudDao<Reaction, Long> {
     Page<Reaction> findAll(Pageable pageable);
+
     Optional<Reaction> findByName(String reactionName);
 }

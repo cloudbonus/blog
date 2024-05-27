@@ -12,5 +12,6 @@ import java.util.Optional;
  */
 public interface PostReactionDao extends CrudDao<PostReaction, Long> {
     Page<PostReaction> findAll(PostReactionFilter dtoFilter, Pageable pageable);
+
     Optional<PostReaction> findByPostIdAndUserId(Long postId, Long userId);
 }

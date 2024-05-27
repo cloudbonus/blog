@@ -8,7 +8,6 @@ import com.github.blog.repository.RoleDao;
 import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.RoleFilter;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

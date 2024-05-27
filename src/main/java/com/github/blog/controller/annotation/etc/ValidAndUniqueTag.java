@@ -17,9 +17,9 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = CustomTagValidator.class)
 public @interface ValidAndUniqueTag {
 
-    public String message() default "Invalid tag or already exists with this name";
+    String message() default "Invalid tag or already exists with this name";
 
-    public Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-    public Class<? extends Payload>[] payload() default{};
+    Class<? extends Payload>[] payload() default {};
 }

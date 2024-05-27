@@ -11,7 +11,7 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {CommentMapper.class, UserMapper.class})
-public interface CommentReactionMapper extends BasePageMapper<CommentReaction, CommentReactionDto>{
+public interface CommentReactionMapper extends BasePageMapper<CommentReaction, CommentReactionDto> {
     @Mapping(source = "commentId", target = "comment.id")
     @Mapping(source = "reactionId", target = "reaction.id")
     CommentReaction toEntity(CommentReactionRequest request);

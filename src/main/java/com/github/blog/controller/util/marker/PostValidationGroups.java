@@ -7,5 +7,6 @@ import jakarta.validation.GroupSequence;
  */
 public interface PostValidationGroups {
     @GroupSequence({Marker.First.class, Marker.Second.class})
-    interface PostReactionCreateValidationGroupSequence {}
+    interface PostReactionCreateValidationGroupSequence {
+    }
 }

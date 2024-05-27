@@ -17,6 +17,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = CustomUniqueUsernameValidator.class)
 public @interface UniqueUsername {
     String message() default "There is already user with this username";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

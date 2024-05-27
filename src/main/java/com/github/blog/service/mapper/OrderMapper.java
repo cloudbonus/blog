@@ -11,7 +11,7 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PostMapper.class, UserMapper.class})
-public interface OrderMapper extends BasePageMapper<Order, OrderDto>{
+public interface OrderMapper extends BasePageMapper<Order, OrderDto> {
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "postId", target = "post.id")
     Order toEntity(OrderRequest request);

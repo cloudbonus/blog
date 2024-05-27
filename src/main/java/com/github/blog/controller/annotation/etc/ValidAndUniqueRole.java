@@ -17,9 +17,9 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = CustomRoleValidator.class)
 public @interface ValidAndUniqueRole {
 
-    public String message() default "Invalid role or already exists with this name";
+    String message() default "Invalid role or already exists with this name";
 
-    public Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-    public Class<? extends Payload>[] payload() default{};
+    Class<? extends Payload>[] payload() default {};
 }

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {UserMapper.class})
-public abstract class PostMapper implements BasePageMapper<Post, PostDto>{
+public abstract class PostMapper implements BasePageMapper<Post, PostDto> {
     @Autowired
     private TagDao tagDao;
 

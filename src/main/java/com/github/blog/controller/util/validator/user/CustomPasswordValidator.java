@@ -32,8 +32,7 @@ public class CustomPasswordValidator implements ConstraintValidator<ValidPasswor
     public boolean isValid(String password, ConstraintValidatorContext context) {
         if (password == null) {
             return true;
-        }
-        else {
+        } else {
             Properties props = new Properties();
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream("passay.properties");
             props.load(inputStream);

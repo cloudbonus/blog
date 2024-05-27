@@ -17,9 +17,9 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = CustomCommentReactionValidator.class)
 public @interface UniqueCommentReaction {
 
-    public String message() default "Reaction already exists";
+    String message() default "Reaction already exists";
 
-    public Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-    public Class<? extends Payload>[] payload() default{};
+    Class<? extends Payload>[] payload() default {};
 }

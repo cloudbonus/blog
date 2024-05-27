@@ -13,7 +13,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface TagMapper extends BasePageMapper<Tag, TagDto>{
+public interface TagMapper extends BasePageMapper<Tag, TagDto> {
     Tag toEntity(TagRequest request);
 
     TagDto toDto(Tag tag);

@@ -14,11 +14,10 @@ public class CustomUniqueEmailValidator implements ConstraintValidator<UniqueEma
     private final UserDao userDao;
 
     @Override
-    public boolean isValid(String email, ConstraintValidatorContext context){
+    public boolean isValid(String email, ConstraintValidatorContext context) {
         if (email == null) {
             return true;
-        }
-        else {
+        } else {
             return userDao.findByEmail(email).isEmpty();
         }
     }

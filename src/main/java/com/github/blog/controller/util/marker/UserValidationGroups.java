@@ -8,17 +8,22 @@ import jakarta.validation.groups.Default;
  */
 public interface UserValidationGroups {
     @GroupSequence({Marker.First.class, Marker.Second.class, Marker.Third.class})
-    interface UserCreateValidationGroupSequence {}
+    interface UserCreateValidationGroupSequence {
+    }
 
     @GroupSequence(Marker.First.class)
-    interface UserAuthenticateValidationGroupSequence {}
+    interface UserAuthenticateValidationGroupSequence {
+    }
 
     @GroupSequence({Marker.Second.class, Marker.Third.class})
-    interface UserUpdateValidationGroupSequence {}
+    interface UserUpdateValidationGroupSequence {
+    }
 
     @GroupSequence({Marker.First.class, Default.class})
-    interface UserInfoCreateValidationGroupSequence {}
+    interface UserInfoCreateValidationGroupSequence {
+    }
 
     @GroupSequence({Marker.Second.class, Default.class})
-    interface UserInfoUpdateValidationGroupSequence {}
+    interface UserInfoUpdateValidationGroupSequence {
+    }
 }

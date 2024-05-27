@@ -14,11 +14,10 @@ public class CustomUniqueUsernameValidator implements ConstraintValidator<Unique
     private final UserDao userDao;
 
     @Override
-    public boolean isValid(String username, ConstraintValidatorContext context){
+    public boolean isValid(String username, ConstraintValidatorContext context) {
         if (username == null) {
             return true;
-        }
-        else {
+        } else {
             return userDao.findByUsername(username).isEmpty();
         }
     }

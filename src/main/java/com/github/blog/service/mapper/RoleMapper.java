@@ -13,7 +13,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {UserMapper.class})
-public interface RoleMapper extends BasePageMapper<Role, RoleDto>{
+public interface RoleMapper extends BasePageMapper<Role, RoleDto> {
     Role toEntity(RoleRequest request);
 
     RoleDto toDto(Role role);

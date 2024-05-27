@@ -7,5 +7,6 @@ import jakarta.validation.GroupSequence;
  */
 public interface CommentValidationGroups {
     @GroupSequence({Marker.First.class, Marker.Second.class})
-    interface CommentReactionCreateValidationGroupSequence {}
+    interface CommentReactionCreateValidationGroupSequence {
+    }
 }

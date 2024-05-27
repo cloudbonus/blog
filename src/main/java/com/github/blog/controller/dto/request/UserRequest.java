@@ -6,7 +6,6 @@ import com.github.blog.controller.annotation.user.ValidPassword;
 import com.github.blog.controller.util.marker.Marker;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.groups.Default;
 import lombok.Getter;
 import lombok.Setter;
 

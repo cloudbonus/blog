@@ -12,6 +12,7 @@ import java.util.Optional;
  */
 public interface TagDao extends CrudDao<Tag, Long> {
     Page<Tag> findAll(TagFilter filter, Pageable pageable);
+
     Optional<Tag> findByName(String tagName);
 
 }

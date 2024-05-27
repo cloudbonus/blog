@@ -12,7 +12,6 @@ import com.github.blog.repository.PostDao;
 import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.PostFilter;
-import com.github.blog.service.statemachine.state.OrderState;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

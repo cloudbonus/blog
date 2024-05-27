@@ -12,5 +12,6 @@ import java.util.Optional;
  */
 public interface CommentReactionDao extends CrudDao<CommentReaction, Long> {
     Page<CommentReaction> findAll(CommentReactionFilter dtoFilter, Pageable pageable);
+
     Optional<CommentReaction> findByCommentIdAndUserId(Long commentId, Long userId);
 }

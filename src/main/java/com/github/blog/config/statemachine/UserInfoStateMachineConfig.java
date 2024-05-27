@@ -42,6 +42,6 @@ public class UserInfoStateMachineConfig extends EnumStateMachineConfigurerAdapte
                 .and()
                 .withExternal().source(UserInfoState.RESERVED).target(UserInfoState.VERIFIED).event(UserInfoEvent.VERIFY)
                 .and()
-                .withExternal().source(UserInfoState.VERIFIED).target(UserInfoState.VERIFIED).event(UserInfoEvent.VERIFY);;
+                .withExternal().source(UserInfoState.VERIFIED).target(UserInfoState.VERIFIED).event(UserInfoEvent.VERIFY);
     }
 }

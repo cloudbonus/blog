@@ -47,7 +47,7 @@ public class PostController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or @postAccess.canFilter(#request)")
-    public PageResponse<PostDto> findAll(@P("request") @Valid  PostFilterRequest requestFilter, @Valid PageableRequest pageableRequest) {
+    public PageResponse<PostDto> findAll(@P("request") @Valid PostFilterRequest requestFilter, @Valid PageableRequest pageableRequest) {
         return postService.findAll(requestFilter, pageableRequest);
     }
 
