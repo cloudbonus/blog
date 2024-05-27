@@ -1,11 +1,11 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Post;
 import com.github.blog.model.Post_;
 import com.github.blog.model.Tag;
 import com.github.blog.model.Tag_;
 import com.github.blog.repository.TagDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.TagFilter;
 import jakarta.persistence.TypedQuery;
@@ -23,14 +23,16 @@ import org.springframework.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class TagDaoImpl extends AbstractJpaDao<Tag, Long> implements TagDao {
+
     @Override
-    @Transactional
     public Page<Tag> findAll(TagFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<TagBox> cq = cb.createQuery(TagBox.class);
@@ -75,6 +77,24 @@ public class TagDaoImpl extends AbstractJpaDao<Tag, Long> implements TagDao {
         }
 
         return new Page<>(results, pageable, count);
+    }
+
+    @Override
+    public Optional<Tag> findByName(String tagName) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
+        Root<Tag> root = cq.from(Tag.class);
+
+        cq.select(root).where(cb.like(cb.lower(root.get(Tag_.tagName).as(String.class)), tagName.toLowerCase()));
+        TypedQuery<Tag> query = entityManager.createQuery(cq);
+
+        List<Tag> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return result.stream().findFirst();
+        }
     }
 }
 

@@ -1,6 +1,5 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Post;
 import com.github.blog.model.PostReaction;
 import com.github.blog.model.PostReaction_;
@@ -10,6 +9,7 @@ import com.github.blog.model.Reaction_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.PostReactionDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.PostReactionFilter;
 import jakarta.persistence.TypedQuery;
@@ -27,14 +27,16 @@ import org.springframework.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class PostReactionDaoImpl extends AbstractJpaDao<PostReaction, Long> implements PostReactionDao {
+
     @Override
-    @Transactional
     public Page<PostReaction> findAll(PostReactionFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<PostReactionBox> cq = cb.createQuery(PostReactionBox.class);
@@ -89,6 +91,26 @@ public class PostReactionDaoImpl extends AbstractJpaDao<PostReaction, Long> impl
         }
 
         return new Page<>(results, pageable, count);
+    }
+
+    @Override
+    public Optional<PostReaction> findByPostIdAndUserId(Long postId, Long userId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PostReaction> cq = cb.createQuery(PostReaction.class);
+        Root<PostReaction> root = cq.from(PostReaction.class);
+        Join<PostReaction, Post> post = root.join(PostReaction_.post, JoinType.LEFT);
+        Join<PostReaction, User> user = root.join(PostReaction_.user, JoinType.LEFT);
+
+        cq.select(root).where(cb.equal(post.get(Post_.id), postId)).where(cb.equal(user.get(User_.id), userId));
+        TypedQuery<PostReaction> query = entityManager.createQuery(cq);
+
+        List<PostReaction> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return result.stream().findFirst();
+        }
     }
 }
 

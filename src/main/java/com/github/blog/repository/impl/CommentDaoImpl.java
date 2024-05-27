@@ -1,11 +1,11 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Comment_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.CommentDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.CommentFilter;
 import jakarta.persistence.TypedQuery;
@@ -33,7 +33,6 @@ import java.util.List;
 public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements CommentDao {
 
     @Override
-    @Transactional
     public Page<Comment> findAll(CommentFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 

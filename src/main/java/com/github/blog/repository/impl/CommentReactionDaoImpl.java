@@ -1,6 +1,5 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Comment;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.model.CommentReaction_;
@@ -10,6 +9,7 @@ import com.github.blog.model.Reaction_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.CommentReactionDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.CommentReactionFilter;
 import jakarta.persistence.TypedQuery;
@@ -27,14 +27,16 @@ import org.springframework.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class CommentReactionDaoImpl extends AbstractJpaDao<CommentReaction, Long> implements CommentReactionDao {
+
     @Override
-    @Transactional
     public Page<CommentReaction> findAll(CommentReactionFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CommentReactionBox> cq = cb.createQuery(CommentReactionBox.class);
@@ -89,6 +91,26 @@ public class CommentReactionDaoImpl extends AbstractJpaDao<CommentReaction, Long
         }
 
         return new Page<>(results, pageable, count);
+    }
+
+    @Override
+    public Optional<CommentReaction> findByCommentIdAndUserId(Long commentId, Long userId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CommentReaction> cq = cb.createQuery(CommentReaction.class);
+        Root<CommentReaction> root = cq.from(CommentReaction.class);
+        Join<CommentReaction, Comment> post = root.join(CommentReaction_.comment, JoinType.LEFT);
+        Join<CommentReaction, User> user = root.join(CommentReaction_.user, JoinType.LEFT);
+
+        cq.select(root).where(cb.equal(post.get(Comment_.id), commentId)).where(cb.equal(user.get(User_.id), userId));
+        TypedQuery<CommentReaction> query = entityManager.createQuery(cq);
+
+        List<CommentReaction> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return result.stream().findFirst();
+        }
     }
 }
 

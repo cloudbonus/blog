@@ -1,9 +1,9 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.UserInfo;
 import com.github.blog.model.UserInfo_;
 import com.github.blog.repository.UserInfoDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.UserInfoFilter;
 import jakarta.persistence.TypedQuery;
@@ -21,9 +21,10 @@ import java.util.Collections;
 import java.util.List;
 
 @Repository
+@Transactional
 public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements UserInfoDao {
+
     @Override
-    @Transactional
     public Page<UserInfo> findAll(UserInfoFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserInfoBox> cq = cb.createQuery(UserInfoBox.class);

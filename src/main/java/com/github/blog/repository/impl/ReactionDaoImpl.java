@@ -1,9 +1,9 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Reaction;
 import com.github.blog.model.Reaction_;
 import com.github.blog.repository.ReactionDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -15,14 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class ReactionDaoImpl extends AbstractJpaDao<Reaction, Long> implements ReactionDao {
+
     @Override
-    @Transactional
     public Page<Reaction> findAll(Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<ReactionBox> cq = cb.createQuery(ReactionBox.class);
@@ -60,6 +62,24 @@ public class ReactionDaoImpl extends AbstractJpaDao<Reaction, Long> implements R
         }
 
         return new Page<>(results, pageable, count);
+    }
+
+    @Override
+    public Optional<Reaction> findByName(String reactionName) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reaction> cq = cb.createQuery(Reaction.class);
+        Root<Reaction> root = cq.from(Reaction.class);
+
+        cq.select(root).where(cb.like(cb.lower(root.get(Reaction_.reactionName).as(String.class)), reactionName.toLowerCase()));
+        TypedQuery<Reaction> query = entityManager.createQuery(cq);
+
+        List<Reaction> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(result.get(0));
+        }
     }
 }
 

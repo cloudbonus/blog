@@ -1,6 +1,5 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
@@ -8,6 +7,7 @@ import com.github.blog.model.UserInfo;
 import com.github.blog.model.UserInfo_;
 import com.github.blog.model.User_;
 import com.github.blog.repository.UserDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.UserFilter;
 import jakarta.persistence.TypedQuery;
@@ -31,10 +31,10 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
     @Override
-    @Transactional
     public Page<User> findAll(UserFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
@@ -74,7 +74,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         }
 
         if (!ObjectUtils.isEmpty(filter.getRoleId())) {
-            predicates.add(cb.equal(role.get(Role_.roleName), filter.getRoleId()));
+            predicates.add(cb.equal(role.get(Role_.id), filter.getRoleId()));
         }
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
@@ -111,7 +111,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         return new Page<>(results, pageable, count);
     }
 
-    @Transactional
+    @Override
     public Optional<User> findByUsername(String username) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> cq = cb.createQuery(User.class);
@@ -126,7 +126,26 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         if (result.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(result.get(0));
+            return result.stream().findFirst();
+        }
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        root.fetch(User_.roles, JoinType.LEFT);
+
+        cq.select(root).where(cb.like(cb.lower(root.get(User_.email).as(String.class)), email.toLowerCase()));
+        TypedQuery<User> query = entityManager.createQuery(cq);
+
+        List<User> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return result.stream().findFirst();
         }
     }
 }

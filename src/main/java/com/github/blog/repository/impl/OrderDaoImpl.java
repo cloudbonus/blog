@@ -1,12 +1,12 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Order;
 import com.github.blog.model.Order_;
 import com.github.blog.model.Post_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.OrderDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.OrderFilter;
 import com.github.blog.service.statemachine.state.OrderState;
@@ -31,10 +31,10 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class OrderDaoImpl extends AbstractJpaDao<Order, Long> implements OrderDao {
 
     @Override
-    @Transactional
     public Page<Order> findAll(OrderFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
@@ -89,7 +89,6 @@ public class OrderDaoImpl extends AbstractJpaDao<Order, Long> implements OrderDa
         return new Page<>(results, pageable, count);
     }
 
-    @Transactional
     @Override
     public List<Order> findAllInactiveOrders() {
         TypedQuery<Order> query = entityManager.createQuery("select o from Order o where o.state = :stateOne or o.state = :stateTwo", Order.class);
@@ -98,15 +97,14 @@ public class OrderDaoImpl extends AbstractJpaDao<Order, Long> implements OrderDa
         return query.getResultList();
     }
 
-    @Transactional
     @Override
     public Optional<Order> findByPostId(Long id) {
         TypedQuery<Order> query = entityManager.createQuery("select o from Order o where o.post.id = :id", Order.class);
         query.setParameter("id", id);
-        List<Order> orders = query.getResultList();
-        if (orders.isEmpty()) {
+        List<Order> result = query.getResultList();
+        if (result.isEmpty()) {
             return Optional.empty();
-        } else return orders.stream().findFirst();
+        } else return result.stream().findFirst();
     }
 }
 

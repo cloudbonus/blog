@@ -1,11 +1,11 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
 import com.github.blog.model.Role;
 import com.github.blog.model.Role_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.RoleDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.RoleFilter;
 import jakarta.persistence.NoResultException;
@@ -30,10 +30,10 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 @Repository
+@Transactional
 public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
 
     @Override
-    @Transactional
     public Page<Role> findAll(RoleFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<RoleBox> cq = cb.createQuery(RoleBox.class);
@@ -80,15 +80,15 @@ public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
         return new Page<>(results, pageable, count);
     }
 
-    @Transactional
+    @Override
     public Optional<Role> findByName(String name) {
         TypedQuery<Role> query = entityManager.createQuery("select r from Role r where r.roleName = :name", Role.class);
         query.setParameter("name", name);
-        try {
-            Role role = query.getSingleResult();
-            return Optional.of(role);
-        } catch (NoResultException ex) {
+        List<Role> result = query.getResultList();
+        if (result.isEmpty()) {
             return Optional.empty();
+        } else {
+            return result.stream().findFirst();
         }
     }
 }
