@@ -1,5 +1,7 @@
-package com.github.blog.controller.dto.request;
+package com.github.blog.controller.dto.request.etc;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PageableRequest {
+    @Positive
     private int pageSize;
+    @Positive
     private int pageNumber;
+    @Size(min = 3, max = 4)
     private String orderBy;
 
     public PageableRequest() {

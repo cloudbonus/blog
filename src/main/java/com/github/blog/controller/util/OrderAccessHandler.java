@@ -1,4 +1,4 @@
-package com.github.blog.service.util;
+package com.github.blog.controller.util;
 
 import com.github.blog.service.security.AuthenticatedUserService;
 import lombok.RequiredArgsConstructor;

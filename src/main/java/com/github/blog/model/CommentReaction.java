@@ -19,7 +19,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "comment_reaction", schema = "blogging_platform")
 public class CommentReaction {
     @Id
-    @Column(name = "comment_id", nullable = false)
+    @Column(name = "comment_reaction_id", nullable = false)
     private Long id;
 
     @MapsId

@@ -1,5 +1,6 @@
 package com.github.blog.controller.dto.request;
 
+import com.github.blog.controller.annotation.etc.ValidAndUniqueReaction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,5 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReactionRequest {
-    private Long reactionId;
+    @ValidAndUniqueReaction
+    private String reactionName;
 }

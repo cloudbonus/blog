@@ -19,7 +19,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "post_reaction", schema = "blogging_platform")
 public class PostReaction {
     @Id
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "post_reaction_id", nullable = false)
     private Long id;
 
     @MapsId

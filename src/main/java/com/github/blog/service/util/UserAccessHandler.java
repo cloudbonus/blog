@@ -7,13 +7,17 @@ import org.springframework.stereotype.Component;
 /**
  * @author Raman Haurylau
  */
-@Component("userInfoAccess")
+@Component("userAccess")
 @RequiredArgsConstructor
-public class UserInfoAccessHandler {
+public class UserAccessHandler {
     private final AuthenticatedUserService authenticatedUserService;
 
     public boolean hasRole(String roleName) {
         return authenticatedUserService.getAuthenticatedUser().getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(roleName));
+    }
+
+    public Long getUserId() {
+        return authenticatedUserService.getAuthenticatedUser().getId();
     }
 }

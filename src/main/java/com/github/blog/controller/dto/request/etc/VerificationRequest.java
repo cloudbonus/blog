@@ -1,5 +1,6 @@
-package com.github.blog.controller.dto.request;
+package com.github.blog.controller.dto.request.etc;
 
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,5 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VerificationRequest {
+    @Positive(message = "Role ID should be positive")
     private Long roleId;
 }

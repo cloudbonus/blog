@@ -1,5 +1,6 @@
 package com.github.blog.controller.dto.request.filter;
 
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UserInfoDtoFilter {
-    private Long userId;
+public class TagFilterRequest {
+    @Positive
+    private Long postId;
 }

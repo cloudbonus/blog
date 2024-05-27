@@ -1,13 +1,16 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.TagDto;
-import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.TagRequest;
-import com.github.blog.controller.dto.request.filter.TagDtoFilter;
-import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.request.etc.PageableRequest;
+import com.github.blog.controller.dto.request.filter.TagFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.service.TagService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Raman Haurylau
  */
+@Validated
 @RestController
 @RequestMapping("tags")
 @RequiredArgsConstructor
@@ -28,31 +32,31 @@ public class TagController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public TagDto create(@RequestBody TagRequest request) {
+    public TagDto create(@RequestBody @Valid TagRequest request) {
         return tagService.create(request);
     }
 
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public TagDto findById(@PathVariable("id") Long id) {
+    public TagDto findById(@PathVariable("id") @Positive Long id) {
         return tagService.findById(id);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<TagDto> findAll(TagDtoFilter filterRequest, PageableRequest pageableRequest) {
+    public PageResponse<TagDto> findAll(@Valid TagFilterRequest filterRequest, @Valid PageableRequest pageableRequest) {
         return tagService.findAll(filterRequest, pageableRequest);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public TagDto update(@PathVariable("id") Long id, @RequestBody TagRequest request) {
+    public TagDto update(@PathVariable("id") @Positive Long id, @RequestBody @Valid TagRequest request) {
         return tagService.update(id, request);
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public TagDto delete(@PathVariable("id") Long id) {
+    public TagDto delete(@PathVariable("id") @Positive Long id) {
         return tagService.delete(id);
     }
 }
