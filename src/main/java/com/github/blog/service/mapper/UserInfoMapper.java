@@ -1,7 +1,8 @@
 package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.UserInfoDto;
-import com.github.blog.controller.dto.request.filter.UserInfoDtoFilter;
+import com.github.blog.controller.dto.request.UserInfoRequest;
+import com.github.blog.controller.dto.request.filter.UserInfoFilterRequest;
 import com.github.blog.model.UserInfo;
 import com.github.blog.repository.dto.filter.UserInfoFilter;
 import org.mapstruct.BeanMapping;
@@ -12,13 +13,13 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {UserMapper.class})
-public interface UserInfoMapper {
-    UserInfo toEntity(UserInfoDto request);
+public interface UserInfoMapper extends BasePageMapper<UserInfo, UserInfoDto> {
+    UserInfo toEntity(UserInfoRequest request);
 
     UserInfoDto toDto(UserInfo userInfo);
 
-    UserInfoFilter toDto(UserInfoDtoFilter requestFilter);
+    UserInfoFilter toDto(UserInfoFilterRequest requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    UserInfo partialUpdate(UserInfoDto request, @MappingTarget UserInfo userInfo);
+    UserInfo partialUpdate(UserInfoRequest request, @MappingTarget UserInfo userInfo);
 }

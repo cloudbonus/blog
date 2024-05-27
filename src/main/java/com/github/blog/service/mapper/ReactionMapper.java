@@ -14,7 +14,7 @@ import org.mapstruct.ReportingPolicy;
  * @author Raman Haurylau
  */
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ReactionMapper {
+public interface ReactionMapper extends BasePageMapper<Reaction, ReactionDto>{
     Reaction toEntity(ReactionRequest request);
 
     ReactionDto toDto(Reaction reaction);

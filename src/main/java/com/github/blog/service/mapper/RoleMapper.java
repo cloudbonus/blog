@@ -2,7 +2,7 @@ package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.RoleDto;
 import com.github.blog.controller.dto.request.RoleRequest;
-import com.github.blog.controller.dto.request.filter.RoleDtoFilter;
+import com.github.blog.controller.dto.request.filter.RoleFilterRequest;
 import com.github.blog.model.Role;
 import com.github.blog.repository.dto.filter.RoleFilter;
 import org.mapstruct.BeanMapping;
@@ -13,12 +13,12 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {UserMapper.class})
-public interface RoleMapper {
+public interface RoleMapper extends BasePageMapper<Role, RoleDto>{
     Role toEntity(RoleRequest request);
 
     RoleDto toDto(Role role);
 
-    RoleFilter toDto(RoleDtoFilter requestFilter);
+    RoleFilter toDto(RoleFilterRequest requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Role partialUpdate(RoleRequest request, @MappingTarget Role role);

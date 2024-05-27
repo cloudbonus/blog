@@ -2,13 +2,15 @@ package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.PostRequest;
-import com.github.blog.controller.dto.request.filter.PostDtoFilter;
+import com.github.blog.controller.dto.request.filter.PostFilterRequest;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
 import com.github.blog.repository.CommentDao;
 import com.github.blog.repository.TagDao;
 import com.github.blog.repository.dto.filter.PostFilter;
+import com.github.blog.service.exception.ExceptionEnum;
+import com.github.blog.service.exception.impl.CustomException;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,16 +22,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {UserMapper.class})
-public abstract class PostMapper {
+public abstract class PostMapper implements BasePageMapper<Post, PostDto>{
     @Autowired
-    protected TagDao tagDao;
-    @Autowired
-    protected CommentDao commentDao;
+    private TagDao tagDao;
 
-    @Mapping(source = "userId", target = "user.id")
+    @Autowired
+    private CommentDao commentDao;
+
     @Mapping(source = "tagIds", target = "tags")
     public abstract Post toEntity(PostRequest request);
 
@@ -38,7 +39,7 @@ public abstract class PostMapper {
     @Mapping(target = "tagIds", source = "tags")
     public abstract PostDto toDto(Post post);
 
-    public abstract PostFilter toDto(PostDtoFilter requestFilter);
+    public abstract PostFilter toDto(PostFilterRequest requestFilter);
 
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -51,8 +52,11 @@ public abstract class PostMapper {
 
         List<Tag> tags = new ArrayList<>(ids.size());
         for (Long id : ids) {
-            Optional<Tag> tag = tagDao.findById(id);
-            tag.ifPresent(tags::add);
+            Tag tag = tagDao
+                    .findById(id)
+                    .orElseThrow(() -> new CustomException(ExceptionEnum.TAG_NOT_FOUND));
+
+            tags.add(tag);
         }
 
         return tags;
@@ -78,8 +82,11 @@ public abstract class PostMapper {
 
         List<Comment> comments = new ArrayList<>(ids.size());
         for (Long id : ids) {
-            Optional<Comment> comment = commentDao.findById(id);
-            comment.ifPresent(comments::add);
+            Comment comment = commentDao
+                    .findById(id)
+                    .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_NOT_FOUND));
+
+            comments.add(comment);
         }
 
         return comments;
