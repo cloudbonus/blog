@@ -1,8 +1,8 @@
 package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.RoleDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.RoleRequest;
-import com.github.blog.controller.dto.request.etc.PageableRequest;
 import com.github.blog.controller.dto.request.filter.RoleFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 

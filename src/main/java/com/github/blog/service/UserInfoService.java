@@ -1,9 +1,8 @@
 package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.UserInfoDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.UserInfoRequest;
-import com.github.blog.controller.dto.request.etc.PageableRequest;
-import com.github.blog.controller.dto.request.etc.VerificationRequest;
 import com.github.blog.controller.dto.request.filter.UserInfoFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 
@@ -18,7 +17,7 @@ public interface UserInfoService {
 
     UserInfoDto cancel(Long id);
 
-    UserInfoDto verify(Long id, VerificationRequest request);
+    UserInfoDto verify(Long id, Long roleId);
 
     UserInfoDto findById(Long id);
 

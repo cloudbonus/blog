@@ -2,7 +2,7 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
-import com.github.blog.controller.dto.request.etc.PageableRequest;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 
