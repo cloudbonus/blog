@@ -35,7 +35,7 @@ http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2orderBy=asc
     ```console  
     git clone https://github.com/cloudbonus/senla-course.git 
     ```
-2. **Run the script**
+2. **Run the scripts**
    - Execute `docker-compose.yaml` to set up the PostgreSQL database and Tomcat server.
    - Execute gradlew bootRun (or gradle) and then go to localhost:8080 `http://localhost:8080/blog-1.0/auth/sign-up`.
    - (OPTIONAL) Execute `init-db.sql` in the resources folder to initialize the database with starter data.
