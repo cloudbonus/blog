@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ExceptionEnum {
+    // Jwt
+    AUTHENTICATION_TOKEN_EXCEPTION(HttpStatus.NOT_ACCEPTABLE, "Please verify the validity of your token/account"),
     // State Machine
     STATE_TRANSITION_EXCEPTION(HttpStatus.BAD_REQUEST, "Unable to change state"),
     // Auth
