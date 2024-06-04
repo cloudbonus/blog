@@ -18,9 +18,10 @@ import java.util.EnumSet;
  * @author Raman Haurylau
  */
 @Configuration
-@EnableStateMachineFactory(name = "config1")
+@EnableStateMachineFactory(name = "orderStateMachineFactory")
 @RequiredArgsConstructor
 public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderState, OrderEvent> {
+
     private final StateMachineRuntimePersister<OrderState, OrderEvent, String> stateMachinePersister;
 
     @Override

@@ -17,9 +17,10 @@ import java.util.EnumSet;
  * @author Raman Haurylau
  */
 @Configuration
-@EnableStateMachineFactory(name = "config2")
+@EnableStateMachineFactory(name = "userStateMachineFactory")
 @RequiredArgsConstructor
 public class UserInfoStateMachineConfig extends EnumStateMachineConfigurerAdapter<UserInfoState, UserInfoEvent> {
+
     private final StateMachineRuntimePersister<UserInfoState, UserInfoEvent, String> stateMachinePersister;
 
     @Override

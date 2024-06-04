@@ -13,6 +13,7 @@ import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.persist.StateMachineRuntimePersister;
 import org.springframework.statemachine.service.DefaultStateMachineService;
 import org.springframework.statemachine.service.StateMachineService;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ComponentScan(basePackages = "com.github.blog")
 @PropertySource(value = "classpath:application.properties", encoding = "UTF-8")
 public class WebAppConfig {
+
     @Bean
     public StateMachineService<OrderState, OrderEvent> orderPersister(
             StateMachineFactory<OrderState, OrderEvent> stateMachineFactory,
@@ -35,5 +37,10 @@ public class WebAppConfig {
             StateMachineFactory<UserInfoState, UserInfoEvent> stateMachineFactory,
             StateMachineRuntimePersister<UserInfoState, UserInfoEvent, String> stateMachinePersister) {
         return new DefaultStateMachineService<>(stateMachineFactory, stateMachinePersister);
+    }
+
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
     }
 }
