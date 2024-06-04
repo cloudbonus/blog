@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS idx_comment_reaction_user_id ON blogging_platform.comment_reaction(user_id);
