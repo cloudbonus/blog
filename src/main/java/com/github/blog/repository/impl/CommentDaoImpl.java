@@ -32,6 +32,8 @@ import java.util.List;
 @Transactional
 public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements CommentDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<Comment> findAll(CommentFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -48,7 +50,7 @@ public class CommentDaoImpl extends AbstractJpaDao<Comment, Long> implements Com
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(Comment_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(Comment_.id)));

@@ -36,6 +36,8 @@ import java.util.Optional;
 @Transactional
 public class PostReactionDaoImpl extends AbstractJpaDao<PostReaction, Long> implements PostReactionDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<PostReaction> findAll(PostReactionFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -56,12 +58,12 @@ public class PostReactionDaoImpl extends AbstractJpaDao<PostReaction, Long> impl
         }
 
         if (!ObjectUtils.isEmpty(filter.getReactionId())) {
-            predicates.add(cb.equal(reaction.get(Reaction_.reactionName), filter.getReactionId()));
+            predicates.add(cb.equal(reaction.get(Reaction_.name), filter.getReactionId()));
         }
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(PostReaction_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(PostReaction_.id)));
@@ -101,7 +103,13 @@ public class PostReactionDaoImpl extends AbstractJpaDao<PostReaction, Long> impl
         Join<PostReaction, Post> post = root.join(PostReaction_.post, JoinType.LEFT);
         Join<PostReaction, User> user = root.join(PostReaction_.user, JoinType.LEFT);
 
-        cq.select(root).where(cb.equal(post.get(Post_.id), postId)).where(cb.equal(user.get(User_.id), userId));
+        cq.select(root).distinct(true).where(
+                cb.and(
+                        cb.equal(post.get(Post_.id), postId),
+                        cb.equal(user.get(User_.id), userId)
+                )
+        );
+
         TypedQuery<PostReaction> query = entityManager.createQuery(cq);
 
         List<PostReaction> result = query.getResultList();

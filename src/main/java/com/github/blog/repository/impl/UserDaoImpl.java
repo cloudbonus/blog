@@ -34,6 +34,8 @@ import java.util.Optional;
 @Transactional
 public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<User> findAll(UserFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -54,19 +56,19 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
         }
 
         if (!ObjectUtils.isEmpty(filter.getUniversity())) {
-            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.universityName).as(String.class)), filter.getUniversity().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.university).as(String.class)), filter.getUniversity().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getMajor())) {
-            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.majorName).as(String.class)), filter.getMajor().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.major).as(String.class)), filter.getMajor().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getCompany())) {
-            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.companyName).as(String.class)), filter.getCompany().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.company).as(String.class)), filter.getCompany().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getJob())) {
-            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.jobTitle).as(String.class)), filter.getJob().toLowerCase().concat("%")));
+            predicates.add(cb.like(cb.lower(userInfo.get(UserInfo_.job).as(String.class)), filter.getJob().toLowerCase().concat("%")));
         }
 
         if (!ObjectUtils.isEmpty(filter.getUsername())) {
@@ -79,7 +81,7 @@ public class UserDaoImpl extends AbstractJpaDao<User, Long> implements UserDao {
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(User_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(User_.id)));

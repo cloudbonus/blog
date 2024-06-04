@@ -24,6 +24,8 @@ import java.util.Optional;
 @Transactional
 public class ReactionDaoImpl extends AbstractJpaDao<Reaction, Long> implements ReactionDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<Reaction> findAll(Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -32,7 +34,7 @@ public class ReactionDaoImpl extends AbstractJpaDao<Reaction, Long> implements R
 
         cq.multiselect(root).distinct(true);
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(Reaction_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(Reaction_.id)));
@@ -70,7 +72,7 @@ public class ReactionDaoImpl extends AbstractJpaDao<Reaction, Long> implements R
         CriteriaQuery<Reaction> cq = cb.createQuery(Reaction.class);
         Root<Reaction> root = cq.from(Reaction.class);
 
-        cq.select(root).where(cb.like(cb.lower(root.get(Reaction_.reactionName).as(String.class)), reactionName.toLowerCase()));
+        cq.select(root).where(cb.like(cb.lower(root.get(Reaction_.name).as(String.class)), reactionName.toLowerCase()));
         TypedQuery<Reaction> query = entityManager.createQuery(cq);
 
         List<Reaction> result = query.getResultList();

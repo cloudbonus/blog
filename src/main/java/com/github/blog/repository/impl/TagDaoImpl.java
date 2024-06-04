@@ -32,6 +32,8 @@ import java.util.Optional;
 @Transactional
 public class TagDaoImpl extends AbstractJpaDao<Tag, Long> implements TagDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<Tag> findAll(TagFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -47,7 +49,7 @@ public class TagDaoImpl extends AbstractJpaDao<Tag, Long> implements TagDao {
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(Tag_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(Tag_.id)));
@@ -85,7 +87,7 @@ public class TagDaoImpl extends AbstractJpaDao<Tag, Long> implements TagDao {
         CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
         Root<Tag> root = cq.from(Tag.class);
 
-        cq.select(root).where(cb.like(cb.lower(root.get(Tag_.tagName).as(String.class)), tagName.toLowerCase()));
+        cq.select(root).where(cb.like(cb.lower(root.get(Tag_.name).as(String.class)), tagName.toLowerCase()));
         TypedQuery<Tag> query = entityManager.createQuery(cq);
 
         List<Tag> result = query.getResultList();

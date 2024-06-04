@@ -36,6 +36,8 @@ import java.util.Optional;
 @Transactional
 public class CommentReactionDaoImpl extends AbstractJpaDao<CommentReaction, Long> implements CommentReactionDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<CommentReaction> findAll(CommentReactionFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -56,12 +58,12 @@ public class CommentReactionDaoImpl extends AbstractJpaDao<CommentReaction, Long
         }
 
         if (!ObjectUtils.isEmpty(filter.getReactionId())) {
-            predicates.add(cb.equal(reaction.get(Reaction_.reactionName), filter.getReactionId()));
+            predicates.add(cb.equal(reaction.get(Reaction_.name), filter.getReactionId()));
         }
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(CommentReaction_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(CommentReaction_.id)));
@@ -101,7 +103,12 @@ public class CommentReactionDaoImpl extends AbstractJpaDao<CommentReaction, Long
         Join<CommentReaction, Comment> post = root.join(CommentReaction_.comment, JoinType.LEFT);
         Join<CommentReaction, User> user = root.join(CommentReaction_.user, JoinType.LEFT);
 
-        cq.select(root).where(cb.equal(post.get(Comment_.id), commentId)).where(cb.equal(user.get(User_.id), userId));
+        cq.select(root).distinct(true).where(
+                cb.and(
+                        cb.equal(post.get(Comment_.id), commentId),
+                        cb.equal(user.get(User_.id), userId)
+                )
+        );
         TypedQuery<CommentReaction> query = entityManager.createQuery(cq);
 
         List<CommentReaction> result = query.getResultList();

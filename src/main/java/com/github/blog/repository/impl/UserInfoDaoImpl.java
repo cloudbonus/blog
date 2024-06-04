@@ -6,6 +6,7 @@ import com.github.blog.repository.UserInfoDao;
 import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.UserInfoFilter;
+import com.github.blog.service.statemachine.state.UserInfoState;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -24,6 +25,8 @@ import java.util.List;
 @Transactional
 public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements UserInfoDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<UserInfo> findAll(UserInfoFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -38,7 +41,7 @@ public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements U
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(UserInfo_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(UserInfo_.id)));
@@ -68,6 +71,13 @@ public class UserInfoDaoImpl extends AbstractJpaDao<UserInfo, Long> implements U
         }
 
         return new Page<>(results, pageable, count);
+    }
+
+    @Override
+    public List<UserInfo> findAllCanceledInfo() {
+        TypedQuery<UserInfo> query = entityManager.createQuery("select ui from UserInfo ui where ui.state = :stateOne", UserInfo.class);
+        query.setParameter("stateOne", UserInfoState.CANCELED.name());
+        return query.getResultList();
     }
 }
 

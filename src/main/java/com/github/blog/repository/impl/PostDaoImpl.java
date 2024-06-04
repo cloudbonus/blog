@@ -35,6 +35,8 @@ import java.util.List;
 @Transactional
 public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<Post> findAll(PostFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -64,7 +66,7 @@ public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(Post_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(Post_.id)));

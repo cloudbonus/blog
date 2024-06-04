@@ -32,6 +32,8 @@ import java.util.Optional;
 @Transactional
 public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<Role> findAll(RoleFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -47,7 +49,7 @@ public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(Role_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(Role_.id)));
@@ -81,7 +83,7 @@ public class RoleDaoImpl extends AbstractJpaDao<Role, Long> implements RoleDao {
 
     @Override
     public Optional<Role> findByName(String name) {
-        TypedQuery<Role> query = entityManager.createQuery("select r from Role r where r.roleName = :name", Role.class);
+        TypedQuery<Role> query = entityManager.createQuery("select r from Role r where r.name = :name", Role.class);
         query.setParameter("name", name);
         List<Role> result = query.getResultList();
         if (result.isEmpty()) {

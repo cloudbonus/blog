@@ -34,6 +34,8 @@ import java.util.Optional;
 @Transactional
 public class OrderDaoImpl extends AbstractJpaDao<Order, Long> implements OrderDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<Order> findAll(OrderFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -58,7 +60,7 @@ public class OrderDaoImpl extends AbstractJpaDao<Order, Long> implements OrderDa
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
 
-        if (pageable.getOrderBy().equalsIgnoreCase("asc")) {
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
             cq.orderBy(cb.asc(root.get(Order_.id)));
         } else {
             cq.orderBy(cb.desc(root.get(Order_.id)));
