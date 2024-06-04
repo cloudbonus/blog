@@ -18,5 +18,5 @@ public class UserDto {
     private String password;
     private String email;
     private OffsetDateTime createdAt;
-    private OffsetDateTime lastLogin;
+    private OffsetDateTime updatedAt;
 }

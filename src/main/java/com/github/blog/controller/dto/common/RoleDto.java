@@ -10,5 +10,5 @@ import lombok.Setter;
 @Setter
 public class RoleDto {
     private Long id;
-    private String roleName;
+    private String name;
 }

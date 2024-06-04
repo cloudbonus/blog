@@ -14,6 +14,6 @@ public class OrderDto {
     private Long id;
     private Long postId;
     private Long userId;
-    private OffsetDateTime orderedAt;
+    private OffsetDateTime createdAt;
     private String state;
 }

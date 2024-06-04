@@ -10,5 +10,5 @@ import lombok.Setter;
 @Setter
 public class TagDto {
     private Long id;
-    private String tagName;
+    private String name;
 }

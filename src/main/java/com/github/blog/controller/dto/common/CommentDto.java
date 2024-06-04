@@ -15,5 +15,5 @@ public class CommentDto {
     private Long postId;
     private Long userId;
     private String content;
-    private OffsetDateTime publishedAt;
+    private OffsetDateTime createdAt;
 }

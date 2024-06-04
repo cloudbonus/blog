@@ -16,7 +16,7 @@ public class PostDto {
     private Long userId;
     private String title;
     private String content;
-    private OffsetDateTime publishedAt;
+    private OffsetDateTime createdAt;
     private List<Long> tagIds;
     private List<Long> commentIds;
 }

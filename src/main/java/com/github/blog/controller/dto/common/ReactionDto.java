@@ -10,5 +10,5 @@ import lombok.Setter;
 @Setter
 public class ReactionDto {
     private Long id;
-    private String reactionName;
+    private String name;
 }

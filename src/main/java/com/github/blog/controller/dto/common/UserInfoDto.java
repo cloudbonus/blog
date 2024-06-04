@@ -11,10 +11,11 @@ import lombok.Setter;
 @Setter
 public class UserInfoDto {
     private Long id;
+    private String state;
     private String firstname;
     private String surname;
-    private String universityName;
-    private String majorName;
-    private String companyName;
-    private String jobTitle;
+    private String university;
+    private String major;
+    private String company;
+    private String job;
 }
