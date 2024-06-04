@@ -20,11 +20,12 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"order\"", schema = "blogging_platform")
+@Table(name = "\"order\"", schema = "blog")
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @OneToOne(optional = false)
@@ -38,7 +39,7 @@ public class Order {
     private User user;
 
     @Column(nullable = false)
-    private OffsetDateTime orderedAt;
+    private OffsetDateTime createdAt;
 
     @Column(nullable = false)
     private String state;
@@ -48,6 +49,6 @@ public class Order {
 
     @PrePersist
     private void prePersist() {
-        orderedAt = OffsetDateTime.now();
+        createdAt = OffsetDateTime.now();
     }
 }

@@ -16,15 +16,16 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "role", schema = "blogging_platform")
+@Table(name = "role", schema = "blog")
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false, length = Integer.MAX_VALUE)
-    private String roleName;
+    private String name;
 
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();

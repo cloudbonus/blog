@@ -16,15 +16,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "reaction", schema = "blogging_platform")
+@Table(name = "reaction", schema = "blog")
 public class Reaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reaction_id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false, length = Integer.MAX_VALUE)
-    private String reactionName;
+    private String name;
 
     @OneToOne(mappedBy = "reaction")
     private CommentReaction commentReaction;

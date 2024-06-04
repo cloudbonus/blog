@@ -25,11 +25,12 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "post", schema = "blogging_platform")
+@Table(name = "post", schema = "blog")
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @ManyToOne(optional = false)
@@ -44,13 +45,13 @@ public class Post {
     private String content;
 
     @Column(nullable = false)
-    private OffsetDateTime publishedAt;
+    private OffsetDateTime createdAt;
 
     @OneToOne(mappedBy = "post")
     private Order order;
 
     @ManyToMany
-    @JoinTable(name = "post_tag", schema = "blogging_platform", joinColumns = {@JoinColumn(name = "post_id")}, inverseJoinColumns = {@JoinColumn(name = "tag_id")})
+    @JoinTable(name = "post_tag", schema = "blog", joinColumns = {@JoinColumn(name = "post_id")}, inverseJoinColumns = {@JoinColumn(name = "tag_id")})
     private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", orphanRemoval = true)
@@ -58,6 +59,6 @@ public class Post {
 
     @PrePersist
     private void prePersist() {
-        publishedAt = OffsetDateTime.now();
+        createdAt = OffsetDateTime.now();
     }
 }

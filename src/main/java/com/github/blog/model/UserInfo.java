@@ -15,16 +15,17 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
-@Table(name = "user_details", schema = "blogging_platform")
+@Table(name = "user_info", schema = "blog")
 public class UserInfo {
+
     @Id
-    @Column(name = "user_id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @MapsId
     @OneToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "id", nullable = false)
     private User user;
 
     @Column(length = Integer.MAX_VALUE)
@@ -34,16 +35,16 @@ public class UserInfo {
     private String surname;
 
     @Column(length = Integer.MAX_VALUE)
-    private String universityName;
+    private String university;
 
     @Column(length = Integer.MAX_VALUE)
-    private String majorName;
+    private String major;
 
     @Column(length = Integer.MAX_VALUE)
-    private String companyName;
+    private String company;
 
     @Column(length = Integer.MAX_VALUE)
-    private String jobTitle;
+    private String job;
 
     @Column(nullable = false)
     private String state;
