@@ -2,28 +2,27 @@ package com.github.blog.repository;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.controller.dto.response.Page;
-import com.github.blog.model.Comment;
+import com.github.blog.config.RepositoryTestConfig;
+import com.github.blog.config.WebTestConfig;
 import com.github.blog.model.Post;
-import com.github.blog.model.Tag;
 import com.github.blog.model.User;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.PostFilter;
 import com.github.blog.repository.dto.filter.UserFilter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,10 +30,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Raman Haurylau
  */
 @Transactional
-@ExtendWith({SpringExtension.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@SpringJUnitConfig(classes = {WebTestConfig.class, RepositoryTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-post-table.sql"})
+@Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
 class PostDaoImplTests {
 
     @Autowired
@@ -43,12 +42,6 @@ class PostDaoImplTests {
     @Autowired
     private UserDao userDao;
 
-    @Autowired
-    private TagDao tagDao;
-
-    @Autowired
-    private CommentDao commentDao;
-
     private static Pageable pageable;
 
     @BeforeAll
@@ -56,17 +49,18 @@ class PostDaoImplTests {
         pageable = new Pageable();
         pageable.setPageSize(Integer.MAX_VALUE);
         pageable.setPageNumber(1);
+        pageable.setOrderBy("ASC");
     }
 
     @Test
+    @Rollback
     @DisplayName("post dao: create")
-    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql"})
     void create_returnsPostDto_whenDataIsValid() {
         String content = "This is the content of the first post.";
-        String login = "kvossing0";
+        String username = "kvossing0";
 
         UserFilter filter = new UserFilter();
-        filter.setLogin(login);
+        filter.setUsername(username);
 
         Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
@@ -76,7 +70,7 @@ class PostDaoImplTests {
         post.setUser(filteredUserResult.getContent().get(0));
         post.setTitle("First Post");
         post.setContent(content);
-        post.setPublishedAt(OffsetDateTime.now());
+        post.setCreatedAt(OffsetDateTime.now());
 
         post = postDao.create(post);
 
@@ -86,86 +80,79 @@ class PostDaoImplTests {
 
         List<Post> allPosts = postDao.findAll();
 
-        assertThat(allPosts).isNotEmpty().hasSize(4);
+        assertThat(allPosts).isNotEmpty().hasSize(8);
     }
 
     @Test
+    @Rollback
     @DisplayName("post dao: update")
-    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql"})
+    @Sql("/db/insert-test-data-into-post_tag-table.sql")
     void update_returnsUpdatedPostDto_whenDataIsValid() {
-        String login = "gmaccook1";
+        String username = "student";
         PostFilter filter = new PostFilter();
-        filter.setLogin(login);
+        filter.setUsername(username);
 
         Page<Post> filteredPostResult = postDao.findAll(filter, pageable);
 
-        assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(1);
+        assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(3);
 
         Post post = filteredPostResult.getContent().get(0);
         String updatedContent = "Look at me i've made it!!!";
-        OffsetDateTime updatedTime = OffsetDateTime.now();
 
         post.setContent(updatedContent);
-        post.setPublishedAt(updatedTime);
 
         post = postDao.update(post);
 
         assertThat(post).isNotNull();
         assertThat(post.getContent()).isEqualTo(updatedContent);
-        assertThat(post.getPublishedAt()).isEqualTo(updatedTime);
-        assertThat(post.getTags()).hasSize(2);
+        assertThat(post.getTags()).hasSize(1);
     }
 
     @Test
+    @Rollback
     @DisplayName("post dao: delete")
-    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql", "/db/daotests/insert-test-data-into-comment-table.sql"})
     void delete_deletesPost_whenDataIsValid() {
-        String login = "gmaccook1";
-        PostFilter filter = new PostFilter();
-        filter.setLogin(login);
+        Optional<Post> post = postDao.findById(1L);
 
-        Page<Post> filteredPostResult = postDao.findAll(filter, pageable);
+        assertThat(post).isPresent();
 
-        assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(1);
+        postDao.delete(post.get());
 
-        Post post = filteredPostResult.getContent().get(0);
-
-        postDao.delete(post);
-
-        List<Post> allPosts = postDao.findAll();
-        List<Tag> allTags = tagDao.findAll();
-        List<Comment> allComments = commentDao.findAll();
-
-        assertThat(allPosts).isNotEmpty().hasSize(2);
-        assertThat(allTags).isNotEmpty().hasSize(2);
-        assertThat(allComments).isNotEmpty().hasSize(2);
+        assertThat(postDao.findAll()).isNotEmpty().hasSize(6);
     }
 
     @Test
-    @DisplayName("post dao: findAllByLogin")
-    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql"})
-    void find_findsAllPostsByLogin_whenDataIsValid() {
-        String login = "kvossing0";
+    @DisplayName("post dao: find by id")
+    void findById_returnsPost_whenIdIsValid() {
+        Optional<Post> foundPost = postDao.findById(1L);
+
+        assertThat(foundPost).isPresent();
+        assertThat(foundPost.get().getId()).isEqualTo(1L);
+        assertThat(foundPost.get().getTitle()).isEqualTo("1 post");
+    }
+
+    @Test
+    @DisplayName("post dao: find all by username")
+    void find_findsAllPostsByUsername_whenDataIsValid() {
+        String username = "student";
         PostFilter filter = new PostFilter();
-        filter.setLogin(login);
+        filter.setUsername(username);
 
         Page<Post> filteredPostResult2 = postDao.findAll(filter, pageable);
 
-        assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(2);
+        assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(3);
     }
 
     @Test
-    @DisplayName("post dao: findAllByTag")
-    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-post-table.sql", "/db/daotests/insert-test-data-into-post_tag-table.sql"})
+    @DisplayName("post dao: find all by tag")
+    @Sql("/db/insert-test-data-into-post_tag-table.sql")
     void find_findsAllPostsByTag_whenDataIsValid() {
-        String tag1 = "news";
-        String tag2 = "education";
         PostFilter filter = new PostFilter();
 
-        filter.setTag(tag1);
+        filter.setTagId(4L);
         Page<Post> filteredPostResult1 = postDao.findAll(filter, pageable);
 
-        filter.setTag(tag2);
+        filter.setTagId(3L);
         Page<Post> filteredPostResult2 = postDao.findAll(filter, pageable);
 
         assertThat(filteredPostResult1.getContent()).isNotEmpty().hasSize(3);

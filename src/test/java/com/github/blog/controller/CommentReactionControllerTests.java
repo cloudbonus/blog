@@ -1,6 +1,5 @@
 package com.github.blog.controller;
 
-
 import com.github.blog.config.ControllerTestConfig;
 import com.github.blog.config.WebTestConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @SpringJUnitWebConfig(classes = {ControllerTestConfig.class, WebTestConfig.class,})
 @TestPropertySource(locations = "classpath:application-test.properties")
-@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_info-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql"})
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql", "/db/insert-test-data-into-comment_reaction-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class CommentControllerTests {
+public class CommentReactionControllerTests {
 
     private MockMvc mockMvc;
 
@@ -45,47 +44,30 @@ public class CommentControllerTests {
     @Test
     @Rollback
     @WithUserDetails
-    @DisplayName("comment controller: create")
-    void create_returnsCommentDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(post("/comments")
+    @DisplayName("comment reaction controller: create")
+    void create_returnsCreatedCommentReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(post("/comment-reactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "postId": 1,
-                                "content": "content_template"
+                                "commentId": 2,
+                                "reactionId": 1
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.content").value("content_template"));
-    }
-
-    @Test
-    @Rollback
-    @WithUserDetails("kvossing0")
-    @DisplayName("comment controller: update")
-    void update_returnsUpdatedCommentDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(put("/comments/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                "content": "updated_content_template"
-                                }
-                                """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.content").value("updated_content_template"));
+                .andExpect(jsonPath("$.id").isNotEmpty());
     }
 
     @Test
     @WithUserDetails
-    @DisplayName("comment controller: update - bad request exception")
-    void update_throwsExceptionBadRequest_whenDataNotBelongToUser() throws Exception {
-        mockMvc.perform(put("/comments/{id}", 2)
+    @DisplayName("comment reaction controller: create - validation exception")
+    void create_throwsExceptionForbidden_whenReactionAlreadyExists() throws Exception {
+        mockMvc.perform(post("/comment-reactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "content": "updated_content_template"
+                                "commentId": 1,
+                                "reactionId": 1
                                 }
                                 """))
                 .andExpect(status().isBadRequest());
@@ -93,41 +75,45 @@ public class CommentControllerTests {
 
     @Test
     @Rollback
-    @WithUserDetails("kvossing0")
-    @DisplayName("comment controller: delete")
-    void delete_deletesComment_whenDataIsValid() throws Exception {
-        mockMvc.perform(delete("/comments/{id}", 1))
+    @WithUserDetails
+    @DisplayName("comment reaction controller: update")
+    void update_returnsUpdatedCommentReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(put("/comment-reactions/{id}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                "reactionId": 2
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.content").value("1 content"));
+                .andExpect(jsonPath("$.reactionId").value(2));
     }
 
     @Test
-    @WithUserDetails("gmaccook1")
-    @DisplayName("comment controller: delete - bad request exception")
-    void delete_throwExceptionForbidden_whenDataNotBelongToUser() throws Exception {
-        mockMvc.perform(delete("/users/{id}", 1))
-                .andExpect(status().isBadRequest());
+    @Rollback
+    @WithUserDetails
+    @DisplayName("comment reaction controller: delete")
+    void delete_returnsDeletedCommentReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(delete("/comment-reactions/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     @WithUserDetails
-    @DisplayName("comment controller: find by id")
-    void find_findsById_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/comments/{id}", 1))
+    @DisplayName("comment reaction controller: find by id")
+    void find_findsCommentReactionById_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/comment-reactions/{id}", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.content").value("1 content"));
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     @WithUserDetails
-    @DisplayName("comment controller: find all by username")
-    void find_findsAllCommentsByUsername_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/comments").param("username", "kvossing0"))
+    @DisplayName("comment reaction controller: find all")
+    void find_findsAllCommentReactions_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/comment-reactions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(4))
-                .andExpect(jsonPath("$.content[0].content").value("1 content"))
-                .andExpect(jsonPath("$.content[1].content").value("2 content"));
+                .andExpect(jsonPath("$.content.length()").value(2));
     }
 }
