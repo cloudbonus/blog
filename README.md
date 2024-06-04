@@ -43,6 +43,7 @@ http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2orderBy=asc
 ## To-Do
 
 - [ ] Refactor the code.
+- [ ] Make the state machine operate at its full potential.
 - [ ] Migrate to Spring Boot and Spring Data JPA.
 - [ ] Fix bugs (I'm sure they exist).
 
