@@ -17,22 +17,31 @@ import org.springframework.stereotype.Component;
 @Component("postAccess")
 @RequiredArgsConstructor
 public class PostAccessHandler {
+
     private final AuthenticatedUserService authenticatedUserService;
+
     private final OrderService orderService;
+
     private final PostService postService;
 
-    public boolean verifyPostPurchase(Long id) {
+    public boolean verifyPostOwnershipIfPurchased(Long id) {
         try {
+            Long sessionUserId = authenticatedUserService.getAuthenticatedUser().getId();
             OrderDto orderDto = orderService.findByPostId(id);
-            return orderDto.getUserId().equals(authenticatedUserService.getAuthenticatedUser().getId());
+            return orderDto.getUserId().equals(sessionUserId);
         } catch (CustomException e) {
             return true;
         }
     }
 
-    public boolean verifyOwner(Long id) {
-        PostDto postDto = postService.findById(id);
-        return postDto.getUserId().equals(authenticatedUserService.getAuthenticatedUser().getId());
+    public boolean verifyOwnership(Long id) {
+        try {
+            Long sessionUserId = authenticatedUserService.getAuthenticatedUser().getId();
+            PostDto postDto = postService.findById(id);
+            return postDto.getUserId().equals(sessionUserId);
+        } catch (CustomException e) {
+            return false;
+        }
     }
 
     public boolean canFilter(PostFilterRequest requestFilter) {

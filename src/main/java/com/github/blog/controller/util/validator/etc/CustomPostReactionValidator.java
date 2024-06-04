@@ -1,6 +1,7 @@
 package com.github.blog.controller.util.validator.etc;
 
 import com.github.blog.controller.annotation.etc.UniquePostReaction;
+import com.github.blog.controller.dto.request.PostReactionRequest;
 import com.github.blog.repository.PostReactionDao;
 import com.github.blog.service.util.UserAccessHandler;
 import jakarta.validation.ConstraintValidator;
@@ -11,12 +12,18 @@ import lombok.RequiredArgsConstructor;
  * @author Raman Haurylau
  */
 @RequiredArgsConstructor
-public class CustomPostReactionValidator implements ConstraintValidator<UniquePostReaction, Long> {
+public class CustomPostReactionValidator implements ConstraintValidator<UniquePostReaction, PostReactionRequest> {
+
     private final PostReactionDao postReactionDao;
+
     private final UserAccessHandler userAccessHandler;
 
     @Override
-    public boolean isValid(Long postId, ConstraintValidatorContext context) {
-        return postReactionDao.findByPostIdAndUserId(postId, userAccessHandler.getUserId()).isEmpty();
+    public boolean isValid(PostReactionRequest request, ConstraintValidatorContext context) {
+        if (request.getPostId() == null) {
+            return true;
+        } else {
+            return postReactionDao.findByPostIdAndUserId(request.getPostId(), userAccessHandler.getUserId()).isEmpty();
+        }
     }
 }

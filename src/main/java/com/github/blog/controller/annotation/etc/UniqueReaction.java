@@ -1,6 +1,6 @@
 package com.github.blog.controller.annotation.etc;
 
-import com.github.blog.controller.util.validator.etc.CustomRoleValidator;
+import com.github.blog.controller.util.validator.etc.CustomReactionValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -12,12 +12,12 @@ import java.lang.annotation.Target;
 /**
  * @author Raman Haurylau
  */
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = CustomRoleValidator.class)
-public @interface ValidAndUniqueRole {
+@Constraint(validatedBy = CustomReactionValidator.class)
+public @interface UniqueReaction {
 
-    String message() default "Invalid role or already exists with this name";
+    String message() default "Already exists with this name";
 
     Class<?>[] groups() default {};
 

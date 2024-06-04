@@ -1,24 +1,23 @@
 package com.github.blog.controller.util.validator.etc;
 
-import com.github.blog.controller.annotation.etc.ValidAndUniqueRole;
+import com.github.blog.controller.annotation.etc.UniqueRole;
+import com.github.blog.controller.dto.request.RoleRequest;
 import com.github.blog.repository.RoleDao;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Raman Haurylau
  */
 @RequiredArgsConstructor
-public class CustomRoleValidator implements ConstraintValidator<ValidAndUniqueRole, String> {
+public class CustomRoleValidator implements ConstraintValidator<UniqueRole, RoleRequest> {
+
     private final RoleDao roleDao;
+    private static final String ROLE_PREFIX = "ROLE_";
 
     @Override
-    public boolean isValid(String roleName, ConstraintValidatorContext context) {
-        return Pattern.compile("^[A-Za-z]{2,15}$")
-                .matcher(roleName)
-                .matches() && roleDao.findByName("ROLE_" + roleName).isEmpty();
+    public boolean isValid(RoleRequest request, ConstraintValidatorContext context) {
+        return roleDao.findByName(ROLE_PREFIX + request.getName()).isEmpty();
     }
 }

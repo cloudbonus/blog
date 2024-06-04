@@ -12,10 +12,11 @@ import java.lang.annotation.Target;
 /**
  * @author Raman Haurylau
  */
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.FIELD)
 @Constraint(validatedBy = CustomPasswordValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPassword {
+
     String message() default "Invalid password";
 
     Class<?>[] groups() default {};

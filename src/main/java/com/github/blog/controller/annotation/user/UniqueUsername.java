@@ -12,10 +12,11 @@ import java.lang.annotation.Target;
 /**
  * @author Raman Haurylau
  */
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = CustomUniqueUsernameValidator.class)
 public @interface UniqueUsername {
+
     String message() default "There is already user with this username";
 
     Class<?>[] groups() default {};

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class CustomUniqueUsernameValidator implements ConstraintValidator<UniqueUsername, String> {
+
     private final UserDao userDao;
 
     @Override

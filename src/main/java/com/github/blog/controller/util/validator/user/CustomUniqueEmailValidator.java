@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class CustomUniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
+
     private final UserDao userDao;
 
     @Override

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Raman Haurylau
  */
-@Component("userAccess")
+@Component
 @RequiredArgsConstructor
 public class UserAccessHandler {
     private final AuthenticatedUserService authenticatedUserService;

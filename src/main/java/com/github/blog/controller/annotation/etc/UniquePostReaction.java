@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 /**
  * @author Raman Haurylau
  */
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = CustomPostReactionValidator.class)
 public @interface UniquePostReaction {

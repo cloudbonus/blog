@@ -12,10 +12,11 @@ import java.lang.annotation.Target;
 /**
  * @author Raman Haurylau
  */
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = CustomUniqueEmailValidator.class)
 public @interface UniqueEmail {
+
     String message() default "There is already user with this email";
 
     Class<?>[] groups() default {};

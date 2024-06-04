@@ -1,6 +1,6 @@
 package com.github.blog.controller.annotation.etc;
 
-import com.github.blog.controller.util.validator.etc.CustomReactionValidator;
+import com.github.blog.controller.util.validator.etc.CustomTagValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -12,12 +12,12 @@ import java.lang.annotation.Target;
 /**
  * @author Raman Haurylau
  */
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = CustomReactionValidator.class)
-public @interface ValidAndUniqueReaction {
+@Constraint(validatedBy = CustomTagValidator.class)
+public @interface UniqueTag {
 
-    String message() default "Invalid reaction or already exists with this name";
+    String message() default "Already exists with this name";
 
     Class<?>[] groups() default {};
 

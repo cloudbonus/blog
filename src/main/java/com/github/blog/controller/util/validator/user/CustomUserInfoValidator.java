@@ -5,28 +5,15 @@ import com.github.blog.controller.dto.request.UserInfoRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Raman Haurylau
  */
 public class CustomUserInfoValidator implements ConstraintValidator<ValidUserInfo, UserInfoRequest> {
 
     @Override
-    public boolean isValid(UserInfoRequest object, ConstraintValidatorContext context) {
-        boolean isEducationValid = object.getUniversityName() != null && object.getMajorName() != null && compareToRegex(object.getUniversityName()) && compareToRegex(object.getMajorName());
-        boolean isJobValid = object.getCompanyName() != null && object.getJobTitle() != null && compareToRegex(object.getCompanyName()) && compareToRegex(object.getJobTitle());
-
-        if (isEducationValid && isJobValid) {
-            return true;
-        } else if (isEducationValid && object.getCompanyName() == null && object.getJobTitle() == null) {
-            return true;
-        } else return object.getUniversityName() == null && object.getMajorName() == null && isJobValid;
-    }
-
-    private boolean compareToRegex(String text) {
-        return Pattern.compile("^[A-Za-z][a-zA-Z .'-]{6,30}$")
-                .matcher(text)
-                .matches();
+    public boolean isValid(UserInfoRequest userInfo, ConstraintValidatorContext context) {
+        boolean isEducationInfoValid = userInfo.getUniversity() != null && userInfo.getMajor() != null;
+        boolean isJobInfoValid = userInfo.getCompany() != null && userInfo.getJob() != null;
+        return isEducationInfoValid || isJobInfoValid;
     }
 }
