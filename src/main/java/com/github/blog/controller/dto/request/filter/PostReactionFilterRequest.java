@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostReactionFilterRequest {
+
     @Positive
     private Long postId;
 

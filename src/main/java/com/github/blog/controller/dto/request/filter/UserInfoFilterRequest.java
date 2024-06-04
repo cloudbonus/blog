@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserInfoFilterRequest {
+
     @Positive
     private Long userId;
 }

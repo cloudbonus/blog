@@ -12,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostFilterRequest {
+
     @Pattern(message = "Invalid username", regexp = "^[A-Za-z][A-Za-z0-9._-]{0,15}$")
     private String username;
 

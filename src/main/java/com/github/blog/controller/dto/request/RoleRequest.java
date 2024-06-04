@@ -1,6 +1,7 @@
 package com.github.blog.controller.dto.request;
 
-import com.github.blog.controller.annotation.etc.ValidAndUniqueRole;
+import com.github.blog.controller.annotation.etc.UniqueRole;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +10,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@UniqueRole
 public class RoleRequest {
-    @ValidAndUniqueRole
-    private String roleName;
+
+    @Pattern(message = "Invalid name", regexp = "^[A-Za-z]{2,15}")
+    private String name;
 }

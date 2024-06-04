@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderRequest {
+
     @NotNull(message = "Post ID is mandatory")
     private Long postId;
 
