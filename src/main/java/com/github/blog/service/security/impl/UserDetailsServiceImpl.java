@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         User user = userDao.findByUsername(username).orElseThrow(() -> new CustomException(ExceptionEnum.BAD_CREDENTIALS));
 
-        Collection<? extends GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
+        Collection<? extends GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
 
         return new UserDetailsImpl(user.getId(), user.getUsername(), user.getPassword(), authorities);
     }
