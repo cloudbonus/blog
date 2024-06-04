@@ -6,7 +6,6 @@ import com.github.blog.repository.dto.common.Page;
 /**
  * @author Raman Haurylau
  */
-//@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = PageableMapper.class)
 public interface BasePageMapper<E, DTO> {
     PageResponse<DTO> toDto(Page<E> page);
 }

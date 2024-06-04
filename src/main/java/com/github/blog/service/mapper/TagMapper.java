@@ -18,7 +18,7 @@ public interface TagMapper extends BasePageMapper<Tag, TagDto> {
 
     TagDto toDto(Tag tag);
 
-    TagFilter toDto(TagFilterRequest requestFilter);
+    TagFilter toEntity(TagFilterRequest requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Tag partialUpdate(TagRequest request, @MappingTarget Tag tag);

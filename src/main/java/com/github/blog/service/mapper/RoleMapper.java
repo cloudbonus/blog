@@ -18,7 +18,7 @@ public interface RoleMapper extends BasePageMapper<Role, RoleDto> {
 
     RoleDto toDto(Role role);
 
-    RoleFilter toDto(RoleFilterRequest requestFilter);
+    RoleFilter toEntity(RoleFilterRequest requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Role partialUpdate(RoleRequest request, @MappingTarget Role role);

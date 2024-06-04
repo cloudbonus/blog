@@ -39,7 +39,7 @@ public abstract class PostMapper implements BasePageMapper<Post, PostDto> {
     @Mapping(target = "tagIds", source = "tags")
     public abstract PostDto toDto(Post post);
 
-    public abstract PostFilter toDto(PostFilterRequest requestFilter);
+    public abstract PostFilter toEntity(PostFilterRequest requestFilter);
 
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

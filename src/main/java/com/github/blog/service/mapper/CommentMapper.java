@@ -22,7 +22,7 @@ public interface CommentMapper extends BasePageMapper<Comment, CommentDto> {
     @Mapping(target = "postId", source = "post.id")
     CommentDto toDto(Comment comment);
 
-    CommentFilter toDto(CommentFilterRequest requestFilter);
+    CommentFilter toEntity(CommentFilterRequest requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Comment partialUpdate(CommentRequest request, @MappingTarget Comment comment);

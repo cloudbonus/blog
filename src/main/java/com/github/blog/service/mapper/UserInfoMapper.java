@@ -18,7 +18,7 @@ public interface UserInfoMapper extends BasePageMapper<UserInfo, UserInfoDto> {
 
     UserInfoDto toDto(UserInfo userInfo);
 
-    UserInfoFilter toDto(UserInfoFilterRequest requestFilter);
+    UserInfoFilter toEntity(UserInfoFilterRequest requestFilter);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     UserInfo partialUpdate(UserInfoRequest request, @MappingTarget UserInfo userInfo);

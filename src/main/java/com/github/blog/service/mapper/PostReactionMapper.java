@@ -21,5 +21,5 @@ public interface PostReactionMapper extends BasePageMapper<PostReaction, PostRea
     @Mapping(target = "reactionId", source = "reaction.id")
     PostReactionDto toDto(PostReaction postReaction);
 
-    PostReactionFilter toDto(PostReactionFilterRequest requestFilter);
+    PostReactionFilter toEntity(PostReactionFilterRequest requestFilter);
 }

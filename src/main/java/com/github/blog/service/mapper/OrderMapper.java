@@ -20,5 +20,5 @@ public interface OrderMapper extends BasePageMapper<Order, OrderDto> {
     @Mapping(target = "postId", source = "post.id")
     OrderDto toDto(Order order);
 
-    OrderFilter toDto(OrderFilterRequest requestFilter);
+    OrderFilter toEntity(OrderFilterRequest requestFilter);
 }
