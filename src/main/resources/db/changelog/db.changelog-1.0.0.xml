@@ -3,185 +3,63 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
-                   logicalFilePath="db.changelog-1.0.0">
+                   logicalFilePath="db/changelog/db.changelog-1.0.0.xml">
 
-    <changeSet id="homework-2-schema" author="Raman Haurylau">
+    <changeSet id="blog-schema" author="Raman Haurylau">
         <sqlFile encoding="utf8" path="../migration/01.create-schema.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-user" author="Raman Haurylau" dbms="postgresql">
+    <changeSet id="blog-user" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/02.create-user-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-user_details" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/03.create-user_details-table.sql" relativeToChangelogFile="true"/>
+    <changeSet id="blog-user_info" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/03.create-user_info-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-role" author="Raman Haurylau" dbms="postgresql">
+    <changeSet id="blog-role" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/04.create-role-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-user_role" author="Raman Haurylau" dbms="postgresql">
+    <changeSet id="blog-user_role" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/05.create-user_role-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-post" author="Raman Haurylau" dbms="postgresql">
+    <changeSet id="blog-post" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/06.create-post-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-post_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/07.create-post_reaction-table.sql" relativeToChangelogFile="true"/>
+    <changeSet id="blog-comment" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/07.create-comment-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-tag" author="Raman Haurylau" dbms="postgresql">
+    <changeSet id="blog-tag" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/08.create-tag-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-post_tag" author="Raman Haurylau" dbms="postgresql">
+    <changeSet id="blog-post_tag" author="Raman Haurylau" dbms="postgresql">
         <sqlFile encoding="utf8" path="../migration/09.create-post_tag-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-comment" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/10.create-comment-table.sql" relativeToChangelogFile="true"/>
+    <changeSet id="blog-reaction" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/10.create-reaction-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-comment_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/11.create-comment_reaction-table.sql" relativeToChangelogFile="true"/>
+    <changeSet id="blog-post_reaction" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/11.create-post_reaction-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-order" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/12.create-order-table.sql" relativeToChangelogFile="true"/>
+    <changeSet id="blog-comment_reaction" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/12.create-comment_reaction-table.sql"
+                 relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-insert-values-into-role" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/13.insert-values-into-role-table.sql" relativeToChangelogFile="true"/>
+    <changeSet id="blog-order" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/13.create-order-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-insert-values-into-tag" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/14.insert-values-into-tag-table.sql" relativeToChangelogFile="true"/>
+    <changeSet id="blog-base-values" author="Raman Haurylau" dbms="postgresql">
+        <sqlFile encoding="utf8" path="../migration/14.insert-values-into-tables.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-create-idx-in-post" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/15.create-idx-in-post-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-2-create-idx-in-post_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/16.create-idx-in-post_reaction-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-2-create-idx-in-comment" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/17.create-idx-in-comment-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-2-create-idx-in-comment_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/18.create-idx-in-comment_reaction-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-2-create-idx-in-order" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/19.create-idx-in-order-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-3-replace-unique-constrain-to-primary-key-in-user_role" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/20.replace-unique-constrain-to-primary-key-in-user_role-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-3-replace-unique-constrain-to-primary-key-in-post_tag" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/21.replace-unique-constrain-to-primary-key-in-post_tag-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-user" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/22.rename-idx-in-user-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-user_details" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/23.rename-idx-in-user_details-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-role" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/24.rename-idx-in-role-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-user_role" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/25.rename-idx-in-user_role-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-post" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/26.rename-idx-in-post-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-post_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/27.rename-idx-in-post_reaction-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-tag" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/28.rename-idx-in-tag-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-post_tag" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/29.rename-idx-in-post_tag-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-comment" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/30.rename-idx-in-comment-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-comment_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/31.rename-idx-in-comment_reaction-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-3-rename-idx-in-order" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/32.rename-idx-in-order-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-5-delete-values-from-role" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/33.delete-values-from-role-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-5-insert-values-into-role" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/34.insert-values-into-role-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-6-drop-null-in-post" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/35.drop-null-in-post-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-6-drop-null-in-post_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/36.drop-null-in-post_reaction-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-6-drop-null-in-comment" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/37.drop-null-in-comment-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-6-drop-null-in-comment_reaction" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/38.drop-null-in-comment_reaction-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-6-drop-null-in-order" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/39.drop-null-in-order-table.sql" relativeToChangelogFile="true" splitStatements="false"/>
-    </changeSet>
-
-    <changeSet id="homework-7-add-case-insensitive-unique-constraints-in-tables" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/40.add-case-insensitive-unique-constraints-in-tables.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-9-add-column-into-order-table" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/41.add-column-into-order-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-9-insert-values-into-role-table" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/42.insert-values-into-role-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-9-add-column-into-user_details-table" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/43.add-column-into-user_details-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-9-create-reaction-tables" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/44.create-reaction-tables.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-9-drop-primary-keys-in-tables" author="Raman Haurylau" dbms="postgresql">
-        <sqlFile encoding="utf8" path="../migration/45.drop-primary-keys-in-tables.sql" relativeToChangelogFile="true"/>
-    </changeSet>
 </databaseChangeLog>
