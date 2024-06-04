@@ -5,10 +5,13 @@ import com.github.blog.service.exception.impl.CustomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,10 +22,15 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException e) {
+        List<Violation> violations = new ArrayList<>();
 
-        List<Violation> violations = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
-                .toList();
+        for (ObjectError error : e.getBindingResult().getAllErrors()) {
+            if (error instanceof FieldError) {
+                violations.add(new Violation(((FieldError) error).getField(), error.getDefaultMessage()));
+            } else {
+                violations.add(new Violation(error.getObjectName(), error.getDefaultMessage()));
+            }
+        }
 
         return ResponseEntity
                 .status(e.getStatusCode())
