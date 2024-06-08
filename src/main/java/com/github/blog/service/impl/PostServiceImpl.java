@@ -47,15 +47,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto create(PostRequest request) {
-        log.info("Creating a new post with request: {}", request);
+        log.debug("Creating a new post with request: {}", request);
         Post post = postMapper.toEntity(request);
 
         User user = userDao
                 .findById(userAccessHandler.getUserId())
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", userAccessHandler.getUserId());
-                    return new CustomException(ExceptionEnum.USER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         post.setUser(user);
         post = postDao.create(post);
@@ -67,71 +64,63 @@ public class PostServiceImpl implements PostService {
             order.setState(OrderState.NEW.name());
 
             orderDao.create(order);
-            log.info("Created a new order for post: {}", post.getId());
+            log.debug("Created a new order for post: {}", post.getId());
         }
 
-        log.info("Post created successfully with ID: {}", post.getId());
+        log.debug("Post created successfully with ID: {}", post.getId());
         return postMapper.toDto(post);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PostDto findById(Long id) {
-        log.info("Finding post by ID: {}", id);
+        log.debug("Finding post by ID: {}", id);
         Post post = postDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Post not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.POST_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_NOT_FOUND));
 
-        log.info("Post found with ID: {}", id);
+        log.debug("Post found with ID: {}", id);
         return postMapper.toDto(post);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<PostDto> findAll(PostFilterRequest requestFilter, PageableRequest pageableRequest) {
-        log.info("Finding all posts with filter: {} and pageable: {}", requestFilter, pageableRequest);
+        log.debug("Finding all posts with filter: {} and pageable: {}", requestFilter, pageableRequest);
         PostFilter filter = postMapper.toEntity(requestFilter);
         Pageable pageable = pageableMapper.toEntity(pageableRequest);
 
         Page<Post> posts = postDao.findAll(filter, pageable);
 
         if (posts.isEmpty()) {
-            log.error("No posts found with the given filter and pageable");
             throw new CustomException(ExceptionEnum.POSTS_NOT_FOUND);
         }
 
-        log.info("Found {} posts", posts.getTotalNumberOfEntities());
+        log.debug("Found {} posts", posts.getTotalNumberOfEntities());
         return postMapper.toDto(posts);
     }
 
     @Override
     public PostDto update(Long id, PostRequest request) {
-        log.info("Updating post with ID: {} and request: {}", id, request);
+        log.debug("Updating post with ID: {} and request: {}", id, request);
         Post post = postDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Post not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.POST_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_NOT_FOUND));
 
         post = postMapper.partialUpdate(request, post);
-        log.info("Post updated successfully with ID: {}", id);
+        log.debug("Post updated successfully with ID: {}", id);
         return postMapper.toDto(post);
     }
 
     @Override
     public PostDto delete(Long id) {
-        log.info("Deleting post with ID: {}", id);
+        log.debug("Deleting post with ID: {}", id);
         Post post = postDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Post not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.POST_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_NOT_FOUND));
 
         postDao.delete(post);
-        log.info("Post deleted successfully with ID: {}", id);
+        log.debug("Post deleted successfully with ID: {}", id);
         return postMapper.toDto(post);
     }
 }

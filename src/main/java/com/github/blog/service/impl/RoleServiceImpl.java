@@ -34,73 +34,65 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleDto create(RoleRequest request) {
-        log.info("Creating a new role with request: {}", request);
+        log.debug("Creating a new role with request: {}", request);
         Role role = roleMapper.toEntity(request);
         role.setName(ROLE_PREFIX + role.getName());
 
         role = roleDao.create(role);
-        log.info("Role created successfully with ID: {}", role.getId());
+        log.debug("Role created successfully with ID: {}", role.getId());
         return roleMapper.toDto(role);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RoleDto findById(Long id) {
-        log.info("Finding role by ID: {}", id);
+        log.debug("Finding role by ID: {}", id);
         Role role = roleDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Role not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ROLE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
-        log.info("Role found with ID: {}", id);
+        log.debug("Role found with ID: {}", id);
         return roleMapper.toDto(role);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<RoleDto> findAll(RoleFilterRequest filterRequest, PageableRequest pageableRequest) {
-        log.info("Finding all roles with filter: {} and pageable: {}", filterRequest, pageableRequest);
+        log.debug("Finding all roles with filter: {} and pageable: {}", filterRequest, pageableRequest);
         RoleFilter filter = roleMapper.toEntity(filterRequest);
         Pageable pageable = pageableMapper.toEntity(pageableRequest);
 
         Page<Role> roles = roleDao.findAll(filter, pageable);
 
         if (roles.isEmpty()) {
-            log.error("No roles found with the given filter and pageable");
             throw new CustomException(ExceptionEnum.ROLES_NOT_FOUND);
         }
 
-        log.info("Found {} roles", roles.getTotalNumberOfEntities());
+        log.debug("Found {} roles", roles.getTotalNumberOfEntities());
         return roleMapper.toDto(roles);
     }
 
     @Override
     public RoleDto update(Long id, RoleRequest request) {
-        log.info("Updating role with ID: {} and request: {}", id, request);
+        log.debug("Updating role with ID: {} and request: {}", id, request);
         Role role = roleDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Role not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ROLE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
         role = roleMapper.partialUpdate(request, role);
-        log.info("Role updated successfully with ID: {}", id);
+        log.debug("Role updated successfully with ID: {}", id);
         return roleMapper.toDto(role);
     }
 
     @Override
     public RoleDto delete(Long id) {
-        log.info("Deleting role with ID: {}", id);
+        log.debug("Deleting role with ID: {}", id);
         Role role = roleDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Role not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ROLE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
         roleDao.delete(role);
-        log.info("Role deleted successfully with ID: {}", id);
+        log.debug("Role deleted successfully with ID: {}", id);
         return roleMapper.toDto(role);
     }
 }

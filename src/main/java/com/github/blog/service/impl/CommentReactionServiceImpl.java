@@ -51,25 +51,16 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         CommentReaction commentReaction = commentReactionMapper.toEntity(request);
 
         Comment comment = commentDao
-                .findById(request.getCommentId())
-                .orElseThrow(() -> {
-                    log.error("Comment not found with ID: {}", request.getCommentId());
-                    return new CustomException(ExceptionEnum.COMMENT_NOT_FOUND);
-                });
+                .findById(request.commentId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_NOT_FOUND));
 
         Reaction reaction = reactionDao
-                .findById(request.getReactionId())
-                .orElseThrow(() -> {
-                    log.error("Reaction not found with ID: {}", request.getReactionId());
-                    return new CustomException(ExceptionEnum.REACTION_NOT_FOUND);
-                });
+                .findById(request.reactionId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
         User user = userDao
                 .findById(userAccessHandler.getUserId())
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", userAccessHandler.getUserId());
-                    return new CustomException(ExceptionEnum.USER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         commentReaction.setReaction(reaction);
         commentReaction.setComment(comment);
@@ -82,20 +73,19 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CommentReactionDto findById(Long id) {
         log.debug("Finding comment reaction by ID: {}", id);
         CommentReaction commentReaction = commentReactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Comment reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND));
 
         log.debug("Comment reaction found with ID: {}", id);
         return commentReactionMapper.toDto(commentReaction);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<CommentReactionDto> findAll(CommentReactionFilterRequest requestFilter, PageableRequest pageableRequest) {
         log.debug("Finding all comment reactions with filter: {} and pageable: {}", requestFilter, pageableRequest);
         CommentReactionFilter filter = commentReactionMapper.toEntity(requestFilter);
@@ -104,11 +94,10 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         Page<CommentReaction> commentReactions = commentReactionDao.findAll(filter, pageable);
 
         if (commentReactions.isEmpty()) {
-            log.error("No comment reactions found with the given filter and pageable");
             throw new CustomException(ExceptionEnum.COMMENT_REACTIONS_NOT_FOUND);
         }
 
-        log.info("Found {} comment reactions", commentReactions.getTotalNumberOfEntities());
+        log.debug("Found {} comment reactions", commentReactions.getTotalNumberOfEntities());
         return commentReactionMapper.toDto(commentReactions);
     }
 
@@ -117,17 +106,11 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         log.debug("Updating comment reaction with ID: {} and request: {}", id, request);
         CommentReaction commentReaction = commentReactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Comment reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND));
 
         Reaction reaction = reactionDao
-                .findById(request.getReactionId())
-                .orElseThrow(() -> {
-                    log.error("Reaction not found with ID: {}", request.getReactionId());
-                    return new CustomException(ExceptionEnum.REACTION_NOT_FOUND);
-                });
+                .findById(request.reactionId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
         commentReaction.setReaction(reaction);
         log.debug("Comment reaction updated successfully with ID: {}", id);
@@ -140,10 +123,7 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         log.debug("Deleting comment reaction with ID: {}", id);
         CommentReaction commentReaction = commentReactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Comment reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND));
 
         commentReactionDao.delete(commentReaction);
         log.debug("Post deleted successfully with ID: {}", id);

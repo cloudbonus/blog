@@ -48,17 +48,11 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentMapper.toEntity(request);
         User user = userDao
                 .findById(userAccessHandler.getUserId())
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", userAccessHandler.getUserId());
-                    return new CustomException(ExceptionEnum.USER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         Post post = postDao
-                .findById(request.getPostId())
-                .orElseThrow(() -> {
-                    log.error("Post not found with ID: {}", request.getPostId());
-                    return new CustomException(ExceptionEnum.POST_NOT_FOUND);
-                });
+                .findById(request.postId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_NOT_FOUND));
 
         comment.setUser(user);
         comment.setPost(post);
@@ -70,21 +64,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CommentDto findById(Long id) {
         log.debug("Finding comment by ID: {}", id);
         Comment comment = commentDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Comment not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.COMMENT_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_NOT_FOUND));
 
         log.debug("Comment found with ID: {}", id);
         return commentMapper.toDto(comment);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public PageResponse<CommentDto> findAll(CommentFilterRequest requestFilter, PageableRequest pageableRequest) {
         log.debug("Finding all comments with filter: {} and pageable: {}", requestFilter, pageableRequest);
         CommentFilter filter = commentMapper.toEntity(requestFilter);
@@ -93,11 +85,10 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> comments = commentDao.findAll(filter, pageable);
 
         if (comments.isEmpty()) {
-            log.error("No comments found with the given filter and pageable");
             throw new CustomException(ExceptionEnum.COMMENTS_NOT_FOUND);
         }
 
-        log.info("Found {} comments", comments.getTotalNumberOfEntities());
+        log.debug("Found {} comments", comments.getTotalNumberOfEntities());
         return commentMapper.toDto(comments);
     }
 
@@ -106,10 +97,7 @@ public class CommentServiceImpl implements CommentService {
         log.debug("Updating comment with comments: {} and request: {}", id, request);
         Comment comment = commentDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Comment not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.COMMENT_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_NOT_FOUND));
 
         comment = commentMapper.partialUpdate(request, comment);
         log.debug("Comment updated successfully with ID: {}", id);
@@ -122,10 +110,7 @@ public class CommentServiceImpl implements CommentService {
         log.debug("Deleting comment with ID: {}", id);
         Comment comment = commentDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Comment not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.COMMENT_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_NOT_FOUND));
 
         commentDao.delete(comment);
         log.debug("Comment deleted successfully with ID: {}", id);

@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
  * @author Raman Haurylau
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserDao userDao;
 

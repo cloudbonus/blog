@@ -33,71 +33,63 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public ReactionDto create(ReactionRequest request) {
-        log.info("Creating a new reaction with request: {}", request);
+        log.debug("Creating a new reaction with request: {}", request);
         Reaction reaction = reactionMapper.toEntity(request);
 
         reaction = reactionDao.create(reaction);
-        log.info("Reaction created successfully with ID: {}", reaction.getId());
+        log.debug("Reaction created successfully with ID: {}", reaction.getId());
         return reactionMapper.toDto(reaction);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReactionDto findById(Long id) {
-        log.info("Finding reaction by ID: {}", id);
+        log.debug("Finding reaction by ID: {}", id);
         Reaction reaction = reactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
-        log.info("Reaction found with ID: {}", id);
+        log.debug("Reaction found with ID: {}", id);
         return reactionMapper.toDto(reaction);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ReactionDto> findAll(PageableRequest pageableRequest) {
-        log.info("Finding all reactions with pageable: {}", pageableRequest);
+        log.debug("Finding all reactions with pageable: {}", pageableRequest);
         Pageable pageable = pageableMapper.toEntity(pageableRequest);
 
         Page<Reaction> reactions = reactionDao.findAll(pageable);
 
         if (reactions.isEmpty()) {
-            log.error("No reactions found with the given pageable");
             throw new CustomException(ExceptionEnum.REACTIONS_NOT_FOUND);
         }
 
-        log.info("Found {} reactions", reactions.getTotalNumberOfEntities());
+        log.debug("Found {} reactions", reactions.getTotalNumberOfEntities());
         return reactionMapper.toDto(reactions);
     }
 
     @Override
     public ReactionDto update(Long id, ReactionRequest request) {
-        log.info("Updating reaction with ID: {} and request: {}", id, request);
+        log.debug("Updating reaction with ID: {} and request: {}", id, request);
         Reaction reaction = reactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
         reaction = reactionMapper.partialUpdate(request, reaction);
-        log.info("Reaction updated successfully with ID: {}", id);
+        log.debug("Reaction updated successfully with ID: {}", id);
         return reactionMapper.toDto(reaction);
     }
 
     @Override
     public ReactionDto delete(Long id) {
-        log.info("Deleting reaction with ID: {}", id);
+        log.debug("Deleting reaction with ID: {}", id);
         Reaction reaction = reactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
         reactionDao.delete(reaction);
-        log.info("Reaction deleted successfully with ID: {}", id);
+        log.debug("Reaction deleted successfully with ID: {}", id);
         return reactionMapper.toDto(reaction);
     }
 }

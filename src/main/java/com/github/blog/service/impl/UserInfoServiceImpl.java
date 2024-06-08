@@ -56,70 +56,54 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserInfoDto create(UserInfoRequest request) {
-        log.info("Creating a new user info with request: {}", request);
+        log.debug("Creating a new user info with request: {}", request);
         UserInfo userInfo = userInfoMapper.toEntity(request);
 
         User user = userDao
                 .findById(userAccessHandler.getUserId())
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", userAccessHandler.getUserId());
-                    return new CustomException(ExceptionEnum.USERS_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USERS_NOT_FOUND));
 
         userInfo.setUser(user);
         userInfo.setId(user.getId());
         userInfo.setState(UserInfoState.RESERVED.name());
 
         userInfo = userInfoDao.create(userInfo);
-        log.info("User info created successfully with ID: {}", userInfo.getId());
+        log.debug("User info created successfully with ID: {}", userInfo.getId());
         return userInfoMapper.toDto(userInfo);
     }
 
     @Override
     public UserInfoDto cancel(Long id) {
-        log.info("Cancelling user info with ID: {}", id);
+        log.debug("Cancelling user info with ID: {}", id);
         UserInfo userInfo = userInfoDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("User info not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         StateMachine<UserInfoState, UserInfoEvent> sm = stateMachineService.acquireStateMachine(userInfo.getId().toString());
         StateMachineEventResult<UserInfoState, UserInfoEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(UserInfoEvent.CANCEL).build())).blockFirst());
 
         if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            log.error("State transition denied for user info ID: {}", id);
             throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
         }
 
-        log.info("User info cancelled successfully with ID: {}", id);
+        log.debug("User info cancelled successfully with ID: {}", id);
         return userInfoMapper.toDto(userInfo);
     }
 
     @Override
     public UserInfoDto verify(Long id, Long roleId) {
-        log.info("Verifying user info with ID: {} and role ID: {}", id, roleId);
+        log.debug("Verifying user info with ID: {} and role ID: {}", id, roleId);
         UserInfo userInfo = userInfoDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("User info not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         User user = userDao
                 .findById(userInfo.getId())
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", userInfo.getId());
-                    return new CustomException(ExceptionEnum.USERS_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USERS_NOT_FOUND));
 
         Role role = roleDao
                 .findById(roleId)
-                .orElseThrow(() -> {
-                    log.error("Role not found with ID: {}", roleId);
-                    return new CustomException(ExceptionEnum.ROLE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
         user.getRoles().add(role);
 
@@ -127,82 +111,73 @@ public class UserInfoServiceImpl implements UserInfoService {
         StateMachineEventResult<UserInfoState, UserInfoEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(UserInfoEvent.VERIFY).build())).blockFirst());
 
         if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            log.error("State transition denied for user info ID: {}", id);
             throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
         }
 
-        log.info("User info verified successfully with ID: {}", id);
+        log.debug("User info verified successfully with ID: {}", id);
         return userInfoMapper.toDto(userInfo);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserInfoDto findById(Long id) {
-        log.info("Finding user info by ID: {}", id);
+        log.debug("Finding user info by ID: {}", id);
         UserInfo userInfo = userInfoDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("User info not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.USER_INFO_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_INFO_NOT_FOUND));
 
-        log.info("User info found with ID: {}", id);
+        log.debug("User info found with ID: {}", id);
         return userInfoMapper.toDto(userInfo);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<UserInfoDto> findAll(UserInfoFilterRequest filterRequest, PageableRequest pageableRequest) {
-        log.info("Finding all user infos with filter: {} and pageable: {}", filterRequest, pageableRequest);
+        log.debug("Finding all user infos with filter: {} and pageable: {}", filterRequest, pageableRequest);
         UserInfoFilter filter = userInfoMapper.toEntity(filterRequest);
         Pageable pageable = pageableMapper.toEntity(pageableRequest);
 
         Page<UserInfo> userInfos = userInfoDao.findAll(filter, pageable);
 
         if (userInfos.isEmpty()) {
-            log.error("No user infos found with the given filter and pageable");
             throw new CustomException(ExceptionEnum.USER_INFO_NOT_FOUND);
         }
 
-        log.info("Found {} user infos", userInfos.getTotalNumberOfEntities());
+        log.debug("Found {} user infos", userInfos.getTotalNumberOfEntities());
         return userInfoMapper.toDto(userInfos);
     }
 
     @Override
     public UserInfoDto update(Long id, UserInfoRequest request) {
-        log.info("Updating user info with ID: {} and request: {}", id, request);
+        log.debug("Updating user info with ID: {} and request: {}", id, request);
         UserInfo userInfo = userInfoDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("User info not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.USER_INFO_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_INFO_NOT_FOUND));
 
         userInfo = userInfoMapper.partialUpdate(request, userInfo);
-        log.info("User info updated successfully with ID: {}", id);
+        log.debug("User info updated successfully with ID: {}", id);
         return userInfoMapper.toDto(userInfo);
     }
 
     @Override
     public UserInfoDto delete(Long id) {
-        log.info("Deleting user info with ID: {}", id);
+        log.debug("Deleting user info with ID: {}", id);
         UserInfo userInfo = userInfoDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("User info not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.USER_INFO_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_INFO_NOT_FOUND));
 
         userInfoDao.delete(userInfo);
-        log.info("User info deleted successfully with ID: {}", id);
+        log.debug("User info deleted successfully with ID: {}", id);
         return userInfoMapper.toDto(userInfo);
     }
 
     @Scheduled(fixedRate = 150000)
     private void deleteCanceledUserInfo() {
-        log.info("Deleting canceled user infos");
+        log.debug("Deleting canceled user infos");
         List<UserInfo> info = userInfoDao.findAllCanceledInfo();
         info.forEach(userInfo -> {
             userInfoDao.delete(userInfo);
-            log.info("Deleted canceled user info with ID: {}", userInfo.getId());
+            log.debug("Deleted canceled user info with ID: {}", userInfo.getId());
         });
     }
 }

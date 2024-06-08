@@ -52,50 +52,40 @@ public class PostReactionServiceImpl implements PostReactionService {
 
         Post post = postDao
                 .findById(postReaction.getPost().getId())
-                .orElseThrow(() -> {
-                    log.error("Post not found with ID: {}", request.getPostId());
-                    return new CustomException(ExceptionEnum.POST_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_NOT_FOUND));
 
         Reaction reaction = reactionDao
                 .findById(postReaction.getReaction().getId())
-                .orElseThrow(() -> {
-                    log.error("Reaction not found with ID: {}", request.getReactionId());
-                    return new CustomException(ExceptionEnum.REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
         User user = userDao
                 .findById(userAccessHandler.getUserId())
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", userAccessHandler.getUserId());
-                    return new CustomException(ExceptionEnum.USER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         postReaction.setReaction(reaction);
         postReaction.setPost(post);
         postReaction.setUser(user);
 
         postReaction = postReactionDao.create(postReaction);
-        log.info("Post reaction created successfully with ID: {}", post.getId());
+        log.debug("Post reaction created successfully with ID: {}", post.getId());
 
         return postReactionMapper.toDto(postReaction);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PostReactionDto findById(Long id) {
         log.debug("Finding post reaction by ID: {}", id);
         PostReaction postReaction = postReactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Post Reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.POST_REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_REACTION_NOT_FOUND));
 
         log.debug("Post reaction found with ID: {}", id);
         return postReactionMapper.toDto(postReaction);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<PostReactionDto> findAll(PostReactionFilterRequest filterRequest, PageableRequest pageableRequest) {
         log.debug("Finding all post reactions with filter: {} and pageable: {}", filterRequest, pageableRequest);
         PostReactionFilter filter = postReactionMapper.toEntity(filterRequest);
@@ -104,11 +94,10 @@ public class PostReactionServiceImpl implements PostReactionService {
         Page<PostReaction> postReactions = postReactionDao.findAll(filter, pageable);
 
         if (postReactions.isEmpty()) {
-            log.error("No post reactions found with the given filter and pageable");
             throw new CustomException(ExceptionEnum.POST_REACTIONS_NOT_FOUND);
         }
 
-        log.info("Found {} post reactions", postReactions.getTotalNumberOfEntities());
+        log.debug("Found {} post reactions", postReactions.getTotalNumberOfEntities());
         return postReactionMapper.toDto(postReactions);
     }
 
@@ -117,17 +106,11 @@ public class PostReactionServiceImpl implements PostReactionService {
         log.debug("Updating post reaction with ID: {} and request: {}", id, request);
         PostReaction postReaction = postReactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("PostReaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.POST_REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_REACTION_NOT_FOUND));
 
         Reaction reaction = reactionDao
-                .findById(request.getReactionId())
-                .orElseThrow(() -> {
-                    log.error("Reaction not found with ID: {}", request.getReactionId());
-                    return new CustomException(ExceptionEnum.REACTION_NOT_FOUND);
-                });
+                .findById(request.reactionId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
         postReaction.setReaction(reaction);
         log.debug("Post reaction updated successfully with ID: {}", id);
@@ -140,10 +123,7 @@ public class PostReactionServiceImpl implements PostReactionService {
         log.debug("Deleting post reaction with ID: {}", id);
         PostReaction postReaction = postReactionDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Post reaction not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.POST_REACTION_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_REACTION_NOT_FOUND));
 
         postReactionDao.delete(postReaction);
         log.debug("Post reaction deleted successfully with ID: {}", id);

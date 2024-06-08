@@ -57,16 +57,12 @@ public class OrderServiceImpl implements OrderService {
         log.debug("Reserving order with ID: {}", id);
         Order order = orderDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Order not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         StateMachine<OrderState, OrderEvent> sm = stateMachineService.acquireStateMachine(order.getId().toString());
         StateMachineEventResult<OrderState, OrderEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(OrderEvent.RESERVE).build())).blockFirst());
 
         if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            log.error("State transition denied for order ID: {}", id);
             throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
         }
 
@@ -79,16 +75,12 @@ public class OrderServiceImpl implements OrderService {
         log.debug("Cancelling order with ID: {}", id);
         Order order = orderDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Order not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         StateMachine<OrderState, OrderEvent> sm = stateMachineService.acquireStateMachine(order.getId().toString());
         StateMachineEventResult<OrderState, OrderEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(OrderEvent.CANCEL).build())).blockFirst());
 
         if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            log.error("State transition denied for order ID: {}", id);
             throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
         }
 
@@ -101,16 +93,12 @@ public class OrderServiceImpl implements OrderService {
         log.debug("Buying order with ID: {}", id);
         Order order = orderDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Order not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         StateMachine<OrderState, OrderEvent> sm = stateMachineService.acquireStateMachine(order.getId().toString());
         StateMachineEventResult<OrderState, OrderEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(OrderEvent.BUY).build())).blockFirst());
 
         if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            log.error("State transition denied for order ID: {}", id);
             throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
         }
 
@@ -119,20 +107,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderDto findById(Long id) {
         log.debug("Finding order by ID: {}", id);
         Order order = orderDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Order not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         log.debug("Order found with ID: {}", id);
         return orderMapper.toDto(order);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<OrderDto> findAll(OrderFilterRequest requestFilter, PageableRequest pageableRequest) {
         log.debug("Finding all orders with filter: {} and pageable: {}", requestFilter, pageableRequest);
         OrderFilter filter = orderMapper.toEntity(requestFilter);
@@ -141,11 +128,10 @@ public class OrderServiceImpl implements OrderService {
         Page<Order> orders = orderDao.findAll(filter, pageable);
 
         if (orders.isEmpty()) {
-            log.error("No orders found with the given filter and pageable");
             throw new CustomException(ExceptionEnum.ORDERS_NOT_FOUND);
         }
 
-        log.info("Found {} orders", orders.getTotalNumberOfEntities());
+        log.debug("Found {} orders", orders.getTotalNumberOfEntities());
         return orderMapper.toDto(orders);
     }
 
@@ -154,24 +140,15 @@ public class OrderServiceImpl implements OrderService {
         log.debug("Updating order with ID: {} and request: {}", id, request);
         Order order = orderDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Order not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         User user = userDao
-                .findById(request.getUserId())
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", request.getUserId());
-                    return new CustomException(ExceptionEnum.USER_NOT_FOUND);
-                });
+                .findById(request.userId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
         Post post = postDao
-                .findById(request.getPostId())
-                .orElseThrow(() -> {
-                    log.error("Post not found with ID: {}", request.getPostId());
-                    return new CustomException(ExceptionEnum.POST_NOT_FOUND);
-                });
+                .findById(request.postId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.POST_NOT_FOUND));
 
         order.setUser(user);
         order.setPost(post);
@@ -191,14 +168,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderDto findByPostId(Long id) {
         log.debug("Finding order by post ID: {}", id);
         Order order = orderDao
                 .findByPostId(id)
-                .orElseThrow(() -> {
-                    log.error("Order not found with post ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         log.debug("Order found with ID: {}", id);
         return orderMapper.toDto(order);
@@ -209,10 +184,7 @@ public class OrderServiceImpl implements OrderService {
         log.debug("Deleting order with ID: {}", id);
         Order order = orderDao
                 .findById(id)
-                .orElseThrow(() -> {
-                    log.error("Order not found with ID: {}", id);
-                    return new CustomException(ExceptionEnum.ORDER_NOT_FOUND);
-                });
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
         orderDao.delete(order);
         log.debug("Order deleted successfully with ID: {}", id);
