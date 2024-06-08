@@ -64,7 +64,7 @@ public class CommentServiceImplTests {
     private CommentServiceImpl commentService;
 
     private CommentDto returnedCommentDto;
-    private final CommentRequest request = new CommentRequest();
+    private final CommentRequest request = new CommentRequest(null, null);
     private final Comment comment = new Comment();
 
     private final Long id = 1L;
@@ -72,9 +72,7 @@ public class CommentServiceImplTests {
 
     @BeforeEach
     void setUp() {
-        returnedCommentDto = new CommentDto();
-        returnedCommentDto.setContent(content);
-        returnedCommentDto.setId(id);
+        returnedCommentDto = new CommentDto(id, null, null, content, null);
     }
 
     @Test
@@ -88,13 +86,13 @@ public class CommentServiceImplTests {
         when(commentDao.create(comment)).thenReturn(comment);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
         when(userDao.findById(userAccessHandler.getUserId())).thenReturn(Optional.of(user));
-        when(postDao.findById(request.getPostId())).thenReturn(Optional.of(post));
+        when(postDao.findById(request.postId())).thenReturn(Optional.of(post));
 
         CommentDto createdCommentDto = commentService.create(request);
 
         assertThat(createdCommentDto).isNotNull();
-        assertThat(createdCommentDto.getId()).isEqualTo(id);
-        assertThat(createdCommentDto.getContent()).isEqualTo(content);
+        assertThat(createdCommentDto.id()).isEqualTo(id);
+        assertThat(createdCommentDto.content()).isEqualTo(content);
     }
 
     @Test
@@ -106,8 +104,8 @@ public class CommentServiceImplTests {
         CommentDto updatedCommentDto = commentService.update(id, request);
 
         assertThat(updatedCommentDto).isNotNull();
-        assertThat(updatedCommentDto.getId()).isEqualTo(id);
-        assertThat(updatedCommentDto.getContent()).isEqualTo(content);
+        assertThat(updatedCommentDto.id()).isEqualTo(id);
+        assertThat(updatedCommentDto.content()).isEqualTo(content);
     }
 
     @Test
@@ -119,8 +117,8 @@ public class CommentServiceImplTests {
         CommentDto deletedCommentDto = commentService.delete(id);
 
         assertThat(deletedCommentDto).isNotNull();
-        assertThat(deletedCommentDto.getId()).isEqualTo(id);
-        assertThat(deletedCommentDto.getContent()).isEqualTo(content);
+        assertThat(deletedCommentDto.id()).isEqualTo(id);
+        assertThat(deletedCommentDto.content()).isEqualTo(content);
         verify(commentDao, times(1)).delete(comment);
     }
 
@@ -130,7 +128,7 @@ public class CommentServiceImplTests {
         CommentFilter filter = new CommentFilter();
 
         Pageable pageable = new Pageable();
-        PageableResponse pageableResponse = new PageableResponse();
+        PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
         Page<Comment> page = new Page<>(List.of(comment), pageable, 1L);
         PageResponse<CommentDto> pageResponse = new PageResponse<>(List.of(returnedCommentDto), pageableResponse, 1L);
@@ -140,10 +138,10 @@ public class CommentServiceImplTests {
         when(commentDao.findAll(filter, pageable)).thenReturn(page);
         when(commentMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<CommentDto> filterSearchResult = commentService.findAll(new CommentFilterRequest(), new PageableRequest());
+        PageResponse<CommentDto> filterSearchResult = commentService.findAll(new CommentFilterRequest(null), new PageableRequest(null, null, null));
 
-        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult.getContent()).extracting(CommentDto::getContent).containsExactly(content);
-        assertThat(filterSearchResult.getContent()).extracting(CommentDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.content()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.content()).extracting(CommentDto::content).containsExactly(content);
+        assertThat(filterSearchResult.content()).extracting(CommentDto::id).containsExactly(id);
     }
 }

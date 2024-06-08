@@ -83,26 +83,23 @@ public class OrderServiceImplTests {
     private final Long postId = 1L;
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final OrderFilterRequest orderFilterRequest = new OrderFilterRequest(null, null, null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
         User user = new User();
         Post post = new Post();
 
-        request = new OrderRequest();
-        request.setPostId(postId);
-        request.setUserId(userId);
+        request = new OrderRequest(postId, userId);
 
         order = new Order();
         order.setId(id);
         order.setPost(post);
         order.setUser(user);
 
-        returnedOrderDto = new OrderDto();
-        returnedOrderDto.setId(id);
-        returnedOrderDto.setPostId(postId);
-        returnedOrderDto.setUserId(userId);
+        returnedOrderDto = new OrderDto(id, postId, userId, null, null);
     }
 
     @Test
@@ -121,8 +118,8 @@ public class OrderServiceImplTests {
         OrderDto reservedOrderDto = orderService.reserve(id);
 
         assertNotNull(reservedOrderDto);
-        assertEquals(id, reservedOrderDto.getId());
-        assertEquals(postId, reservedOrderDto.getPostId());
+        assertEquals(id, reservedOrderDto.id());
+        assertEquals(postId, reservedOrderDto.postId());
     }
 
     @Test
@@ -158,8 +155,8 @@ public class OrderServiceImplTests {
         OrderDto cancelledOrderDto = orderService.cancel(id);
 
         assertNotNull(cancelledOrderDto);
-        assertEquals(id, cancelledOrderDto.getId());
-        assertEquals(postId, cancelledOrderDto.getPostId());
+        assertEquals(id, cancelledOrderDto.id());
+        assertEquals(postId, cancelledOrderDto.postId());
     }
 
     @Test
@@ -178,8 +175,8 @@ public class OrderServiceImplTests {
         OrderDto boughtOrderDto = orderService.buy(id);
 
         assertNotNull(boughtOrderDto);
-        assertEquals(id, boughtOrderDto.getId());
-        assertEquals(postId, boughtOrderDto.getPostId());
+        assertEquals(id, boughtOrderDto.id());
+        assertEquals(postId, boughtOrderDto.postId());
     }
 
     @Test
@@ -191,8 +188,8 @@ public class OrderServiceImplTests {
         OrderDto foundOrderDto = orderService.findById(id);
 
         assertNotNull(foundOrderDto);
-        assertEquals(id, foundOrderDto.getId());
-        assertEquals(postId, foundOrderDto.getPostId());
+        assertEquals(id, foundOrderDto.id());
+        assertEquals(postId, foundOrderDto.postId());
     }
 
     @Test
@@ -218,12 +215,12 @@ public class OrderServiceImplTests {
         when(orderDao.findAll(filter, pageable)).thenReturn(page);
         when(orderMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<OrderDto> foundOrders = orderService.findAll(new OrderFilterRequest(), new PageableRequest());
+        PageResponse<OrderDto> foundOrders = orderService.findAll(orderFilterRequest, pageableRequest);
 
         assertNotNull(foundOrders);
-        assertEquals(1, foundOrders.getContent().size());
-        assertEquals(id, foundOrders.getContent().get(0).getId());
-        assertEquals(postId, foundOrders.getContent().get(0).getPostId());
+        assertEquals(1, foundOrders.content().size());
+        assertEquals(id, foundOrders.content().get(0).id());
+        assertEquals(postId, foundOrders.content().get(0).postId());
     }
 
     @Test
@@ -237,7 +234,7 @@ public class OrderServiceImplTests {
         when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
         when(orderDao.findAll(filter, pageable)).thenReturn(page);
 
-        CustomException exception = assertThrows(CustomException.class, () -> orderService.findAll(new OrderFilterRequest(), new PageableRequest()));
+        CustomException exception = assertThrows(CustomException.class, () -> orderService.findAll(orderFilterRequest, pageableRequest));
 
         assertEquals(ExceptionEnum.ORDERS_NOT_FOUND, exception.getExceptionEnum());
     }
@@ -256,8 +253,8 @@ public class OrderServiceImplTests {
         OrderDto updatedOrderDto = orderService.update(id, request);
 
         assertNotNull(updatedOrderDto);
-        assertEquals(id, updatedOrderDto.getId());
-        assertEquals(postId, updatedOrderDto.getPostId());
+        assertEquals(id, updatedOrderDto.id());
+        assertEquals(postId, updatedOrderDto.postId());
     }
 
     @Test
@@ -269,8 +266,8 @@ public class OrderServiceImplTests {
         OrderDto deletedOrderDto = orderService.delete(id);
 
         assertNotNull(deletedOrderDto);
-        assertEquals(id, deletedOrderDto.getId());
-        assertEquals(postId, deletedOrderDto.getPostId());
+        assertEquals(id, deletedOrderDto.id());
+        assertEquals(postId, deletedOrderDto.postId());
         verify(orderDao, times(1)).delete(order);
     }
 }

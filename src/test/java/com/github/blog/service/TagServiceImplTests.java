@@ -61,20 +61,19 @@ public class TagServiceImplTests {
     private final String tagName = "news";
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final TagFilterRequest tagFilterRequest = new TagFilterRequest(null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        request = new TagRequest();
-        request.setName(tagName);
+        request = new TagRequest(tagName);
 
         tag = new Tag();
         tag.setId(id);
         tag.setName(tagName);
 
-        returnedTagDto = new TagDto();
-        returnedTagDto.setId(id);
-        returnedTagDto.setName(tagName);
+        returnedTagDto = new TagDto(id, tagName);
     }
 
     @Test
@@ -87,8 +86,8 @@ public class TagServiceImplTests {
         TagDto createdTagDto = tagService.create(request);
 
         assertNotNull(createdTagDto);
-        assertEquals(id, createdTagDto.getId());
-        assertEquals(tagName, createdTagDto.getName());
+        assertEquals(id, createdTagDto.id());
+        assertEquals(tagName, createdTagDto.name());
     }
 
     @Test
@@ -100,8 +99,8 @@ public class TagServiceImplTests {
         TagDto foundTagDto = tagService.findById(id);
 
         assertNotNull(foundTagDto);
-        assertEquals(id, foundTagDto.getId());
-        assertEquals(tagName, foundTagDto.getName());
+        assertEquals(id, foundTagDto.id());
+        assertEquals(tagName, foundTagDto.name());
     }
 
     @Test
@@ -127,12 +126,12 @@ public class TagServiceImplTests {
         when(tagDao.findAll(filter, pageable)).thenReturn(page);
         when(tagMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<TagDto> foundTags = tagService.findAll(new TagFilterRequest(), new PageableRequest());
+        PageResponse<TagDto> foundTags = tagService.findAll(tagFilterRequest, pageableRequest);
 
         assertNotNull(foundTags);
-        assertEquals(1, foundTags.getContent().size());
-        assertEquals(id, foundTags.getContent().get(0).getId());
-        assertEquals(tagName, foundTags.getContent().get(0).getName());
+        assertEquals(1, foundTags.content().size());
+        assertEquals(id, foundTags.content().get(0).id());
+        assertEquals(tagName, foundTags.content().get(0).name());
     }
 
     @Test
@@ -146,7 +145,7 @@ public class TagServiceImplTests {
         when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
         when(tagDao.findAll(filter, pageable)).thenReturn(page);
 
-        CustomException exception = assertThrows(CustomException.class, () -> tagService.findAll(new TagFilterRequest(), new PageableRequest()));
+        CustomException exception = assertThrows(CustomException.class, () -> tagService.findAll(tagFilterRequest, pageableRequest));
 
         assertEquals(ExceptionEnum.TAGS_NOT_FOUND, exception.getExceptionEnum());
     }
@@ -161,8 +160,8 @@ public class TagServiceImplTests {
         TagDto updatedTagDto = tagService.update(id, request);
 
         assertNotNull(updatedTagDto);
-        assertEquals(id, updatedTagDto.getId());
-        assertEquals(tagName, updatedTagDto.getName());
+        assertEquals(id, updatedTagDto.id());
+        assertEquals(tagName, updatedTagDto.name());
     }
 
     @Test
@@ -174,8 +173,8 @@ public class TagServiceImplTests {
         TagDto deletedTagDto = tagService.delete(id);
 
         assertNotNull(deletedTagDto);
-        assertEquals(id, deletedTagDto.getId());
-        assertEquals(tagName, deletedTagDto.getName());
+        assertEquals(id, deletedTagDto.id());
+        assertEquals(tagName, deletedTagDto.name());
         verify(tagDao, times(1)).delete(tag);
     }
 }

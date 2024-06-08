@@ -3,8 +3,13 @@ package com.github.blog.service;
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.JwtResponse;
+import com.github.blog.model.Role;
+import com.github.blog.model.User;
+import com.github.blog.repository.RoleDao;
+import com.github.blog.repository.UserDao;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
+import com.github.blog.service.mapper.UserMapper;
 import com.github.blog.service.security.JwtService;
 import com.github.blog.service.security.impl.AuthenticationServiceImpl;
 import com.github.blog.service.security.impl.UserDetailsServiceImpl;
@@ -20,6 +25,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,16 +46,22 @@ import static org.mockito.Mockito.when;
 public class AuthenticationServiceImplTests {
 
     @Mock
-    private UserService userService;
+    private UserDao userDao;
 
     @Mock
     private JwtService jwtService;
 
     @Mock
-    private AuthenticationManager authenticationManager;
+    private UserMapper userMapper;
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private RoleDao roleDao;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
 
     @Mock
     private UserDetailsServiceImpl userDetailsService;
@@ -56,37 +69,69 @@ public class AuthenticationServiceImplTests {
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
 
-    private UserRequest userRequest;
-    private UserDto userDto;
-
     private final Long id = 1L;
+
+    private final User user = new User();
+
+    private UserDto returnedUserDto;
+    private UserRequest request;
+
     private final String username = "testuser";
     private final String password = "password";
-    private final String encodedPassword = "encodedPassword";
+
 
     @BeforeEach
     void setUp() {
-        userRequest = new UserRequest();
-        userRequest.setUsername(username);
-        userRequest.setPassword(password);
-
-        userDto = new UserDto();
-        userDto.setId(id);
-        userDto.setUsername(username);
+        request = new UserRequest(username, password, null);
+        returnedUserDto = new UserDto(id, username, password, null, null, null);
     }
 
     @Test
-    @DisplayName("authentication service: sign up")
-    void signUp_encodesPasswordAndCreatesUser() {
-        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
-        when(userService.create(userRequest)).thenReturn(userDto);
+    @DisplayName("user service: create")
+    void create_returnsUserDto_whenDataIsValid() {
+        when(userMapper.toEntity(request)).thenReturn(user);
+        when(roleDao.findByName("ROLE_USER")).thenReturn(Optional.of(new Role()));
+        when(userDao.create(user)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
-        UserDto createdUser = authenticationService.signUp(userRequest);
+        UserDto createdUserDto = authenticationService.signUp(request);
 
-        assertNotNull(createdUser);
-        assertEquals(id, createdUser.getId());
+        assertNotNull(createdUserDto);
+        assertEquals(id, createdUserDto.id());
+        assertEquals(username, createdUserDto.username());
         verify(passwordEncoder, times(1)).encode(password);
-        verify(userService, times(1)).create(userRequest);
+    }
+
+    @Test
+    @DisplayName("user service: update")
+    void update_returnsUpdatedUserDto_whenDataIsValid() {
+        when(userDao.findById(id)).thenReturn(Optional.of(user));
+        when(userMapper.partialUpdate(request, user)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(returnedUserDto);
+
+        UserDto updatedUserDto = authenticationService.update(id, request);
+
+        assertNotNull(updatedUserDto);
+        assertEquals(id, updatedUserDto.id());
+        assertEquals(username, updatedUserDto.username());
+        verify(passwordEncoder, times(1)).encode(password);
+    }
+
+    @Test
+    @DisplayName("authentication service: update user without password")
+    void update_updatesUserWithoutEncodingPassword_whenPasswordIsBlank() {
+        UserRequest request = new UserRequest(username, null, null);
+
+        when(userDao.findById(id)).thenReturn(Optional.of(user));
+        when(userMapper.partialUpdate(request, user)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(returnedUserDto);
+
+        UserDto updatedUserDto = authenticationService.update(id, request);
+
+        assertNotNull(updatedUserDto);
+        assertEquals(id, updatedUserDto.id());
+        assertEquals(username, updatedUserDto.username());
+        verify(passwordEncoder, never()).encode(anyString());
     }
 
     @Test
@@ -103,11 +148,11 @@ public class AuthenticationServiceImplTests {
         when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
         when(jwtService.generateToken(userDetails)).thenReturn(jwtToken);
 
-        JwtResponse response = authenticationService.signIn(userRequest);
+        JwtResponse response = authenticationService.signIn(request);
 
         assertNotNull(response);
-        assertEquals(jwtToken, response.getToken());
-        assertEquals(username, response.getUsername());
+        assertEquals(jwtToken, response.token());
+        assertEquals(username, response.username());
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(userDetailsService, times(1)).loadUserByUsername(username);
         verify(jwtService, times(1)).generateToken(userDetails);
@@ -121,39 +166,8 @@ public class AuthenticationServiceImplTests {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(false);
 
-        CustomException exception = assertThrows(CustomException.class, () -> authenticationService.signIn(userRequest));
+        CustomException exception = assertThrows(CustomException.class, () -> authenticationService.signIn(request));
 
         assertEquals(ExceptionEnum.AUTHENTICATION_FAILED, exception.getExceptionEnum());
-    }
-
-    @Test
-    @DisplayName("authentication service: update user")
-    void update_encodesPasswordAndUpdatesUser() {
-        userRequest.setPassword(password);
-
-        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
-        when(userService.update(id, userRequest)).thenReturn(userDto);
-
-        UserDto updatedUser = authenticationService.update(id, userRequest);
-
-        assertNotNull(updatedUser);
-        assertEquals(id, updatedUser.getId());
-        verify(passwordEncoder, times(1)).encode(password);
-        verify(userService, times(1)).update(id, userRequest);
-    }
-
-    @Test
-    @DisplayName("authentication service: update user without password")
-    void update_updatesUserWithoutEncodingPassword_whenPasswordIsBlank() {
-        userRequest.setPassword("");
-
-        when(userService.update(id, userRequest)).thenReturn(userDto);
-
-        UserDto updatedUser = authenticationService.update(id, userRequest);
-
-        assertNotNull(updatedUser);
-        assertEquals(id, updatedUser.getId());
-        verify(passwordEncoder, never()).encode(anyString());
-        verify(userService, times(1)).update(id, userRequest);
     }
 }

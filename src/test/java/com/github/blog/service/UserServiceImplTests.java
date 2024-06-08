@@ -2,13 +2,10 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.request.filter.UserFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.controller.dto.response.PageableResponse;
-import com.github.blog.model.Role;
 import com.github.blog.model.User;
-import com.github.blog.repository.RoleDao;
 import com.github.blog.repository.UserDao;
 import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
@@ -43,9 +40,6 @@ public class UserServiceImplTests {
     private UserDao userDao;
 
     @Mock
-    private RoleDao roleDao;
-
-    @Mock
     private UserMapper userMapper;
 
     @Mock
@@ -56,47 +50,19 @@ public class UserServiceImplTests {
 
     private UserDto returnedUserDto;
     private final User user = new User();
-    private final UserRequest request = new UserRequest();
 
     private final Long id = 1L;
-    private final String login = "test login";
+    private final String username = "username";
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final UserFilterRequest userFilterRequest = new UserFilterRequest(null, null, null, null, null, null, null, null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        returnedUserDto = new UserDto();
-        returnedUserDto.setId(id);
-        returnedUserDto.setUsername(login);
-    }
-
-    @Test
-    @DisplayName("user service: create")
-    void create_returnsUserDto_whenDataIsValid() {
-        when(userMapper.toEntity(request)).thenReturn(user);
-        when(roleDao.findByName("ROLE_USER")).thenReturn(Optional.of(new Role()));
-        when(userDao.create(user)).thenReturn(user);
-        when(userMapper.toDto(user)).thenReturn(returnedUserDto);
-
-        UserDto createdUserDto = userService.create(request);
-
-        assertThat(createdUserDto).isNotNull();
-        assertThat(createdUserDto.getId()).isEqualTo(id);
-        assertThat(createdUserDto.getUsername()).isEqualTo(login);
-    }
-
-    @Test
-    @DisplayName("user service: update")
-    void update_returnsUpdatedUserDto_whenDataIsValid() {
-        when(userDao.findById(id)).thenReturn(Optional.of(user));
-        when(userMapper.partialUpdate(request, user)).thenReturn(user);
-        when(userMapper.toDto(user)).thenReturn(returnedUserDto);
-        UserDto updatedUserDto = userService.update(id, request);
-
-        assertThat(updatedUserDto).isNotNull();
-        assertThat(updatedUserDto.getId()).isEqualTo(id);
-        assertThat(updatedUserDto.getUsername()).isEqualTo(login);
+        String password = "password";
+        returnedUserDto = new UserDto(id, username, password, null, null, null);
     }
 
     @Test
@@ -108,8 +74,8 @@ public class UserServiceImplTests {
         UserDto deletedUserDto = userService.delete(id);
 
         assertThat(deletedUserDto).isNotNull();
-        assertThat(deletedUserDto.getId()).isEqualTo(id);
-        assertThat(deletedUserDto.getUsername()).isEqualTo(login);
+        assertThat(deletedUserDto.id()).isEqualTo(id);
+        assertThat(deletedUserDto.username()).isEqualTo(username);
         verify(userDao, times(1)).delete(user);
     }
 
@@ -126,11 +92,11 @@ public class UserServiceImplTests {
         when(userDao.findAll(filter, pageable)).thenReturn(page);
         when(userMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<UserDto> filterSearchResult = userService.findAll(new UserFilterRequest(), new PageableRequest());
+        PageResponse<UserDto> filterSearchResult = userService.findAll(userFilterRequest, pageableRequest);
 
-        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getUsername).containsExactly(login);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.content()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.content()).extracting(UserDto::username).containsExactly(username);
+        assertThat(filterSearchResult.content()).extracting(UserDto::id).containsExactly(id);
     }
 
     @Test
@@ -146,11 +112,11 @@ public class UserServiceImplTests {
         when(userDao.findAll(filter, pageable)).thenReturn(page);
         when(userMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<UserDto> filterSearchResult = userService.findAll(new UserFilterRequest(), new PageableRequest());
+        PageResponse<UserDto> filterSearchResult = userService.findAll(userFilterRequest, pageableRequest);
 
-        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getUsername).containsExactly(login);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.content()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.content()).extracting(UserDto::username).containsExactly(username);
+        assertThat(filterSearchResult.content()).extracting(UserDto::id).containsExactly(id);
     }
 
     @Test
@@ -166,11 +132,11 @@ public class UserServiceImplTests {
         when(userDao.findAll(filter, pageable)).thenReturn(page);
         when(userMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<UserDto> filterSearchResult = userService.findAll(new UserFilterRequest(), new PageableRequest());
+        PageResponse<UserDto> filterSearchResult = userService.findAll(userFilterRequest, pageableRequest);
 
-        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getUsername).containsExactly(login);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.content()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.content()).extracting(UserDto::username).containsExactly(username);
+        assertThat(filterSearchResult.content()).extracting(UserDto::id).containsExactly(id);
     }
 
     @Test
@@ -186,10 +152,10 @@ public class UserServiceImplTests {
         when(userDao.findAll(filter, pageable)).thenReturn(page);
         when(userMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<UserDto> filterSearchResult = userService.findAll(new UserFilterRequest(), new PageableRequest());
+        PageResponse<UserDto> filterSearchResult = userService.findAll(userFilterRequest, pageableRequest);
 
-        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getUsername).containsExactly(login);
-        assertThat(filterSearchResult.getContent()).extracting(UserDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.content()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.content()).extracting(UserDto::username).containsExactly(username);
+        assertThat(filterSearchResult.content()).extracting(UserDto::id).containsExactly(id);
     }
 }

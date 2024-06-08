@@ -59,22 +59,22 @@ public class RoleServiceImplTests {
 
     private final Long id = 1L;
     private final String roleName = "USER";
+    private static final String ROLE_PREFIX = "ROLE_";
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final RoleFilterRequest roleFilterRequest = new RoleFilterRequest(null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        request = new RoleRequest();
-        request.setName(roleName);
+        request = new RoleRequest(roleName);
 
         role = new Role();
         role.setId(id);
-        role.setName("ROLE_" + roleName);
+        role.setName(ROLE_PREFIX + roleName);
 
-        returnedRoleDto = new RoleDto();
-        returnedRoleDto.setId(id);
-        returnedRoleDto.setName("ROLE_" + roleName);
+        returnedRoleDto = new RoleDto(id, ROLE_PREFIX + roleName);
     }
 
     @Test
@@ -87,8 +87,8 @@ public class RoleServiceImplTests {
         RoleDto createdRoleDto = roleService.create(request);
 
         assertNotNull(createdRoleDto);
-        assertEquals(id, createdRoleDto.getId());
-        assertEquals("ROLE_" + roleName, createdRoleDto.getName());
+        assertEquals(id, createdRoleDto.id());
+        assertEquals("ROLE_" + roleName, createdRoleDto.name());
     }
 
     @Test
@@ -100,8 +100,8 @@ public class RoleServiceImplTests {
         RoleDto foundRoleDto = roleService.findById(id);
 
         assertNotNull(foundRoleDto);
-        assertEquals(id, foundRoleDto.getId());
-        assertEquals("ROLE_" + roleName, foundRoleDto.getName());
+        assertEquals(id, foundRoleDto.id());
+        assertEquals(ROLE_PREFIX + roleName, foundRoleDto.name());
     }
 
     @Test
@@ -127,12 +127,12 @@ public class RoleServiceImplTests {
         when(roleDao.findAll(filter, pageable)).thenReturn(page);
         when(roleMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<RoleDto> foundRoles = roleService.findAll(new RoleFilterRequest(), new PageableRequest());
+        PageResponse<RoleDto> foundRoles = roleService.findAll(roleFilterRequest, pageableRequest);
 
         assertNotNull(foundRoles);
-        assertEquals(1, foundRoles.getContent().size());
-        assertEquals(id, foundRoles.getContent().get(0).getId());
-        assertEquals("ROLE_" + roleName, foundRoles.getContent().get(0).getName());
+        assertEquals(1, foundRoles.content().size());
+        assertEquals(id, foundRoles.content().get(0).id());
+        assertEquals(ROLE_PREFIX + roleName, foundRoles.content().get(0).name());
     }
 
     @Test
@@ -146,7 +146,7 @@ public class RoleServiceImplTests {
         when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
         when(roleDao.findAll(filter, pageable)).thenReturn(page);
 
-        CustomException exception = assertThrows(CustomException.class, () -> roleService.findAll(new RoleFilterRequest(), new PageableRequest()));
+        CustomException exception = assertThrows(CustomException.class, () -> roleService.findAll(roleFilterRequest, pageableRequest));
 
         assertEquals(ExceptionEnum.ROLES_NOT_FOUND, exception.getExceptionEnum());
     }
@@ -161,8 +161,8 @@ public class RoleServiceImplTests {
         RoleDto updatedRoleDto = roleService.update(id, request);
 
         assertNotNull(updatedRoleDto);
-        assertEquals(id, updatedRoleDto.getId());
-        assertEquals("ROLE_" + roleName, updatedRoleDto.getName());
+        assertEquals(id, updatedRoleDto.id());
+        assertEquals(ROLE_PREFIX + roleName, updatedRoleDto.name());
     }
 
     @Test
@@ -174,8 +174,8 @@ public class RoleServiceImplTests {
         RoleDto deletedRoleDto = roleService.delete(id);
 
         assertNotNull(deletedRoleDto);
-        assertEquals(id, deletedRoleDto.getId());
-        assertEquals("ROLE_" + roleName, deletedRoleDto.getName());
+        assertEquals(id, deletedRoleDto.id());
+        assertEquals(ROLE_PREFIX + roleName, deletedRoleDto.name());
         verify(roleDao, times(1)).delete(role);
     }
 }

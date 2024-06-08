@@ -63,20 +63,20 @@ public class PostServiceImplTests {
     private PostServiceImpl postService;
 
     private PostDto returnedPostDto;
-    private final PostRequest request = new PostRequest();
+    private final PostRequest request = new PostRequest(null, null, null);
     private final Post post = new Post();
 
     private final Long id = 1L;
     private final String title = "test title";
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final PostFilterRequest postFilterRequest = new PostFilterRequest(null, null, null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        returnedPostDto = new PostDto();
-        returnedPostDto.setId(id);
-        returnedPostDto.setTitle(title);
+        returnedPostDto = new PostDto(id, null, title, null, null, null, null);
     }
 
     @Test
@@ -94,8 +94,8 @@ public class PostServiceImplTests {
         PostDto createdPostDto = postService.create(request);
 
         assertThat(createdPostDto).isNotNull();
-        assertThat(createdPostDto.getId()).isEqualTo(id);
-        assertThat(createdPostDto.getTitle()).isEqualTo(title);
+        assertThat(createdPostDto.id()).isEqualTo(id);
+        assertThat(createdPostDto.title()).isEqualTo(title);
     }
 
     @Test
@@ -113,8 +113,8 @@ public class PostServiceImplTests {
         PostDto createdPostDto = postService.create(request);
 
         assertThat(createdPostDto).isNotNull();
-        assertThat(createdPostDto.getId()).isEqualTo(id);
-        assertThat(createdPostDto.getTitle()).isEqualTo(title);
+        assertThat(createdPostDto.id()).isEqualTo(id);
+        assertThat(createdPostDto.title()).isEqualTo(title);
     }
 
     @Test
@@ -127,8 +127,8 @@ public class PostServiceImplTests {
         PostDto updatedPostDto = postService.update(id, request);
 
         assertThat(updatedPostDto).isNotNull();
-        assertThat(updatedPostDto.getId()).isEqualTo(id);
-        assertThat(updatedPostDto.getTitle()).isEqualTo(title);
+        assertThat(updatedPostDto.id()).isEqualTo(id);
+        assertThat(updatedPostDto.title()).isEqualTo(title);
     }
 
     @Test
@@ -140,8 +140,8 @@ public class PostServiceImplTests {
         PostDto deletedPostDto = postService.delete(id);
 
         assertThat(deletedPostDto).isNotNull();
-        assertThat(deletedPostDto.getId()).isEqualTo(id);
-        assertThat(deletedPostDto.getTitle()).isEqualTo(title);
+        assertThat(deletedPostDto.id()).isEqualTo(id);
+        assertThat(deletedPostDto.title()).isEqualTo(title);
         verify(postDao, times(1)).delete(post);
     }
 
@@ -158,11 +158,11 @@ public class PostServiceImplTests {
         when(postDao.findAll(filter, pageable)).thenReturn(page);
         when(postMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<PostDto> filterSearchResult = postService.findAll(new PostFilterRequest(), new PageableRequest());
+        PageResponse<PostDto> filterSearchResult = postService.findAll(postFilterRequest, pageableRequest);
 
-        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult.getContent()).extracting(PostDto::getTitle).containsExactly(title);
-        assertThat(filterSearchResult.getContent()).extracting(PostDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.content()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.content()).extracting(PostDto::title).containsExactly(title);
+        assertThat(filterSearchResult.content()).extracting(PostDto::id).containsExactly(id);
     }
 
     @Test
@@ -178,10 +178,10 @@ public class PostServiceImplTests {
         when(postDao.findAll(filter, pageable)).thenReturn(page);
         when(postMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<PostDto> filterSearchResult = postService.findAll(new PostFilterRequest(), new PageableRequest());
+        PageResponse<PostDto> filterSearchResult = postService.findAll(postFilterRequest, pageableRequest);
 
-        assertThat(filterSearchResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filterSearchResult.getContent()).extracting(PostDto::getTitle).containsExactly(title);
-        assertThat(filterSearchResult.getContent()).extracting(PostDto::getId).containsExactly(id);
+        assertThat(filterSearchResult.content()).isNotEmpty().hasSize(1);
+        assertThat(filterSearchResult.content()).extracting(PostDto::title).containsExactly(title);
+        assertThat(filterSearchResult.content()).extracting(PostDto::id).containsExactly(id);
     }
 }

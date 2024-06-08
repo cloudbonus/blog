@@ -59,20 +59,18 @@ public class ReactionServiceImplTests {
     private final String reactionName = "LIKE";
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        request = new ReactionRequest();
-        request.setName(reactionName);
+        request = new ReactionRequest(reactionName);
 
         reaction = new Reaction();
         reaction.setId(id);
         reaction.setName(reactionName);
 
-        returnedReactionDto = new ReactionDto();
-        returnedReactionDto.setId(id);
-        returnedReactionDto.setName(reactionName);
+        returnedReactionDto = new ReactionDto(id, reactionName);
     }
 
     @Test
@@ -85,8 +83,8 @@ public class ReactionServiceImplTests {
         ReactionDto createdReactionDto = reactionService.create(request);
 
         assertNotNull(createdReactionDto);
-        assertEquals(id, createdReactionDto.getId());
-        assertEquals(reactionName, createdReactionDto.getName());
+        assertEquals(id, createdReactionDto.id());
+        assertEquals(reactionName, createdReactionDto.name());
     }
 
     @Test
@@ -98,8 +96,8 @@ public class ReactionServiceImplTests {
         ReactionDto foundReactionDto = reactionService.findById(id);
 
         assertNotNull(foundReactionDto);
-        assertEquals(id, foundReactionDto.getId());
-        assertEquals(reactionName, foundReactionDto.getName());
+        assertEquals(id, foundReactionDto.id());
+        assertEquals(reactionName, foundReactionDto.name());
     }
 
     @Test
@@ -122,11 +120,11 @@ public class ReactionServiceImplTests {
         when(reactionDao.findAll(pageable)).thenReturn(page);
         when(reactionMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<ReactionDto> foundReactions = reactionService.findAll(new PageableRequest());
+        PageResponse<ReactionDto> foundReactions = reactionService.findAll(pageableRequest);
 
         assertNotNull(foundReactions);
-        assertEquals(1, foundReactions.getContent().size());
-        assertEquals(id, foundReactions.getContent().get(0).getId());
+        assertEquals(1, foundReactions.content().size());
+        assertEquals(id, foundReactions.content().get(0).id());
     }
 
     @Test
@@ -137,7 +135,7 @@ public class ReactionServiceImplTests {
         when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
         when(reactionDao.findAll(pageable)).thenReturn(page);
 
-        CustomException exception = assertThrows(CustomException.class, () -> reactionService.findAll(new PageableRequest()));
+        CustomException exception = assertThrows(CustomException.class, () -> reactionService.findAll(pageableRequest));
 
         assertEquals(ExceptionEnum.REACTIONS_NOT_FOUND, exception.getExceptionEnum());
     }
@@ -152,8 +150,8 @@ public class ReactionServiceImplTests {
         ReactionDto updatedReactionDto = reactionService.update(id, request);
 
         assertNotNull(updatedReactionDto);
-        assertEquals(id, updatedReactionDto.getId());
-        assertEquals(reactionName, updatedReactionDto.getName());
+        assertEquals(id, updatedReactionDto.id());
+        assertEquals(reactionName, updatedReactionDto.name());
     }
 
     @Test
@@ -165,8 +163,8 @@ public class ReactionServiceImplTests {
         ReactionDto deletedReactionDto = reactionService.delete(id);
 
         assertNotNull(deletedReactionDto);
-        assertEquals(id, deletedReactionDto.getId());
-        assertEquals(reactionName, deletedReactionDto.getName());
+        assertEquals(id, deletedReactionDto.id());
+        assertEquals(reactionName, deletedReactionDto.name());
         verify(reactionDao, times(1)).delete(reaction);
     }
 }

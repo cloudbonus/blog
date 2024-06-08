@@ -83,14 +83,14 @@ public class CommentReactionServiceImplTests {
     private final Long commentId = 1L;
     private final Long reactionId = 1L;
 
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final CommentReactionFilterRequest commentReactionFilterRequest = new CommentReactionFilterRequest(null, null, null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        request = new CommentReactionRequest();
-        request.setCommentId(commentId);
-        request.setReactionId(reactionId);
+        request = new CommentReactionRequest(commentId, reactionId);
 
         comment = new Comment();
         comment.setId(commentId);
@@ -103,8 +103,7 @@ public class CommentReactionServiceImplTests {
         commentReaction.setComment(comment);
         commentReaction.setReaction(reaction);
 
-        returnedCommentReactionDto = new CommentReactionDto();
-        returnedCommentReactionDto.setId(id);
+        returnedCommentReactionDto = new CommentReactionDto(id, null, null, null);
     }
 
     @Test
@@ -123,7 +122,7 @@ public class CommentReactionServiceImplTests {
         CommentReactionDto createdCommentReactionDto = commentReactionService.create(request);
 
         assertNotNull(createdCommentReactionDto);
-        assertEquals(id, createdCommentReactionDto.getId());
+        assertEquals(id, createdCommentReactionDto.id());
         verify(commentReactionDao, times(1)).create(commentReaction);
     }
 
@@ -136,7 +135,7 @@ public class CommentReactionServiceImplTests {
         CommentReactionDto foundCommentReactionDto = commentReactionService.findById(id);
 
         assertNotNull(foundCommentReactionDto);
-        assertEquals(id, foundCommentReactionDto.getId());
+        assertEquals(id, foundCommentReactionDto.id());
     }
 
     @Test
@@ -162,11 +161,11 @@ public class CommentReactionServiceImplTests {
         when(commentReactionDao.findAll(filter, pageable)).thenReturn(page);
         when(commentReactionMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<CommentReactionDto> foundCommentReactions = commentReactionService.findAll(new CommentReactionFilterRequest(), new PageableRequest());
+        PageResponse<CommentReactionDto> foundCommentReactions = commentReactionService.findAll(commentReactionFilterRequest, pageableRequest);
 
         assertNotNull(foundCommentReactions);
-        assertEquals(1, foundCommentReactions.getContent().size());
-        assertEquals(id, foundCommentReactions.getContent().get(0).getId());
+        assertEquals(1, foundCommentReactions.content().size());
+        assertEquals(id, foundCommentReactions.content().get(0).id());
     }
 
     @Test
@@ -180,7 +179,7 @@ public class CommentReactionServiceImplTests {
         when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
         when(commentReactionDao.findAll(filter, pageable)).thenReturn(page);
 
-        CustomException exception = assertThrows(CustomException.class, () -> commentReactionService.findAll(new CommentReactionFilterRequest(), new PageableRequest()));
+        CustomException exception = assertThrows(CustomException.class, () -> commentReactionService.findAll(commentReactionFilterRequest, pageableRequest));
 
         assertEquals(ExceptionEnum.COMMENT_REACTIONS_NOT_FOUND, exception.getExceptionEnum());
     }
@@ -195,7 +194,7 @@ public class CommentReactionServiceImplTests {
         CommentReactionDto updatedCommentReactionDto = commentReactionService.update(id, request);
 
         assertNotNull(updatedCommentReactionDto);
-        assertEquals(id, updatedCommentReactionDto.getId());
+        assertEquals(id, updatedCommentReactionDto.id());
     }
 
     @Test
@@ -207,7 +206,7 @@ public class CommentReactionServiceImplTests {
         CommentReactionDto deletedCommentReactionDto = commentReactionService.delete(id);
 
         assertNotNull(deletedCommentReactionDto);
-        assertEquals(id, deletedCommentReactionDto.getId());
+        assertEquals(id, deletedCommentReactionDto.id());
         verify(commentReactionDao, times(1)).delete(commentReaction);
     }
 }

@@ -89,11 +89,13 @@ public class UserInfoServiceImplTests {
     private final Long roleId = 1L;
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final UserInfoFilterRequest userInfoFilterRequest = new UserInfoFilterRequest(null);
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        request = new UserInfoRequest();
+        request = new UserInfoRequest(null, null, null, null, null, null);
 
         userInfo = new UserInfo();
         userInfo.setId(id);
@@ -104,8 +106,7 @@ public class UserInfoServiceImplTests {
         role = new Role();
         role.setId(roleId);
 
-        returnedUserInfoDto = new UserInfoDto();
-        returnedUserInfoDto.setId(id);
+        returnedUserInfoDto = new UserInfoDto(id, null, null, null, null, null, null, null);
     }
 
     @Test
@@ -120,7 +121,7 @@ public class UserInfoServiceImplTests {
         UserInfoDto createdUserInfoDto = userInfoService.create(request);
 
         assertNotNull(createdUserInfoDto);
-        assertEquals(id, createdUserInfoDto.getId());
+        assertEquals(id, createdUserInfoDto.id());
         verify(userInfoDao, times(1)).create(userInfo);
     }
 
@@ -140,7 +141,7 @@ public class UserInfoServiceImplTests {
         UserInfoDto canceledUserInfoDto = userInfoService.cancel(id);
 
         assertNotNull(canceledUserInfoDto);
-        assertEquals(id, canceledUserInfoDto.getId());
+        assertEquals(id, canceledUserInfoDto.id());
     }
 
     @Test
@@ -161,7 +162,7 @@ public class UserInfoServiceImplTests {
         UserInfoDto verifiedUserInfoDto = userInfoService.verify(id, roleId);
 
         assertNotNull(verifiedUserInfoDto);
-        assertEquals(id, verifiedUserInfoDto.getId());
+        assertEquals(id, verifiedUserInfoDto.id());
     }
 
     @Test
@@ -173,7 +174,7 @@ public class UserInfoServiceImplTests {
         UserInfoDto foundUserInfoDto = userInfoService.findById(id);
 
         assertNotNull(foundUserInfoDto);
-        assertEquals(id, foundUserInfoDto.getId());
+        assertEquals(id, foundUserInfoDto.id());
     }
 
     @Test
@@ -199,11 +200,11 @@ public class UserInfoServiceImplTests {
         when(userInfoDao.findAll(filter, pageable)).thenReturn(page);
         when(userInfoMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<UserInfoDto> foundUserInfos = userInfoService.findAll(new UserInfoFilterRequest(), new PageableRequest());
+        PageResponse<UserInfoDto> foundUserInfos = userInfoService.findAll(userInfoFilterRequest, pageableRequest);
 
         assertNotNull(foundUserInfos);
-        assertEquals(1, foundUserInfos.getContent().size());
-        assertEquals(id, foundUserInfos.getContent().get(0).getId());
+        assertEquals(1, foundUserInfos.content().size());
+        assertEquals(id, foundUserInfos.content().get(0).id());
     }
 
     @Test
@@ -217,7 +218,7 @@ public class UserInfoServiceImplTests {
         when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
         when(userInfoDao.findAll(filter, pageable)).thenReturn(page);
 
-        CustomException exception = assertThrows(CustomException.class, () -> userInfoService.findAll(new UserInfoFilterRequest(), new PageableRequest()));
+        CustomException exception = assertThrows(CustomException.class, () -> userInfoService.findAll(userInfoFilterRequest, pageableRequest));
 
         assertEquals(ExceptionEnum.USER_INFO_NOT_FOUND, exception.getExceptionEnum());
     }
@@ -232,7 +233,7 @@ public class UserInfoServiceImplTests {
         UserInfoDto updatedUserInfoDto = userInfoService.update(id, request);
 
         assertNotNull(updatedUserInfoDto);
-        assertEquals(id, updatedUserInfoDto.getId());
+        assertEquals(id, updatedUserInfoDto.id());
     }
 
     @Test
@@ -244,7 +245,7 @@ public class UserInfoServiceImplTests {
         UserInfoDto deletedUserInfoDto = userInfoService.delete(id);
 
         assertNotNull(deletedUserInfoDto);
-        assertEquals(id, deletedUserInfoDto.getId());
+        assertEquals(id, deletedUserInfoDto.id());
         verify(userInfoDao, times(1)).delete(userInfo);
     }
 }

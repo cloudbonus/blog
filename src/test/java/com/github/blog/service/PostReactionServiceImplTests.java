@@ -84,13 +84,14 @@ public class PostReactionServiceImplTests {
     private final Long reactionId = 1L;
 
     private final Pageable pageable = new Pageable();
-    private final PageableResponse pageableResponse = new PageableResponse();
+    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final PostReactionFilterRequest postReactionFilterRequest = new PostReactionFilterRequest(null, null, null);
+
+    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
-        request = new PostReactionRequest();
-        request.setPostId(postId);
-        request.setReactionId(reactionId);
+        request = new PostReactionRequest(postId, reactionId);
 
         post = new Post();
         post.setId(postId);
@@ -103,8 +104,7 @@ public class PostReactionServiceImplTests {
         postReaction.setReaction(reaction);
         postReaction.setPost(post);
 
-        returnedPostReactionDto = new PostReactionDto();
-        returnedPostReactionDto.setId(id);
+        returnedPostReactionDto = new PostReactionDto(id, null, null, null);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class PostReactionServiceImplTests {
         PostReactionDto createdPostReactionDto = postReactionService.create(request);
 
         assertNotNull(createdPostReactionDto);
-        assertEquals(id, createdPostReactionDto.getId());
+        assertEquals(id, createdPostReactionDto.id());
         verify(postReactionDao, times(1)).create(postReaction);
     }
 
@@ -136,7 +136,7 @@ public class PostReactionServiceImplTests {
         PostReactionDto foundPostReactionDto = postReactionService.findById(id);
 
         assertNotNull(foundPostReactionDto);
-        assertEquals(id, foundPostReactionDto.getId());
+        assertEquals(id, foundPostReactionDto.id());
     }
 
     @Test
@@ -162,11 +162,11 @@ public class PostReactionServiceImplTests {
         when(postReactionDao.findAll(filter, pageable)).thenReturn(page);
         when(postReactionMapper.toDto(page)).thenReturn(pageResponse);
 
-        PageResponse<PostReactionDto> foundPostReactions = postReactionService.findAll(new PostReactionFilterRequest(), new PageableRequest());
+        PageResponse<PostReactionDto> foundPostReactions = postReactionService.findAll(postReactionFilterRequest, pageableRequest);
 
         assertNotNull(foundPostReactions);
-        assertEquals(1, foundPostReactions.getContent().size());
-        assertEquals(id, foundPostReactions.getContent().get(0).getId());
+        assertEquals(1, foundPostReactions.content().size());
+        assertEquals(id, foundPostReactions.content().get(0).id());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class PostReactionServiceImplTests {
         when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
         when(postReactionDao.findAll(filter, pageable)).thenReturn(page);
 
-        CustomException exception = assertThrows(CustomException.class, () -> postReactionService.findAll(new PostReactionFilterRequest(), new PageableRequest()));
+        CustomException exception = assertThrows(CustomException.class, () -> postReactionService.findAll(postReactionFilterRequest, pageableRequest));
 
         assertEquals(ExceptionEnum.POST_REACTIONS_NOT_FOUND, exception.getExceptionEnum());
     }
@@ -195,7 +195,7 @@ public class PostReactionServiceImplTests {
         PostReactionDto updatedPostReactionDto = postReactionService.update(id, request);
 
         assertNotNull(updatedPostReactionDto);
-        assertEquals(id, updatedPostReactionDto.getId());
+        assertEquals(id, updatedPostReactionDto.id());
     }
 
     @Test
@@ -207,7 +207,7 @@ public class PostReactionServiceImplTests {
         PostReactionDto deletedPostReactionDto = postReactionService.delete(id);
 
         assertNotNull(deletedPostReactionDto);
-        assertEquals(id, deletedPostReactionDto.getId());
+        assertEquals(id, deletedPostReactionDto.id());
         verify(postReactionDao, times(1)).delete(postReaction);
     }
 }
