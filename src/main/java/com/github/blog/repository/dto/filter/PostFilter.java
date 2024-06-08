@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostFilter {
-    private String login;
-    private String tag;
+    private String username;
+    private Long tagId;
+    private String state;
 }

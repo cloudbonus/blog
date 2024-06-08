@@ -10,8 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Pageable {
-    int pageSize;
-    int pageNumber;
+    private int pageSize;
+    private int pageNumber;
+    private String orderBy;
 
     @JsonIgnore
     public int getOffset() {

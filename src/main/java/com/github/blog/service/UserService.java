@@ -2,22 +2,17 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.RegistrationRequest;
-import com.github.blog.controller.dto.request.filter.UserDtoFilter;
-import com.github.blog.controller.dto.response.Page;
+import com.github.blog.controller.dto.request.filter.UserFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 
 
 /**
  * @author Raman Haurylau
  */
 public interface UserService {
-    Page<UserDto> findAll(UserDtoFilter requestFilter, PageableRequest pageableRequest);
-
-    UserDto create(RegistrationRequest t);
+    PageResponse<UserDto> findAll(UserFilterRequest requestFilter, PageableRequest pageableRequest);
 
     UserDto findById(Long id);
-
-    UserDto update(Long id, RegistrationRequest t);
 
     UserDto delete(Long id);
 }

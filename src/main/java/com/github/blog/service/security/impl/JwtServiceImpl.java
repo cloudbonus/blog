@@ -26,12 +26,16 @@ public class JwtServiceImpl implements JwtService {
     @Value("${com.github.blog.jwtExpirationMs}")
     public int jwtExpirationMs;
 
+    private static final String JWT_TYPE = "JWT";
+    private static final String ID = "id";
+    private static final String ROLES = "roles";
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
 
         if (userDetails instanceof UserDetailsImpl customUserDetails) {
-            claims.put("id", customUserDetails.getId());
-            claims.put("roles", customUserDetails.getAuthorities());
+            claims.put(ID, customUserDetails.getId());
+            claims.put(ROLES, customUserDetails.getAuthorities());
         }
 
         return generateToken(claims, userDetails);
@@ -40,7 +44,7 @@ public class JwtServiceImpl implements JwtService {
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .claims(extraClaims)
-                .header().type("JWT").and()
+                .header().type(JWT_TYPE).and()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))

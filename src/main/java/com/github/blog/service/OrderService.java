@@ -2,21 +2,28 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
-
-import java.util.List;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 
 
 /**
  * @author Raman Haurylau
  */
 public interface OrderService {
-    List<OrderDto> findAll();
+    PageResponse<OrderDto> findAll(OrderFilterRequest requestFilter, PageableRequest pageableRequest);
 
-    OrderDto create(OrderRequest t);
+    OrderDto reserve(Long id);
+
+    OrderDto cancel(Long id);
+
+    OrderDto buy(Long id);
 
     OrderDto findById(Long id);
 
     OrderDto update(Long id, OrderRequest t);
 
     OrderDto delete(Long id);
+
+    OrderDto findByPostId(Long id);
 }

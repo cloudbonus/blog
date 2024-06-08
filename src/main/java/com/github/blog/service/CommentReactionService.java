@@ -2,14 +2,15 @@ package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.CommentReactionDto;
 import com.github.blog.controller.dto.request.CommentReactionRequest;
-
-import java.util.List;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.filter.CommentReactionFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 
 /**
  * @author Raman Haurylau
  */
 public interface CommentReactionService {
-    List<CommentReactionDto> findAll();
+    PageResponse<CommentReactionDto> findAll(CommentReactionFilterRequest requestFilter, PageableRequest pageableRequest);
 
     CommentReactionDto create(CommentReactionRequest t);
 

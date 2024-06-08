@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class DataSourceProperties {
+
     private final String url;
     private final String username;
     private final String password;

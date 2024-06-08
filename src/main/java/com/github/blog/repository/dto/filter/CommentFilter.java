@@ -9,5 +9,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CommentFilter {
-    private String login;
+    private String username;
 }

@@ -1,15 +1,11 @@
 package com.github.blog.controller.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Raman Haurylau
  */
-@Getter
-@Setter
-public class OrderRequest {
-    Long id;
-    Long postId;
-    Long userId;
+public record OrderRequest(@NotNull(message = "Post ID is mandatory") Long postId,
+                           @NotNull(message = "User ID is mandatory") Long userId) {
+
 }

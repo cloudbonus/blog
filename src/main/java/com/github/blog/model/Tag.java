@@ -16,15 +16,16 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "tag", schema = "blogging_platform")
+@Table(name = "tag", schema = "blog")
 public class Tag {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tag_id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false, length = Integer.MAX_VALUE)
-    private String tagName;
+    private String name;
 
     @ManyToMany(mappedBy = "tags")
     private List<Post> posts = new ArrayList<>();

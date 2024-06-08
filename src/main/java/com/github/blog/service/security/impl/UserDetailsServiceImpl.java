@@ -2,8 +2,8 @@ package com.github.blog.service.security.impl;
 
 import com.github.blog.model.User;
 import com.github.blog.repository.UserDao;
-import com.github.blog.service.exception.UserErrorResult;
-import com.github.blog.service.exception.impl.UserException;
+import com.github.blog.service.exception.ExceptionEnum;
+import com.github.blog.service.exception.impl.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,15 +21,15 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserDao userDao;
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) {
-        User user = userDao.findByUsername(username).orElseThrow(() -> new UserException(UserErrorResult.BAD_CREDENTIALS));
+        User user = userDao.findByUsername(username).orElseThrow(() -> new CustomException(ExceptionEnum.BAD_CREDENTIALS));
 
-        Collection<? extends GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
+        Collection<? extends GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
 
         return new UserDetailsImpl(user.getId(), user.getUsername(), user.getPassword(), authorities);
     }

@@ -1,6 +1,7 @@
 package com.github.blog.repository.impl;
 
-import com.github.blog.controller.dto.response.Page;
+import com.github.blog.model.Order;
+import com.github.blog.model.Order_;
 import com.github.blog.model.Post;
 import com.github.blog.model.Post_;
 import com.github.blog.model.Tag;
@@ -8,6 +9,7 @@ import com.github.blog.model.Tag_;
 import com.github.blog.model.User;
 import com.github.blog.model.User_;
 import com.github.blog.repository.PostDao;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.PostFilter;
 import jakarta.persistence.TypedQuery;
@@ -33,6 +35,8 @@ import java.util.List;
 @Transactional
 public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
 
+    private static final String DEFAULT_ORDER = "asc";
+
     @Override
     public Page<Post> findAll(PostFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -41,19 +45,32 @@ public class PostDaoImpl extends AbstractJpaDao<Post, Long> implements PostDao {
         Root<Post> root = cq.from(Post.class);
         Join<Post, User> user = root.join(Post_.user, JoinType.LEFT);
         Join<Post, Tag> tag = root.join(Post_.tags, JoinType.LEFT);
+        Join<Post, Order> order = root.join(Post_.order, JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (!ObjectUtils.isEmpty(filter.getLogin())) {
-            predicates.add(cb.equal(cb.lower(user.get(User_.username).as(String.class)), filter.getLogin().toLowerCase()));
+        if (!ObjectUtils.isEmpty(filter.getUsername())) {
+            predicates.add(cb.like(cb.lower(user.get(User_.username).as(String.class)), filter.getUsername().toLowerCase()));
         }
 
-        if (!ObjectUtils.isEmpty(filter.getTag())) {
-            predicates.add(cb.equal(cb.lower(tag.get(Tag_.tagName).as(String.class)), filter.getTag().toLowerCase()));
+        if (!ObjectUtils.isEmpty(filter.getState())) {
+            predicates.add(cb.or(
+                    cb.isNull(order.get(Order_.state)),
+                    cb.equal(cb.lower(order.get(Order_.state).as(String.class)), filter.getState().toLowerCase())
+            ));
+        }
+
+        if (!ObjectUtils.isEmpty(filter.getTagId())) {
+            predicates.add(cb.equal(tag.get(Tag_.id), filter.getTagId()));
         }
 
         cq.multiselect(root).distinct(true).where(cb.and(predicates.toArray(Predicate[]::new)));
-        cq.orderBy(cb.asc(root.get(Post_.id)));
+
+        if (pageable.getOrderBy().equalsIgnoreCase(DEFAULT_ORDER)) {
+            cq.orderBy(cb.asc(root.get(Post_.id)));
+        } else {
+            cq.orderBy(cb.desc(root.get(Post_.id)));
+        }
 
         TypedQuery<PostBox> query = entityManager.createQuery(cq);
 

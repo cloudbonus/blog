@@ -2,21 +2,21 @@ package com.github.blog.repository;
 
 import com.github.blog.config.DataSourceProperties;
 import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.controller.dto.response.Page;
+import com.github.blog.config.RepositoryTestConfig;
+import com.github.blog.config.WebTestConfig;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
+import com.github.blog.repository.dto.common.Page;
 import com.github.blog.repository.dto.common.Pageable;
 import com.github.blog.repository.dto.filter.UserFilter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
@@ -28,10 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Raman Haurylau
  */
 @Transactional
-@ExtendWith({SpringExtension.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(classes = {DaoTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@SpringJUnitConfig(classes = {WebTestConfig.class, RepositoryTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = "/db/insert-test-data-into-user-table.sql")
+@Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
 public class UserDaoImplTests {
 
     @Autowired
@@ -47,17 +47,18 @@ public class UserDaoImplTests {
         pageable = new Pageable();
         pageable.setPageSize(Integer.MAX_VALUE);
         pageable.setPageNumber(1);
+        pageable.setOrderBy("ASC");
     }
 
     @Test
+    @Rollback
     @DisplayName("user dao: create")
-    @Sql("/db/daotests/insert-test-data-into-user-table.sql")
     void create_returnsUserDto_whenDataIsValid() {
         User user = new User();
         user.setUsername("login1");
         user.setEmail("temp1@test.by");
         user.setPassword("123");
-        user.setLastLogin(OffsetDateTime.now());
+        user.setUpdatedAt(OffsetDateTime.now());
         user.setCreatedAt(OffsetDateTime.now());
 
         Optional<Role> role = roleDao.findByName("ROLE_USER");
@@ -71,18 +72,18 @@ public class UserDaoImplTests {
         assertThat(user.getRoles()).isNotEmpty().hasSize(1);
 
         assertThat(userDao.findById(user.getId())).isPresent();
-        assertThat(userDao.findAll()).isNotEmpty().hasSize(3);
+        assertThat(userDao.findAll()).isNotEmpty().hasSize(7);
     }
 
     @Test
+    @Rollback
     @DisplayName("user dao: update")
-    @Sql("/db/daotests/insert-test-data-into-user-table.sql")
     void update_returnsUpdatedUserDto_whenDataIsValid() {
-        String login = "kvossing0";
+        String username = "kvossing0";
         String expectedLogin = "new_kvossing0";
 
         UserFilter filter = new UserFilter();
-        filter.setLogin(login);
+        filter.setUsername(username);
 
         Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
@@ -100,52 +101,58 @@ public class UserDaoImplTests {
     }
 
     @Test
+    @Rollback
     @DisplayName("user dao: delete")
-    @Sql("/db/daotests/insert-test-data-into-user-table.sql")
     void delete_deletesUser_whenDataIsValid() {
-        String login = "kvossing0";
+        String username = "kvossing0";
 
         UserFilter filter = new UserFilter();
-        filter.setLogin(login);
+        filter.setUsername(username);
         Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty();
 
         userDao.delete(filteredUserResult.getContent().get(0));
 
-        assertThat(userDao.findAll()).isNotEmpty().hasSize(1);
+        assertThat(userDao.findAll()).isNotEmpty().hasSize(5);
     }
 
     @Test
-    @DisplayName("user dao: findAllByRole")
-    @Sql("/db/daotests/insert-test-data-into-user-table.sql")
+    @DisplayName("user dao: find by id")
+    void findById_returnsUser_whenIdIsValid() {
+        Optional<User> foundUser = userDao.findById(4L);
+
+        assertThat(foundUser).isPresent();
+        assertThat(foundUser.get().getId()).isEqualTo(4L);
+        assertThat(foundUser.get().getUsername()).isEqualTo("user");
+    }
+
+    @Test
+    @DisplayName("user dao: find all by role")
     void find_findsAllUsersByRole_whenDataIsValid() {
-        String role = "user";
-
         UserFilter filter = new UserFilter();
-        filter.setRole(role);
+        filter.setRoleId(2L);
 
-        assertThat(userDao.findAll(filter, pageable).getContent()).isNotEmpty().hasSize(2);
+        assertThat(userDao.findAll(filter, pageable).getContent()).isNotEmpty().hasSize(3);
     }
 
     @Test
-    @DisplayName("user dao: findByLogin")
-    @Sql("/db/daotests/insert-test-data-into-user-table.sql")
-    void find_findsUserByLogin_whenDataIsValid() {
-        String login = "kvossing0";
+    @DisplayName("user dao: find by username")
+    void find_findsUserByUsername_whenDataIsValid() {
+        String username = "kvossing0";
 
         UserFilter filter = new UserFilter();
-        filter.setLogin(login);
+        filter.setUsername(username);
 
         Page<User> filteredUserResult = userDao.findAll(filter, pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty().hasSize(1);
-        assertThat(filteredUserResult.getContent().get(0).getUsername()).isEqualTo(login);
+        assertThat(filteredUserResult.getContent().get(0).getUsername()).isEqualTo(username);
     }
 
     @Test
-    @DisplayName("user dao: findAllByJobTitle")
-    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-user_details-table.sql"})
+    @DisplayName("user dao: find all by job")
+    @Sql("/db/insert-test-data-into-user_info-table.sql")
     void find_findsAllUsersByJobTitle_whenDataIsValid() {
         String jobTitle = "Software Engineer";
 
@@ -156,8 +163,8 @@ public class UserDaoImplTests {
     }
 
     @Test
-    @DisplayName("user dao: findAllByUniversity")
-    @Sql({"/db/daotests/insert-test-data-into-user-table.sql", "/db/daotests/insert-test-data-into-user_details-table.sql"})
+    @DisplayName("user dao: find all by university")
+    @Sql("/db/insert-test-data-into-user_info-table.sql")
     void find_findsAllUsersByUniversity_whenDataIsValid() {
         String university = "MIT";
 

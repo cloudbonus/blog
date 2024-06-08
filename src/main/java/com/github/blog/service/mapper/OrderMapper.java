@@ -2,17 +2,16 @@ package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
+import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.model.Order;
-import org.mapstruct.BeanMapping;
+import com.github.blog.repository.dto.filter.OrderFilter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PostMapper.class, UserMapper.class})
-public interface OrderMapper {
+public interface OrderMapper extends BasePageMapper<Order, OrderDto> {
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "postId", target = "post.id")
     Order toEntity(OrderRequest request);
@@ -21,6 +20,5 @@ public interface OrderMapper {
     @Mapping(target = "postId", source = "post.id")
     OrderDto toDto(Order order);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Order partialUpdate(OrderRequest request, @MappingTarget Order order);
+    OrderFilter toEntity(OrderFilterRequest requestFilter);
 }

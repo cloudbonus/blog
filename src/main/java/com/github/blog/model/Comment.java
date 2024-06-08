@@ -19,11 +19,12 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "comment", schema = "blogging_platform")
+@Table(name = "comment", schema = "blog")
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @ManyToOne(optional = false)
@@ -40,10 +41,10 @@ public class Comment {
     private String content;
 
     @Column(nullable = false)
-    private OffsetDateTime publishedAt;
+    private OffsetDateTime createdAt;
 
     @PrePersist
     private void prePersist() {
-        publishedAt = OffsetDateTime.now();
+        createdAt = OffsetDateTime.now();
     }
 }

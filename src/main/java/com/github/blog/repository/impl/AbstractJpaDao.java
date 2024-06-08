@@ -12,6 +12,7 @@ import java.util.Optional;
  * @author Raman Haurylau
  */
 public class AbstractJpaDao<E, ID> implements CrudDao<E, ID> {
+
     private final Class<E> clazz;
 
     @SuppressWarnings("unchecked")

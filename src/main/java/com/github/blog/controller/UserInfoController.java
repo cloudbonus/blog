@@ -1,10 +1,17 @@
 package com.github.blog.controller;
 
 import com.github.blog.controller.dto.common.UserInfoDto;
+import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.UserInfoRequest;
+import com.github.blog.controller.dto.request.filter.UserInfoFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
+import com.github.blog.controller.util.marker.UserInfoValidationGroup;
 import com.github.blog.service.UserInfoService;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,46 +19,58 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Raman Haurylau
  */
+@Validated
 @RestController
 @RequestMapping("user-info")
 @RequiredArgsConstructor
 public class UserInfoController {
+
     private final UserInfoService userInfoService;
 
     @PostMapping
-    @PreAuthorize("#r.id == authentication.principal.id")
-    public UserInfoDto create(@RequestBody @P("r") UserInfoDto request) {
+    public UserInfoDto create(@RequestBody @Validated(UserInfoValidationGroup.onCreate.class) UserInfoRequest request) {
         return userInfoService.create(request);
     }
 
+    @GetMapping("{id}/cancel")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    public UserInfoDto cancel(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
+        return userInfoService.cancel(id);
+    }
+
+    @GetMapping("{id}/verify")
+    @PreAuthorize("hasRole('ADMIN') and (#roleId == 3 or #roleId == 4)")
+    public UserInfoDto verify(@PathVariable("id") @Positive(message = "ID must be greater than 0") Long id, @RequestParam("roleId") @P("roleId") Long roleId) {
+        return userInfoService.verify(id, roleId);
+    }
+
     @GetMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
-    public UserInfoDto findById(@PathVariable("id") @P("id") Long id) {
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    public UserInfoDto findById(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
         return userInfoService.findById(id);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserInfoDto> findAll() {
-        return userInfoService.findAll();
+    public PageResponse<UserInfoDto> findAll(@Validated UserInfoFilterRequest filterRequest, @Validated PageableRequest pageableRequest) {
+        return userInfoService.findAll(filterRequest, pageableRequest);
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
-    public UserInfoDto update(@PathVariable("id") @P("id") Long id, @RequestBody UserInfoDto request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserInfoDto update(@PathVariable("id") @Positive(message = "ID must be greater than 0") Long id, @RequestBody @Validated UserInfoRequest request) {
         return userInfoService.update(id, request);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('Admin') or #id == authentication.principal.id")
-    public UserInfoDto delete(@PathVariable("id") @P("id") Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserInfoDto delete(@PathVariable("id") @Positive(message = "ID must be greater than 0") Long id) {
         return userInfoService.delete(id);
     }
 }

@@ -1,15 +1,16 @@
 package com.github.blog.service;
 
 import com.github.blog.controller.dto.common.RoleDto;
+import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.RoleRequest;
-
-import java.util.List;
+import com.github.blog.controller.dto.request.filter.RoleFilterRequest;
+import com.github.blog.controller.dto.response.PageResponse;
 
 /**
  * @author Raman Haurylau
  */
 public interface RoleService {
-    List<RoleDto> findAll();
+    PageResponse<RoleDto> findAll(RoleFilterRequest filterRequest, PageableRequest pageableRequest);
 
     RoleDto create(RoleRequest t);
 

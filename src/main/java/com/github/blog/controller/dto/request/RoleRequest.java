@@ -1,13 +1,12 @@
 package com.github.blog.controller.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.github.blog.controller.annotation.etc.UniqueRole;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * @author Raman Haurylau
  */
-@Getter
-@Setter
-public class RoleRequest {
-    private String roleName;
+@UniqueRole
+public record RoleRequest(@Pattern(message = "Invalid name", regexp = "^[A-Za-z]{2,15}") String name) {
+
 }
