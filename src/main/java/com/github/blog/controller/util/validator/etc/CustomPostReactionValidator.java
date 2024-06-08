@@ -20,10 +20,10 @@ public class CustomPostReactionValidator implements ConstraintValidator<UniquePo
 
     @Override
     public boolean isValid(PostReactionRequest request, ConstraintValidatorContext context) {
-        if (request.getPostId() == null) {
+        if (request.postId() == null) {
             return true;
         } else {
-            return postReactionDao.findByPostIdAndUserId(request.getPostId(), userAccessHandler.getUserId()).isEmpty();
+            return postReactionDao.findByPostIdAndUserId(request.postId(), userAccessHandler.getUserId()).isEmpty();
         }
     }
 }

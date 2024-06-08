@@ -22,7 +22,7 @@ public class CommentAccessHandler {
         try {
             Long sessionUserId = authenticatedUserService.getAuthenticatedUser().getId();
             CommentDto comment = commentService.findById(id);
-            return comment.getUserId().equals(sessionUserId);
+            return comment.userId().equals(sessionUserId);
         } catch (CustomException e) {
             return false;
         }

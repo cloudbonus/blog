@@ -49,7 +49,8 @@ public class User {
     private OffsetDateTime updatedAt;
 
     @ManyToMany
-    @JoinTable(name = "user_role", schema = "blog", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    @JoinTable(name = "user_role", schema = "blog", joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> roles = new HashSet<>();
 
     @OneToOne(mappedBy = "user")

@@ -28,7 +28,7 @@ public class PostAccessHandler {
         try {
             Long sessionUserId = authenticatedUserService.getAuthenticatedUser().getId();
             OrderDto orderDto = orderService.findByPostId(id);
-            return orderDto.getUserId().equals(sessionUserId);
+            return orderDto.userId().equals(sessionUserId);
         } catch (CustomException e) {
             return true;
         }
@@ -38,15 +38,15 @@ public class PostAccessHandler {
         try {
             Long sessionUserId = authenticatedUserService.getAuthenticatedUser().getId();
             PostDto postDto = postService.findById(id);
-            return postDto.getUserId().equals(sessionUserId);
+            return postDto.userId().equals(sessionUserId);
         } catch (CustomException e) {
             return false;
         }
     }
 
     public boolean canFilter(PostFilterRequest requestFilter) {
-        if (!requestFilter.getState().equals(OrderState.COMPLETED.name()) && requestFilter.getUsername() != null) {
-            return requestFilter.getUsername().equals(authenticatedUserService.getAuthenticatedUser().getUsername());
+        if (!requestFilter.state().equals(OrderState.COMPLETED.name()) && requestFilter.username() != null) {
+            return requestFilter.username().equals(authenticatedUserService.getAuthenticatedUser().getUsername());
         }
         return true;
     }

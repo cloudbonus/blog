@@ -20,10 +20,10 @@ public class CustomCommentReactionValidator implements ConstraintValidator<Uniqu
 
     @Override
     public boolean isValid(CommentReactionRequest commentId, ConstraintValidatorContext context) {
-        if (commentId.getCommentId() == null) {
+        if (commentId.commentId() == null) {
             return true;
         } else {
-            return commentReactionDao.findByCommentIdAndUserId(commentId.getCommentId(), userAccessHandler.getUserId()).isEmpty();
+            return commentReactionDao.findByCommentIdAndUserId(commentId.commentId(), userAccessHandler.getUserId()).isEmpty();
         }
     }
 }

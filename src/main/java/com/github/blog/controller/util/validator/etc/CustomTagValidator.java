@@ -17,7 +17,7 @@ public class CustomTagValidator implements ConstraintValidator<UniqueTag, TagReq
 
     @Override
     public boolean isValid(TagRequest request, ConstraintValidatorContext context) {
-        return tagDao.findByName(request.getName()).isEmpty();
+        return tagDao.findByName(request.name()).isEmpty();
     }
 }
 

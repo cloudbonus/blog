@@ -22,7 +22,7 @@ public class PostReactionAccessHandler {
         try {
             Long sessionUserId = authenticatedUserService.getAuthenticatedUser().getId();
             PostReactionDto postReaction = postReactionService.findById(id);
-            return postReaction.getUserId().equals(sessionUserId);
+            return postReaction.userId().equals(sessionUserId);
         } catch (CustomException e) {
             return false;
         }

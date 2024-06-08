@@ -17,6 +17,6 @@ public class CustomReactionValidator implements ConstraintValidator<UniqueReacti
 
     @Override
     public boolean isValid(ReactionRequest request, ConstraintValidatorContext context) {
-        return reactionDao.findByName(request.getName()).isEmpty();
+        return reactionDao.findByName(request.name()).isEmpty();
     }
 }

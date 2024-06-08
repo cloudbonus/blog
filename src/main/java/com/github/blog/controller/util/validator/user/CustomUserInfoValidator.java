@@ -12,8 +12,8 @@ public class CustomUserInfoValidator implements ConstraintValidator<ValidUserInf
 
     @Override
     public boolean isValid(UserInfoRequest userInfo, ConstraintValidatorContext context) {
-        boolean isEducationInfoValid = userInfo.getUniversity() != null && userInfo.getMajor() != null;
-        boolean isJobInfoValid = userInfo.getCompany() != null && userInfo.getJob() != null;
+        boolean isEducationInfoValid = userInfo.university() != null && userInfo.major() != null;
+        boolean isJobInfoValid = userInfo.company() != null && userInfo.job() != null;
         return isEducationInfoValid || isJobInfoValid;
     }
 }

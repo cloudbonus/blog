@@ -67,7 +67,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework:spring-test")
-    testImplementation("org.assertj:assertj-core:3.25.3")
+    testImplementation('org.assertj:assertj-core:3.26.0')
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:junit-jupiter")
     testRuntimeOnly("com.jayway.jsonpath:json-path:2.9.0")

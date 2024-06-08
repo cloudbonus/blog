@@ -52,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 username = jwtService.extractUserName(jwt);
                 log.debug("Extracted username from JWT: {}", username);
             } catch (JwtException e) {
-                log.error("JWT exception: {}", e.getMessage());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
 
@@ -74,7 +73,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.debug("User authenticated: {}", username);
                 }
             } catch (CustomException e) {
-                log.error("Custom exception: {}", e.getExceptionEnum().getMessage());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
 

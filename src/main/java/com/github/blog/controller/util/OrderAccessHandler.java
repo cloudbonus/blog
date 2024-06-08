@@ -22,7 +22,7 @@ public class OrderAccessHandler {
     public boolean isOrderCompleted(Long id) {
         try {
             OrderDto orderDto = orderService.findByPostId(id);
-            return orderDto.getState().equals(OrderState.COMPLETED.name());
+            return orderDto.state().equals(OrderState.COMPLETED.name());
         } catch (CustomException e) {
             return true;
         }
@@ -32,7 +32,7 @@ public class OrderAccessHandler {
         try {
             Long sessionUserId = authenticatedUserService.getAuthenticatedUser().getId();
             OrderDto orderDto = orderService.findById(id);
-            return orderDto.getUserId().equals(sessionUserId);
+            return orderDto.userId().equals(sessionUserId);
         } catch (CustomException e) {
             return false;
         }

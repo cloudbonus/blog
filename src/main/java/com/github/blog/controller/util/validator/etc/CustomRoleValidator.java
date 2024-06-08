@@ -18,6 +18,6 @@ public class CustomRoleValidator implements ConstraintValidator<UniqueRole, Role
 
     @Override
     public boolean isValid(RoleRequest request, ConstraintValidatorContext context) {
-        return roleDao.findByName(ROLE_PREFIX + request.getName()).isEmpty();
+        return roleDao.findByName(ROLE_PREFIX + request.name()).isEmpty();
     }
 }
