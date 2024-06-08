@@ -1,14 +1,7 @@
 package com.github.blog.controller.dto.common;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
- * @author Raman Haurylau
+ * DTO for {@link com.github.blog.model.Reaction}
  */
-@Getter
-@Setter
-public class ReactionDto {
-    private Long id;
-    private String name;
+public record ReactionDto(Long id, String name) {
 }
