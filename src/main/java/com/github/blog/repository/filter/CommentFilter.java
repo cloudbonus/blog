@@ -1,4 +1,4 @@
-package com.github.blog.repository.dto.filter;
+package com.github.blog.repository.filter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,8 +8,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PostFilter {
+public class CommentFilter {
     private String username;
-    private Long tagId;
-    private String state;
 }

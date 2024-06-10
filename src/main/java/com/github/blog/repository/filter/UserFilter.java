@@ -1,4 +1,4 @@
-package com.github.blog.repository.dto.filter;
+package com.github.blog.repository.filter;
 
 import lombok.Getter;
 import lombok.Setter;
