@@ -4,7 +4,7 @@ import com.github.blog.controller.dto.common.TagDto;
 import com.github.blog.controller.dto.request.TagRequest;
 import com.github.blog.controller.dto.request.filter.TagFilterRequest;
 import com.github.blog.model.Tag;
-import com.github.blog.repository.dto.filter.TagFilter;
+import com.github.blog.repository.filter.TagFilter;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;

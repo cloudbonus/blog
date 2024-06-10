@@ -4,7 +4,7 @@ import com.github.blog.controller.dto.common.UserInfoDto;
 import com.github.blog.controller.dto.request.UserInfoRequest;
 import com.github.blog.controller.dto.request.filter.UserInfoFilterRequest;
 import com.github.blog.model.UserInfo;
-import com.github.blog.repository.dto.filter.UserInfoFilter;
+import com.github.blog.repository.filter.UserInfoFilter;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;

@@ -6,9 +6,9 @@ import com.github.blog.controller.dto.request.filter.PostFilterRequest;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.Tag;
-import com.github.blog.repository.CommentDao;
-import com.github.blog.repository.TagDao;
-import com.github.blog.repository.dto.filter.PostFilter;
+import com.github.blog.repository.CommentRepository;
+import com.github.blog.repository.TagRepository;
+import com.github.blog.repository.filter.PostFilter;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import org.mapstruct.BeanMapping;
@@ -26,10 +26,10 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {UserMapper.class})
 public abstract class PostMapper implements BasePageMapper<Post, PostDto> {
     @Autowired
-    private TagDao tagDao;
+    private TagRepository tagRepository;
 
     @Autowired
-    private CommentDao commentDao;
+    private CommentRepository commentRepository;
 
     @Mapping(source = "tagIds", target = "tags")
     public abstract Post toEntity(PostRequest request);
@@ -52,7 +52,7 @@ public abstract class PostMapper implements BasePageMapper<Post, PostDto> {
 
         List<Tag> tags = new ArrayList<>(ids.size());
         for (Long id : ids) {
-            Tag tag = tagDao
+            Tag tag = tagRepository
                     .findById(id)
                     .orElseThrow(() -> new CustomException(ExceptionEnum.TAG_NOT_FOUND));
 
@@ -82,7 +82,7 @@ public abstract class PostMapper implements BasePageMapper<Post, PostDto> {
 
         List<Comment> comments = new ArrayList<>(ids.size());
         for (Long id : ids) {
-            Comment comment = commentDao
+            Comment comment = commentRepository
                     .findById(id)
                     .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_NOT_FOUND));
 

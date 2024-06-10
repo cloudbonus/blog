@@ -8,21 +8,23 @@ import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.model.Order;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
-import com.github.blog.repository.OrderDao;
-import com.github.blog.repository.PostDao;
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.OrderFilter;
+import com.github.blog.repository.OrderRepository;
+import com.github.blog.repository.PostRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.filter.OrderFilter;
+import com.github.blog.repository.specification.OrderSpecification;
 import com.github.blog.service.OrderService;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.OrderMapper;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.statemachine.event.OrderEvent;
 import com.github.blog.service.statemachine.state.OrderState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.statemachine.StateMachine;
@@ -43,19 +45,18 @@ import java.util.Objects;
 @Transactional
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-    private final UserDao userDao;
-    private final OrderDao orderDao;
-    private final PostDao postDao;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final PostRepository postRepository;
 
     private final OrderMapper orderMapper;
-    private final PageableMapper pageableMapper;
 
     private final StateMachineService<OrderState, OrderEvent> stateMachineService;
 
     @Override
     public OrderDto reserve(Long id) {
         log.debug("Reserving order with ID: {}", id);
-        Order order = orderDao
+        Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
@@ -73,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto cancel(Long id) {
         log.debug("Cancelling order with ID: {}", id);
-        Order order = orderDao
+        Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
@@ -91,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto buy(Long id) {
         log.debug("Buying order with ID: {}", id);
-        Order order = orderDao
+        Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
@@ -110,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderDto findById(Long id) {
         log.debug("Finding order by ID: {}", id);
-        Order order = orderDao
+        Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
@@ -123,30 +124,31 @@ public class OrderServiceImpl implements OrderService {
     public PageResponse<OrderDto> findAll(OrderFilterRequest requestFilter, PageableRequest pageableRequest) {
         log.debug("Finding all orders with filter: {} and pageable: {}", requestFilter, pageableRequest);
         OrderFilter filter = orderMapper.toEntity(requestFilter);
-        Pageable pageable = pageableMapper.toEntity(pageableRequest);
 
-        Page<Order> orders = orderDao.findAll(filter, pageable);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Specification<Order> spec = OrderSpecification.filterBy(filter);
+        Page<Order> orders = orderRepository.findAll(spec, pageable);
 
         if (orders.isEmpty()) {
             throw new CustomException(ExceptionEnum.ORDERS_NOT_FOUND);
         }
 
-        log.debug("Found {} orders", orders.getTotalNumberOfEntities());
+        log.debug("Found {} orders", orders.getTotalElements());
         return orderMapper.toDto(orders);
     }
 
     @Override
     public OrderDto update(Long id, OrderRequest request) {
         log.debug("Updating order with ID: {} and request: {}", id, request);
-        Order order = orderDao
+        Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
-        User user = userDao
+        User user = userRepository
                 .findById(request.userId())
                 .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
-        Post post = postDao
+        Post post = postRepository
                 .findById(request.postId())
                 .orElseThrow(() -> new CustomException(ExceptionEnum.POST_NOT_FOUND));
 
@@ -160,9 +162,9 @@ public class OrderServiceImpl implements OrderService {
     @Scheduled(fixedRate = 150000)
     private void deleteInactiveOrders() {
         log.debug("Deleting inactive orders");
-        List<Order> orders = orderDao.findAllInactiveOrders();
+        List<Order> orders = orderRepository.findAllInactiveOrders();
         orders.forEach(order -> {
-            orderDao.delete(order);
+            orderRepository.delete(order);
             log.debug("Deleted inactive order with ID: {}", order.getId());
         });
     }
@@ -171,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderDto findByPostId(Long id) {
         log.debug("Finding order by post ID: {}", id);
-        Order order = orderDao
+        Order order = orderRepository
                 .findByPostId(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
@@ -182,11 +184,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto delete(Long id) {
         log.debug("Deleting order with ID: {}", id);
-        Order order = orderDao
+        Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
-        orderDao.delete(order);
+        orderRepository.delete(order);
         log.debug("Order deleted successfully with ID: {}", id);
 
         return orderMapper.toDto(order);

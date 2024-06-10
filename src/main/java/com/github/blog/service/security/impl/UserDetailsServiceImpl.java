@@ -1,7 +1,7 @@
 package com.github.blog.service.security.impl;
 
 import com.github.blog.model.User;
-import com.github.blog.repository.UserDao;
+import com.github.blog.repository.UserRepository;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        User user = userDao.findByUsername(username).orElseThrow(() -> new CustomException(ExceptionEnum.BAD_CREDENTIALS));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new CustomException(ExceptionEnum.BAD_CREDENTIALS));
 
         Collection<? extends GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
 

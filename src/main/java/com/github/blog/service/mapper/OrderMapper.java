@@ -4,7 +4,7 @@ import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.model.Order;
-import com.github.blog.repository.dto.filter.OrderFilter;
+import com.github.blog.repository.filter.OrderFilter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

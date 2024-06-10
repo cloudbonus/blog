@@ -1,7 +1,7 @@
 package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.repository.dto.common.Page;
+import org.springframework.data.domain.Page;
 
 /**
  * @author Raman Haurylau

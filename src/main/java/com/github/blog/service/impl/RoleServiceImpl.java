@@ -6,17 +6,19 @@ import com.github.blog.controller.dto.request.RoleRequest;
 import com.github.blog.controller.dto.request.filter.RoleFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.model.Role;
-import com.github.blog.repository.RoleDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.RoleFilter;
+import com.github.blog.repository.RoleRepository;
+import com.github.blog.repository.filter.RoleFilter;
+import com.github.blog.repository.specification.RoleSpecification;
 import com.github.blog.service.RoleService;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
-    private final RoleDao roleDao;
+    private final RoleRepository roleRepository;
 
     private final RoleMapper roleMapper;
-    private final PageableMapper pageableMapper;
 
     private static final String ROLE_PREFIX = "ROLE_";
 
@@ -38,7 +39,7 @@ public class RoleServiceImpl implements RoleService {
         Role role = roleMapper.toEntity(request);
         role.setName(ROLE_PREFIX + role.getName());
 
-        role = roleDao.create(role);
+        role = roleRepository.save(role);
         log.debug("Role created successfully with ID: {}", role.getId());
         return roleMapper.toDto(role);
     }
@@ -47,7 +48,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     public RoleDto findById(Long id) {
         log.debug("Finding role by ID: {}", id);
-        Role role = roleDao
+        Role role = roleRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
@@ -60,22 +61,23 @@ public class RoleServiceImpl implements RoleService {
     public PageResponse<RoleDto> findAll(RoleFilterRequest filterRequest, PageableRequest pageableRequest) {
         log.debug("Finding all roles with filter: {} and pageable: {}", filterRequest, pageableRequest);
         RoleFilter filter = roleMapper.toEntity(filterRequest);
-        Pageable pageable = pageableMapper.toEntity(pageableRequest);
 
-        Page<Role> roles = roleDao.findAll(filter, pageable);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Specification<Role> spec = RoleSpecification.filterBy(filter);
+        Page<Role> roles = roleRepository.findAll(spec, pageable);
 
         if (roles.isEmpty()) {
             throw new CustomException(ExceptionEnum.ROLES_NOT_FOUND);
         }
 
-        log.debug("Found {} roles", roles.getTotalNumberOfEntities());
+        log.debug("Found {} roles", roles.getTotalElements());
         return roleMapper.toDto(roles);
     }
 
     @Override
     public RoleDto update(Long id, RoleRequest request) {
         log.debug("Updating role with ID: {} and request: {}", id, request);
-        Role role = roleDao
+        Role role = roleRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
@@ -87,11 +89,11 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleDto delete(Long id) {
         log.debug("Deleting role with ID: {}", id);
-        Role role = roleDao
+        Role role = roleRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
-        roleDao.delete(role);
+        roleRepository.delete(role);
         log.debug("Role deleted successfully with ID: {}", id);
         return roleMapper.toDto(role);
     }

@@ -9,21 +9,23 @@ import com.github.blog.model.Comment;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.model.Reaction;
 import com.github.blog.model.User;
-import com.github.blog.repository.CommentDao;
-import com.github.blog.repository.CommentReactionDao;
-import com.github.blog.repository.ReactionDao;
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.CommentReactionFilter;
+import com.github.blog.repository.CommentReactionRepository;
+import com.github.blog.repository.CommentRepository;
+import com.github.blog.repository.ReactionRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.filter.CommentReactionFilter;
+import com.github.blog.repository.specification.CommentReactionSpecification;
 import com.github.blog.service.CommentReactionService;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.CommentReactionMapper;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.util.UserAccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +37,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class CommentReactionServiceImpl implements CommentReactionService {
-    private final UserDao userDao;
-    private final CommentReactionDao commentReactionDao;
-    private final CommentDao commentDao;
-    private final ReactionDao reactionDao;
+    private final UserRepository userRepository;
+    private final CommentReactionRepository commentReactionRepository;
+    private final CommentRepository commentRepository;
+    private final ReactionRepository reactionRepository;
 
     private final CommentReactionMapper commentReactionMapper;
-    private final PageableMapper pageableMapper;
 
     private final UserAccessHandler userAccessHandler;
 
@@ -50,15 +51,15 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         log.debug("Creating a new comment reaction with request: {}", request);
         CommentReaction commentReaction = commentReactionMapper.toEntity(request);
 
-        Comment comment = commentDao
+        Comment comment = commentRepository
                 .findById(request.commentId())
                 .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_NOT_FOUND));
 
-        Reaction reaction = reactionDao
+        Reaction reaction = reactionRepository
                 .findById(request.reactionId())
                 .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
-        User user = userDao
+        User user = userRepository
                 .findById(userAccessHandler.getUserId())
                 .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 
@@ -66,7 +67,7 @@ public class CommentReactionServiceImpl implements CommentReactionService {
         commentReaction.setComment(comment);
         commentReaction.setUser(user);
 
-        commentReaction = commentReactionDao.create(commentReaction);
+        commentReaction = commentReactionRepository.save(commentReaction);
         log.debug("Comment reaction created successfully with ID: {}", commentReaction.getId());
 
         return commentReactionMapper.toDto(commentReaction);
@@ -76,7 +77,7 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     @Transactional(readOnly = true)
     public CommentReactionDto findById(Long id) {
         log.debug("Finding comment reaction by ID: {}", id);
-        CommentReaction commentReaction = commentReactionDao
+        CommentReaction commentReaction = commentReactionRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND));
 
@@ -89,26 +90,28 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     public PageResponse<CommentReactionDto> findAll(CommentReactionFilterRequest requestFilter, PageableRequest pageableRequest) {
         log.debug("Finding all comment reactions with filter: {} and pageable: {}", requestFilter, pageableRequest);
         CommentReactionFilter filter = commentReactionMapper.toEntity(requestFilter);
-        Pageable pageable = pageableMapper.toEntity(pageableRequest);
 
-        Page<CommentReaction> commentReactions = commentReactionDao.findAll(filter, pageable);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Specification<CommentReaction> spec = CommentReactionSpecification.filterBy(filter);
+
+        Page<CommentReaction> commentReactions = commentReactionRepository.findAll(spec, pageable);
 
         if (commentReactions.isEmpty()) {
             throw new CustomException(ExceptionEnum.COMMENT_REACTIONS_NOT_FOUND);
         }
 
-        log.debug("Found {} comment reactions", commentReactions.getTotalNumberOfEntities());
+        log.debug("Found {} comment reactions", commentReactions.getTotalElements());
         return commentReactionMapper.toDto(commentReactions);
     }
 
     @Override
     public CommentReactionDto update(Long id, CommentReactionRequest request) {
         log.debug("Updating comment reaction with ID: {} and request: {}", id, request);
-        CommentReaction commentReaction = commentReactionDao
+        CommentReaction commentReaction = commentReactionRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND));
 
-        Reaction reaction = reactionDao
+        Reaction reaction = reactionRepository
                 .findById(request.reactionId())
                 .orElseThrow(() -> new CustomException(ExceptionEnum.REACTION_NOT_FOUND));
 
@@ -121,11 +124,11 @@ public class CommentReactionServiceImpl implements CommentReactionService {
     @Override
     public CommentReactionDto delete(Long id) {
         log.debug("Deleting comment reaction with ID: {}", id);
-        CommentReaction commentReaction = commentReactionDao
+        CommentReaction commentReaction = commentReactionRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.COMMENT_REACTION_NOT_FOUND));
 
-        commentReactionDao.delete(commentReaction);
+        commentReactionRepository.delete(commentReaction);
         log.debug("Post deleted successfully with ID: {}", id);
 
         return commentReactionMapper.toDto(commentReaction);
