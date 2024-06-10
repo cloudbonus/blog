@@ -1,5 +1,6 @@
 package com.github.blog.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -23,7 +24,7 @@ public class UserInfo {
     private Long id;
 
     @MapsId
-    @OneToOne(optional = false)
+    @OneToOne(cascade = CascadeType.MERGE, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id", nullable = false)
     private User user;
