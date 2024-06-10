@@ -5,16 +5,12 @@ import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.RoleRequest;
 import com.github.blog.controller.dto.request.filter.RoleFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.controller.dto.response.PageableResponse;
 import com.github.blog.model.Role;
-import com.github.blog.repository.RoleDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.RoleFilter;
+import com.github.blog.repository.RoleRepository;
+import com.github.blog.repository.filter.RoleFilter;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.impl.RoleServiceImpl;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.RoleMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +19,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -42,13 +43,10 @@ import static org.mockito.Mockito.when;
 public class RoleServiceImplTests {
 
     @Mock
-    private RoleDao roleDao;
+    private RoleRepository roleDao;
 
     @Mock
     private RoleMapper roleMapper;
-
-    @Mock
-    private PageableMapper pageableMapper;
 
     @InjectMocks
     private RoleServiceImpl roleService;
@@ -61,10 +59,8 @@ public class RoleServiceImplTests {
     private final String roleName = "USER";
     private static final String ROLE_PREFIX = "ROLE_";
 
-    private final Pageable pageable = new Pageable();
-    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final PageableRequest pageableRequest = new PageableRequest(10, null, "asc");
     private final RoleFilterRequest roleFilterRequest = new RoleFilterRequest(null);
-    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
@@ -81,7 +77,7 @@ public class RoleServiceImplTests {
     @DisplayName("role service: create")
     void create_returnsRoleDto_whenDataIsValid() {
         when(roleMapper.toEntity(request)).thenReturn(role);
-        when(roleDao.create(role)).thenReturn(role);
+        when(roleDao.save(role)).thenReturn(role);
         when(roleMapper.toDto(role)).thenReturn(returnedRoleDto);
 
         RoleDto createdRoleDto = roleService.create(request);
@@ -115,16 +111,17 @@ public class RoleServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("role service: find all")
     void findAll_returnsPageResponse_whenDataIsValid() {
         RoleFilter filter = new RoleFilter();
 
-        Page<Role> page = new Page<>(Collections.singletonList(role), pageable, 1L);
-        PageResponse<RoleDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedRoleDto), pageableResponse, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<Role> page = new PageImpl<>(Collections.singletonList(role), pageable, 1L);
+        PageResponse<RoleDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedRoleDto), 1, 1, 0, 1);
 
         when(roleMapper.toEntity(any(RoleFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(roleDao.findAll(filter, pageable)).thenReturn(page);
+        when(roleDao.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(roleMapper.toDto(page)).thenReturn(pageResponse);
 
         PageResponse<RoleDto> foundRoles = roleService.findAll(roleFilterRequest, pageableRequest);
@@ -136,15 +133,16 @@ public class RoleServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("role service: find all - not found exception")
     void findAll_throwsException_whenNoRolesFound() {
         RoleFilter filter = new RoleFilter();
 
-        Page<Role> page = new Page<>(Collections.emptyList(), pageable, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<Role> page = new PageImpl<>(Collections.emptyList(), pageable, 1L);
 
         when(roleMapper.toEntity(any(RoleFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(roleDao.findAll(filter, pageable)).thenReturn(page);
+        when(roleDao.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
         CustomException exception = assertThrows(CustomException.class, () -> roleService.findAll(roleFilterRequest, pageableRequest));
 

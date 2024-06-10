@@ -5,21 +5,17 @@ import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.controller.dto.response.PageableResponse;
 import com.github.blog.model.Order;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
-import com.github.blog.repository.OrderDao;
-import com.github.blog.repository.PostDao;
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.OrderFilter;
+import com.github.blog.repository.OrderRepository;
+import com.github.blog.repository.PostRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.filter.OrderFilter;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.impl.OrderServiceImpl;
 import com.github.blog.service.mapper.OrderMapper;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.statemachine.event.OrderEvent;
 import com.github.blog.service.statemachine.state.OrderState;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +25,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineEventResult;
 import org.springframework.statemachine.service.StateMachineService;
@@ -54,19 +55,16 @@ import static org.mockito.Mockito.when;
 public class OrderServiceImplTests {
 
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Mock
-    private OrderDao orderDao;
+    private OrderRepository orderRepository;
 
     @Mock
-    private PostDao postDao;
+    private PostRepository postRepository;
 
     @Mock
     private OrderMapper orderMapper;
-
-    @Mock
-    private PageableMapper pageableMapper;
 
     @Mock
     private StateMachineService<OrderState, OrderEvent> stateMachineService;
@@ -82,10 +80,8 @@ public class OrderServiceImplTests {
     private final Long userId = 1L;
     private final Long postId = 1L;
 
-    private final Pageable pageable = new Pageable();
-    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final PageableRequest pageableRequest = new PageableRequest(10, null, "asc");
     private final OrderFilterRequest orderFilterRequest = new OrderFilterRequest(null, null, null);
-    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
@@ -109,7 +105,7 @@ public class OrderServiceImplTests {
         StateMachine<OrderState, OrderEvent> sm = mock(StateMachine.class);
         StateMachineEventResult<OrderState, OrderEvent> smResult = mock(StateMachineEventResult.class);
 
-        when(orderDao.findById(id)).thenReturn(Optional.of(order));
+        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
         when(stateMachineService.acquireStateMachine(order.getId().toString())).thenReturn(sm);
         when(sm.sendEvent(any(Mono.class))).thenReturn(Flux.just(smResult));
         when(smResult.getResultType()).thenReturn(StateMachineEventResult.ResultType.ACCEPTED);
@@ -129,7 +125,7 @@ public class OrderServiceImplTests {
         StateMachine<OrderState, OrderEvent> sm = mock(StateMachine.class);
         StateMachineEventResult<OrderState, OrderEvent> smResult = mock(StateMachineEventResult.class);
 
-        when(orderDao.findById(id)).thenReturn(Optional.of(order));
+        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
         when(stateMachineService.acquireStateMachine(order.getId().toString())).thenReturn(sm);
         when(sm.sendEvent(any(Mono.class))).thenReturn(Flux.just(smResult));
         when(smResult.getResultType()).thenReturn(StateMachineEventResult.ResultType.DENIED);
@@ -146,7 +142,7 @@ public class OrderServiceImplTests {
         StateMachine<OrderState, OrderEvent> sm = mock(StateMachine.class);
         StateMachineEventResult<OrderState, OrderEvent> smResult = mock(StateMachineEventResult.class);
 
-        when(orderDao.findById(id)).thenReturn(Optional.of(order));
+        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
         when(stateMachineService.acquireStateMachine(order.getId().toString())).thenReturn(sm);
         when(sm.sendEvent(any(Mono.class))).thenReturn(Flux.just(smResult));
         when(smResult.getResultType()).thenReturn(StateMachineEventResult.ResultType.ACCEPTED);
@@ -166,7 +162,7 @@ public class OrderServiceImplTests {
         StateMachine<OrderState, OrderEvent> sm = mock(StateMachine.class);
         StateMachineEventResult<OrderState, OrderEvent> smResult = mock(StateMachineEventResult.class);
 
-        when(orderDao.findById(id)).thenReturn(Optional.of(order));
+        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
         when(stateMachineService.acquireStateMachine(order.getId().toString())).thenReturn(sm);
         when(sm.sendEvent(any(Mono.class))).thenReturn(Flux.just(smResult));
         when(smResult.getResultType()).thenReturn(StateMachineEventResult.ResultType.ACCEPTED);
@@ -182,7 +178,7 @@ public class OrderServiceImplTests {
     @Test
     @DisplayName("order service: find by id")
     void findById_returnsOrderDto_whenIdIsValid() {
-        when(orderDao.findById(id)).thenReturn(Optional.of(order));
+        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
         when(orderMapper.toDto(order)).thenReturn(returnedOrderDto);
 
         OrderDto foundOrderDto = orderService.findById(id);
@@ -195,7 +191,7 @@ public class OrderServiceImplTests {
     @Test
     @DisplayName("order service: find by id - not found exception")
     void findById_throwsException_whenIdIsInvalid() {
-        when(orderDao.findById(id)).thenReturn(Optional.empty());
+        when(orderRepository.findById(id)).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> orderService.findById(id));
 
@@ -203,16 +199,17 @@ public class OrderServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("order service: find all")
     void findAll_returnsPageResponse_whenDataIsValid() {
         OrderFilter filter = new OrderFilter();
 
-        Page<Order> page = new Page<>(Collections.singletonList(order), pageable, 1L);
-        PageResponse<OrderDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedOrderDto), pageableResponse, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<Order> page = new PageImpl<>(Collections.singletonList(order), pageable, 1L);
+        PageResponse<OrderDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedOrderDto), 1, 1, 0, 1);
 
         when(orderMapper.toEntity(any(OrderFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(orderDao.findAll(filter, pageable)).thenReturn(page);
+        when(orderRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(orderMapper.toDto(page)).thenReturn(pageResponse);
 
         PageResponse<OrderDto> foundOrders = orderService.findAll(orderFilterRequest, pageableRequest);
@@ -224,15 +221,16 @@ public class OrderServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("order service: find all - not found exception")
     void findAll_throwsException_whenNoOrdersFound() {
         OrderFilter filter = new OrderFilter();
 
-        Page<Order> page = new Page<>(Collections.emptyList(), pageable, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<Order> page = new PageImpl<>(Collections.emptyList(), pageable, 1L);
 
         when(orderMapper.toEntity(any(OrderFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(orderDao.findAll(filter, pageable)).thenReturn(page);
+        when(orderRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
         CustomException exception = assertThrows(CustomException.class, () -> orderService.findAll(orderFilterRequest, pageableRequest));
 
@@ -245,9 +243,9 @@ public class OrderServiceImplTests {
         User user = new User();
         Post post = new Post();
 
-        when(orderDao.findById(id)).thenReturn(Optional.of(order));
-        when(userDao.findById(userId)).thenReturn(Optional.of(user));
-        when(postDao.findById(postId)).thenReturn(Optional.of(post));
+        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(orderMapper.toDto(order)).thenReturn(returnedOrderDto);
 
         OrderDto updatedOrderDto = orderService.update(id, request);
@@ -260,7 +258,7 @@ public class OrderServiceImplTests {
     @Test
     @DisplayName("order service: delete")
     void delete_returnsDeletedOrderDto_whenIdIsValid() {
-        when(orderDao.findById(id)).thenReturn(Optional.of(order));
+        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
         when(orderMapper.toDto(order)).thenReturn(returnedOrderDto);
 
         OrderDto deletedOrderDto = orderService.delete(id);
@@ -268,6 +266,6 @@ public class OrderServiceImplTests {
         assertNotNull(deletedOrderDto);
         assertEquals(id, deletedOrderDto.id());
         assertEquals(postId, deletedOrderDto.postId());
-        verify(orderDao, times(1)).delete(order);
+        verify(orderRepository, times(1)).delete(order);
     }
 }

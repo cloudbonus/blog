@@ -5,17 +5,13 @@ import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.controller.dto.request.filter.PostFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.controller.dto.response.PageableResponse;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
-import com.github.blog.repository.OrderDao;
-import com.github.blog.repository.PostDao;
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.PostFilter;
+import com.github.blog.repository.OrderRepository;
+import com.github.blog.repository.PostRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.filter.PostFilter;
 import com.github.blog.service.impl.PostServiceImpl;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.PostMapper;
 import com.github.blog.service.util.UserAccessHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +21,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,22 +44,19 @@ import static org.mockito.Mockito.when;
 public class PostServiceImplTests {
 
     @Mock
-    private PostDao postDao;
+    private PostRepository postRepository;
 
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Mock
-    private OrderDao orderDao;
+    private OrderRepository orderRepository;
 
     @Mock
     private UserAccessHandler userAccessHandler;
 
     @Mock
     private PostMapper postMapper;
-
-    @Mock
-    private PageableMapper pageableMapper;
 
     @InjectMocks
     private PostServiceImpl postService;
@@ -69,10 +68,8 @@ public class PostServiceImplTests {
     private final Long id = 1L;
     private final String title = "test title";
 
-    private final Pageable pageable = new Pageable();
-    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final PageableRequest pageableRequest = new PageableRequest(10, null, "asc");
     private final PostFilterRequest postFilterRequest = new PostFilterRequest(null, null, null);
-    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
@@ -86,9 +83,9 @@ public class PostServiceImplTests {
 
         when(postMapper.toEntity(request)).thenReturn(post);
         when(userAccessHandler.getUserId()).thenReturn(id);
-        when(userDao.findById(userAccessHandler.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(userAccessHandler.getUserId())).thenReturn(Optional.of(user));
         when(userAccessHandler.hasRole("ROLE_COMPANY")).thenReturn(false);
-        when(postDao.create(post)).thenReturn(post);
+        when(postRepository.save(post)).thenReturn(post);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
         PostDto createdPostDto = postService.create(request);
@@ -105,9 +102,9 @@ public class PostServiceImplTests {
 
         when(postMapper.toEntity(request)).thenReturn(post);
         when(userAccessHandler.getUserId()).thenReturn(id);
-        when(userDao.findById(userAccessHandler.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(userAccessHandler.getUserId())).thenReturn(Optional.of(user));
         when(userAccessHandler.hasRole("ROLE_COMPANY")).thenReturn(true);
-        when(postDao.create(post)).thenReturn(post);
+        when(postRepository.save(post)).thenReturn(post);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
         PostDto createdPostDto = postService.create(request);
@@ -120,7 +117,7 @@ public class PostServiceImplTests {
     @Test
     @DisplayName("post service: update")
     void update_returnsUpdatedPostDto_whenDataIsValid() {
-        when(postDao.findById(id)).thenReturn(Optional.of(post));
+        when(postRepository.findById(id)).thenReturn(Optional.of(post));
         when(postMapper.partialUpdate(request, post)).thenReturn(post);
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
@@ -134,7 +131,7 @@ public class PostServiceImplTests {
     @Test
     @DisplayName("comment service: delete")
     void delete_deletesComment_whenDataIsValid() {
-        when(postDao.findById(id)).thenReturn(Optional.of(post));
+        when(postRepository.findById(id)).thenReturn(Optional.of(post));
         when(postMapper.toDto(post)).thenReturn(returnedPostDto);
 
         PostDto deletedPostDto = postService.delete(id);
@@ -142,20 +139,21 @@ public class PostServiceImplTests {
         assertThat(deletedPostDto).isNotNull();
         assertThat(deletedPostDto.id()).isEqualTo(id);
         assertThat(deletedPostDto.title()).isEqualTo(title);
-        verify(postDao, times(1)).delete(post);
+        verify(postRepository, times(1)).delete(post);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("post service: find all by username")
     void find_findsAllPostsByUsername_whenDataIsValid() {
         PostFilter filter = new PostFilter();
 
-        Page<Post> page = new Page<>(List.of(post), pageable, 1L);
-        PageResponse<PostDto> pageResponse = new PageResponse<>(List.of(returnedPostDto), pageableResponse, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<Post> page = new PageImpl<>(List.of(post), pageable, 1L);
+        PageResponse<PostDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedPostDto), 1, 1, 0, 1);
 
         when(postMapper.toEntity(any(PostFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(postDao.findAll(filter, pageable)).thenReturn(page);
+        when(postRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(postMapper.toDto(page)).thenReturn(pageResponse);
 
         PageResponse<PostDto> filterSearchResult = postService.findAll(postFilterRequest, pageableRequest);
@@ -166,16 +164,17 @@ public class PostServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("post service: find all by tag")
     void find_findsAllPostsByTag_whenDataIsValid() {
         PostFilter filter = new PostFilter();
 
-        Page<Post> page = new Page<>(List.of(post), pageable, 1L);
-        PageResponse<PostDto> pageResponse = new PageResponse<>(List.of(returnedPostDto), pageableResponse, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<Post> page = new PageImpl<>(List.of(post), pageable, 1L);
+        PageResponse<PostDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedPostDto), 1, 1, 0, 1);
 
         when(postMapper.toEntity(any(PostFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(postDao.findAll(filter, pageable)).thenReturn(page);
+        when(postRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(postMapper.toDto(page)).thenReturn(pageResponse);
 
         PageResponse<PostDto> filterSearchResult = postService.findAll(postFilterRequest, pageableRequest);

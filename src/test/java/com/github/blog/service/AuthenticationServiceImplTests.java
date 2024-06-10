@@ -5,8 +5,8 @@ import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.JwtResponse;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
-import com.github.blog.repository.RoleDao;
-import com.github.blog.repository.UserDao;
+import com.github.blog.repository.RoleRepository;
+import com.github.blog.repository.UserRepository;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.UserMapper;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 public class AuthenticationServiceImplTests {
 
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Mock
     private JwtService jwtService;
@@ -58,7 +58,7 @@ public class AuthenticationServiceImplTests {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private RoleDao roleDao;
+    private RoleRepository roleRepository;
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -90,8 +90,8 @@ public class AuthenticationServiceImplTests {
     @DisplayName("user service: create")
     void create_returnsUserDto_whenDataIsValid() {
         when(userMapper.toEntity(request)).thenReturn(user);
-        when(roleDao.findByName("ROLE_USER")).thenReturn(Optional.of(new Role()));
-        when(userDao.create(user)).thenReturn(user);
+        when(roleRepository.findByNameIgnoreCase("ROLE_USER")).thenReturn(Optional.of(new Role()));
+        when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
         UserDto createdUserDto = authenticationService.signUp(request);
@@ -105,7 +105,7 @@ public class AuthenticationServiceImplTests {
     @Test
     @DisplayName("user service: update")
     void update_returnsUpdatedUserDto_whenDataIsValid() {
-        when(userDao.findById(id)).thenReturn(Optional.of(user));
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(userMapper.partialUpdate(request, user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 
@@ -122,7 +122,7 @@ public class AuthenticationServiceImplTests {
     void update_updatesUserWithoutEncodingPassword_whenPasswordIsBlank() {
         UserRequest request = new UserRequest(username, null, null);
 
-        when(userDao.findById(id)).thenReturn(Optional.of(user));
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(userMapper.partialUpdate(request, user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(returnedUserDto);
 

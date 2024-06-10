@@ -1,27 +1,26 @@
 package com.github.blog.repository;
 
-import com.github.blog.config.DataSourceProperties;
-import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.config.RepositoryTestConfig;
-import com.github.blog.config.WebTestConfig;
+import com.github.blog.config.ContainerConfig;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.PostFilter;
-import com.github.blog.repository.dto.filter.UserFilter;
+import com.github.blog.repository.filter.PostFilter;
+import com.github.blog.repository.filter.UserFilter;
+import com.github.blog.repository.specification.PostSpecification;
+import com.github.blog.repository.specification.UserSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,26 +29,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Raman Haurylau
  */
 @Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
-@SpringJUnitConfig(classes = {WebTestConfig.class, RepositoryTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-post-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
 class PostDaoImplTests {
 
     @Autowired
-    private PostDao postDao;
+    private PostRepository postRepository;
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     private static Pageable pageable;
 
     @BeforeAll
     public static void setUp() {
-        pageable = new Pageable();
-        pageable.setPageSize(Integer.MAX_VALUE);
-        pageable.setPageNumber(1);
-        pageable.setOrderBy("ASC");
+        pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id").ascending());
     }
 
     @Test
@@ -62,7 +57,7 @@ class PostDaoImplTests {
         UserFilter filter = new UserFilter();
         filter.setUsername(username);
 
-        Page<User> filteredUserResult = userDao.findAll(filter, pageable);
+        Page<User> filteredUserResult = userRepository.findAll(UserSpecification.filterBy(filter), pageable);
 
         assertThat(filteredUserResult.getContent()).isNotEmpty();
 
@@ -72,13 +67,13 @@ class PostDaoImplTests {
         post.setContent(content);
         post.setCreatedAt(OffsetDateTime.now());
 
-        post = postDao.create(post);
+        post = postRepository.save(post);
 
         assertThat(post).isNotNull();
         assertThat(post.getId()).isNotNull();
         assertThat(post.getContent()).isEqualTo(content);
 
-        List<Post> allPosts = postDao.findAll();
+        Iterable<Post> allPosts = postRepository.findAll();
 
         assertThat(allPosts).isNotEmpty().hasSize(8);
     }
@@ -92,7 +87,7 @@ class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setUsername(username);
 
-        Page<Post> filteredPostResult = postDao.findAll(filter, pageable);
+        Page<Post> filteredPostResult = postRepository.findAll(PostSpecification.filterBy(filter), pageable);
 
         assertThat(filteredPostResult.getContent()).isNotEmpty().hasSize(3);
 
@@ -101,7 +96,7 @@ class PostDaoImplTests {
 
         post.setContent(updatedContent);
 
-        post = postDao.update(post);
+        post = postRepository.save(post);
 
         assertThat(post).isNotNull();
         assertThat(post.getContent()).isEqualTo(updatedContent);
@@ -112,19 +107,19 @@ class PostDaoImplTests {
     @Rollback
     @DisplayName("post dao: delete")
     void delete_deletesPost_whenDataIsValid() {
-        Optional<Post> post = postDao.findById(1L);
+        Optional<Post> post = postRepository.findById(1L);
 
         assertThat(post).isPresent();
 
-        postDao.delete(post.get());
+        postRepository.delete(post.get());
 
-        assertThat(postDao.findAll()).isNotEmpty().hasSize(6);
+        assertThat(postRepository.findAll()).isNotEmpty().hasSize(6);
     }
 
     @Test
     @DisplayName("post dao: find by id")
     void findById_returnsPost_whenIdIsValid() {
-        Optional<Post> foundPost = postDao.findById(1L);
+        Optional<Post> foundPost = postRepository.findById(1L);
 
         assertThat(foundPost).isPresent();
         assertThat(foundPost.get().getId()).isEqualTo(1L);
@@ -138,7 +133,7 @@ class PostDaoImplTests {
         PostFilter filter = new PostFilter();
         filter.setUsername(username);
 
-        Page<Post> filteredPostResult2 = postDao.findAll(filter, pageable);
+        Page<Post> filteredPostResult2 = postRepository.findAll(PostSpecification.filterBy(filter), pageable);
 
         assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(3);
     }
@@ -150,10 +145,10 @@ class PostDaoImplTests {
         PostFilter filter = new PostFilter();
 
         filter.setTagId(4L);
-        Page<Post> filteredPostResult1 = postDao.findAll(filter, pageable);
+        Page<Post> filteredPostResult1 = postRepository.findAll(PostSpecification.filterBy(filter), pageable);
 
         filter.setTagId(3L);
-        Page<Post> filteredPostResult2 = postDao.findAll(filter, pageable);
+        Page<Post> filteredPostResult2 = postRepository.findAll(PostSpecification.filterBy(filter), pageable);
 
         assertThat(filteredPostResult1.getContent()).isNotEmpty().hasSize(3);
         assertThat(filteredPostResult2.getContent()).isNotEmpty().hasSize(1);

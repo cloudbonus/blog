@@ -5,19 +5,15 @@ import com.github.blog.controller.dto.request.CommentRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.filter.CommentFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.controller.dto.response.PageableResponse;
 import com.github.blog.model.Comment;
 import com.github.blog.model.Post;
 import com.github.blog.model.User;
-import com.github.blog.repository.CommentDao;
-import com.github.blog.repository.PostDao;
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.CommentFilter;
+import com.github.blog.repository.CommentRepository;
+import com.github.blog.repository.PostRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.filter.CommentFilter;
 import com.github.blog.service.impl.CommentServiceImpl;
 import com.github.blog.service.mapper.CommentMapper;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.util.UserAccessHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +22,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,16 +45,13 @@ import static org.mockito.Mockito.when;
 public class CommentServiceImplTests {
 
     @Mock
-    private CommentDao commentDao;
+    private CommentRepository commentRepository;
 
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Mock
-    private PostDao postDao;
-
-    @Mock
-    private PageableMapper pageableMapper;
+    private PostRepository postRepository;
 
     @Mock
     private CommentMapper commentMapper;
@@ -64,6 +63,7 @@ public class CommentServiceImplTests {
     private CommentServiceImpl commentService;
 
     private CommentDto returnedCommentDto;
+    private final PageableRequest pageableRequest = new PageableRequest(10, null, "asc");
     private final CommentRequest request = new CommentRequest(null, null);
     private final Comment comment = new Comment();
 
@@ -83,10 +83,10 @@ public class CommentServiceImplTests {
 
         when(commentMapper.toEntity(request)).thenReturn(comment);
         when(userAccessHandler.getUserId()).thenReturn(id);
-        when(commentDao.create(comment)).thenReturn(comment);
+        when(commentRepository.save(comment)).thenReturn(comment);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
-        when(userDao.findById(userAccessHandler.getUserId())).thenReturn(Optional.of(user));
-        when(postDao.findById(request.postId())).thenReturn(Optional.of(post));
+        when(userRepository.findById(userAccessHandler.getUserId())).thenReturn(Optional.of(user));
+        when(postRepository.findById(request.postId())).thenReturn(Optional.of(post));
 
         CommentDto createdCommentDto = commentService.create(request);
 
@@ -98,7 +98,7 @@ public class CommentServiceImplTests {
     @Test
     @DisplayName("comment service: update")
     void update_returnsUpdatedCommentDto_whenDataIsValid() {
-        when(commentDao.findById(id)).thenReturn(Optional.of(comment));
+        when(commentRepository.findById(id)).thenReturn(Optional.of(comment));
         when(commentMapper.partialUpdate(request, comment)).thenReturn(comment);
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
         CommentDto updatedCommentDto = commentService.update(id, request);
@@ -111,7 +111,7 @@ public class CommentServiceImplTests {
     @Test
     @DisplayName("comment service: delete")
     void delete_deletesComment_whenDataIsValid() {
-        when(commentDao.findById(id)).thenReturn(Optional.of(comment));
+        when(commentRepository.findById(id)).thenReturn(Optional.of(comment));
         when(commentMapper.toDto(comment)).thenReturn(returnedCommentDto);
 
         CommentDto deletedCommentDto = commentService.delete(id);
@@ -119,23 +119,22 @@ public class CommentServiceImplTests {
         assertThat(deletedCommentDto).isNotNull();
         assertThat(deletedCommentDto.id()).isEqualTo(id);
         assertThat(deletedCommentDto.content()).isEqualTo(content);
-        verify(commentDao, times(1)).delete(comment);
+        verify(commentRepository, times(1)).delete(comment);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("comment service: find all by username")
     void find_findsAllCommentsByUsername_whenDataIsValid() {
         CommentFilter filter = new CommentFilter();
 
-        Pageable pageable = new Pageable();
-        PageableResponse pageableResponse = new PageableResponse(0, 0, null);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
 
-        Page<Comment> page = new Page<>(List.of(comment), pageable, 1L);
-        PageResponse<CommentDto> pageResponse = new PageResponse<>(List.of(returnedCommentDto), pageableResponse, 1L);
+        Page<Comment> page = new PageImpl<>(List.of(comment), pageable, 1L);
+        PageResponse<CommentDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedCommentDto), 1, 1, 0, 1);
 
         when(commentMapper.toEntity(any(CommentFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(commentDao.findAll(filter, pageable)).thenReturn(page);
+        when(commentRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(commentMapper.toDto(page)).thenReturn(pageResponse);
 
         PageResponse<CommentDto> filterSearchResult = commentService.findAll(new CommentFilterRequest(null), new PageableRequest(null, null, null));

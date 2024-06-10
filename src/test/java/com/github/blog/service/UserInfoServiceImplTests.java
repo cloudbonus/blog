@@ -5,20 +5,16 @@ import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.UserInfoRequest;
 import com.github.blog.controller.dto.request.filter.UserInfoFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.controller.dto.response.PageableResponse;
 import com.github.blog.model.Role;
 import com.github.blog.model.User;
 import com.github.blog.model.UserInfo;
-import com.github.blog.repository.RoleDao;
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.UserInfoDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.UserInfoFilter;
+import com.github.blog.repository.RoleRepository;
+import com.github.blog.repository.UserInfoRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.filter.UserInfoFilter;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.impl.UserInfoServiceImpl;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.mapper.UserInfoMapper;
 import com.github.blog.service.statemachine.event.UserInfoEvent;
 import com.github.blog.service.statemachine.state.UserInfoState;
@@ -30,6 +26,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineEventResult;
 import org.springframework.statemachine.service.StateMachineService;
@@ -55,19 +56,16 @@ import static org.mockito.Mockito.when;
 public class UserInfoServiceImplTests {
 
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Mock
-    private UserInfoDao userInfoDao;
+    private UserInfoRepository userInfoRepository;
 
     @Mock
-    private RoleDao roleDao;
+    private RoleRepository roleRepository;
 
     @Mock
     private UserInfoMapper userInfoMapper;
-
-    @Mock
-    private PageableMapper pageableMapper;
 
     @Mock
     private UserAccessHandler userAccessHandler;
@@ -88,10 +86,8 @@ public class UserInfoServiceImplTests {
     private final Long userId = 1L;
     private final Long roleId = 1L;
 
-    private final Pageable pageable = new Pageable();
-    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
+    private final PageableRequest pageableRequest = new PageableRequest(10, null, "asc");
     private final UserInfoFilterRequest userInfoFilterRequest = new UserInfoFilterRequest(null);
-    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
@@ -113,16 +109,16 @@ public class UserInfoServiceImplTests {
     @DisplayName("user info service: create")
     void create_createsUserInfo_whenDataIsValid() {
         when(userAccessHandler.getUserId()).thenReturn(userId);
-        when(userDao.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userInfoMapper.toEntity(request)).thenReturn(userInfo);
-        when(userInfoDao.create(userInfo)).thenReturn(userInfo);
+        when(userInfoRepository.save(userInfo)).thenReturn(userInfo);
         when(userInfoMapper.toDto(userInfo)).thenReturn(returnedUserInfoDto);
 
         UserInfoDto createdUserInfoDto = userInfoService.create(request);
 
         assertNotNull(createdUserInfoDto);
         assertEquals(id, createdUserInfoDto.id());
-        verify(userInfoDao, times(1)).create(userInfo);
+        verify(userInfoRepository, times(1)).save(userInfo);
     }
 
     @Test
@@ -132,7 +128,7 @@ public class UserInfoServiceImplTests {
         StateMachine<UserInfoState, UserInfoEvent> sm = mock(StateMachine.class);
         StateMachineEventResult<UserInfoState, UserInfoEvent> smResult = mock(StateMachineEventResult.class);
 
-        when(userInfoDao.findById(id)).thenReturn(Optional.of(userInfo));
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(userInfo));
         when(stateMachineService.acquireStateMachine(userInfo.getId().toString())).thenReturn(sm);
         when(sm.sendEvent(any(Mono.class))).thenReturn(Flux.just(smResult));
         when(smResult.getResultType()).thenReturn(StateMachineEventResult.ResultType.ACCEPTED);
@@ -151,9 +147,9 @@ public class UserInfoServiceImplTests {
         StateMachine<UserInfoState, UserInfoEvent> sm = mock(StateMachine.class);
         StateMachineEventResult<UserInfoState, UserInfoEvent> smResult = mock(StateMachineEventResult.class);
 
-        when(userInfoDao.findById(id)).thenReturn(Optional.of(userInfo));
-        when(userDao.findById(userId)).thenReturn(Optional.of(user));
-        when(roleDao.findById(roleId)).thenReturn(Optional.of(role));
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(userInfo));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(roleRepository.findById(roleId)).thenReturn(Optional.of(role));
         when(stateMachineService.acquireStateMachine(userInfo.getId().toString())).thenReturn(sm);
         when(sm.sendEvent(any(Mono.class))).thenReturn(Flux.just(smResult));
         when(smResult.getResultType()).thenReturn(StateMachineEventResult.ResultType.ACCEPTED);
@@ -168,7 +164,7 @@ public class UserInfoServiceImplTests {
     @Test
     @DisplayName("user info service: find by id")
     void findById_returnsUserInfoDto_whenIdIsValid() {
-        when(userInfoDao.findById(id)).thenReturn(Optional.of(userInfo));
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(userInfo));
         when(userInfoMapper.toDto(userInfo)).thenReturn(returnedUserInfoDto);
 
         UserInfoDto foundUserInfoDto = userInfoService.findById(id);
@@ -180,7 +176,7 @@ public class UserInfoServiceImplTests {
     @Test
     @DisplayName("user info service: find by id - not found exception")
     void findById_throwsException_whenIdIsInvalid() {
-        when(userInfoDao.findById(id)).thenReturn(Optional.empty());
+        when(userInfoRepository.findById(id)).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> userInfoService.findById(id));
 
@@ -188,16 +184,17 @@ public class UserInfoServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("user info service: find all")
     void findAll_returnsPageResponse_whenDataIsValid() {
         UserInfoFilter filter = new UserInfoFilter();
 
-        Page<UserInfo> page = new Page<>(Collections.singletonList(userInfo), pageable, 1L);
-        PageResponse<UserInfoDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedUserInfoDto), pageableResponse, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<UserInfo> page = new PageImpl<>(Collections.singletonList(userInfo), pageable, 1L);
+        PageResponse<UserInfoDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedUserInfoDto), 1, 1, 0, 1);
 
         when(userInfoMapper.toEntity(any(UserInfoFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(userInfoDao.findAll(filter, pageable)).thenReturn(page);
+        when(userInfoRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(userInfoMapper.toDto(page)).thenReturn(pageResponse);
 
         PageResponse<UserInfoDto> foundUserInfos = userInfoService.findAll(userInfoFilterRequest, pageableRequest);
@@ -208,15 +205,16 @@ public class UserInfoServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("user info service: find all - not found exception")
     void findAll_throwsException_whenNoUserInfosFound() {
         UserInfoFilter filter = new UserInfoFilter();
 
-        Page<UserInfo> page = new Page<>(Collections.emptyList(), pageable, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<UserInfo> page = new PageImpl<>(Collections.emptyList(), pageable, 1L);
 
         when(userInfoMapper.toEntity(any(UserInfoFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(userInfoDao.findAll(filter, pageable)).thenReturn(page);
+        when(userInfoRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
         CustomException exception = assertThrows(CustomException.class, () -> userInfoService.findAll(userInfoFilterRequest, pageableRequest));
 
@@ -226,7 +224,7 @@ public class UserInfoServiceImplTests {
     @Test
     @DisplayName("user info service: update")
     void update_updatesUserInfo_whenDataIsValid() {
-        when(userInfoDao.findById(id)).thenReturn(Optional.of(userInfo));
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(userInfo));
         when(userInfoMapper.partialUpdate(request, userInfo)).thenReturn(userInfo);
         when(userInfoMapper.toDto(userInfo)).thenReturn(returnedUserInfoDto);
 
@@ -239,13 +237,13 @@ public class UserInfoServiceImplTests {
     @Test
     @DisplayName("user info service: delete")
     void delete_deletesUserInfo_whenIdIsValid() {
-        when(userInfoDao.findById(id)).thenReturn(Optional.of(userInfo));
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(userInfo));
         when(userInfoMapper.toDto(userInfo)).thenReturn(returnedUserInfoDto);
 
         UserInfoDto deletedUserInfoDto = userInfoService.delete(id);
 
         assertNotNull(deletedUserInfoDto);
         assertEquals(id, deletedUserInfoDto.id());
-        verify(userInfoDao, times(1)).delete(userInfo);
+        verify(userInfoRepository, times(1)).delete(userInfo);
     }
 }

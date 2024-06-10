@@ -1,21 +1,20 @@
 package com.github.blog.repository;
 
-import com.github.blog.config.DataSourceProperties;
-import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.config.RepositoryTestConfig;
-import com.github.blog.config.WebTestConfig;
+import com.github.blog.config.ContainerConfig;
 import com.github.blog.model.Role;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.RoleFilter;
+import com.github.blog.repository.filter.RoleFilter;
+import com.github.blog.repository.specification.RoleSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -27,22 +26,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Raman Haurylau
  */
 @Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
-@SpringJUnitConfig(classes = {WebTestConfig.class, RepositoryTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
 public class RoleDaoImplTests {
 
     @Autowired
-    private RoleDao roleDao;
+    private RoleRepository roleDao;
 
     private static Pageable pageable;
 
     @BeforeAll
     public static void setUp() {
-        pageable = new Pageable();
-        pageable.setPageSize(Integer.MAX_VALUE);
-        pageable.setPageNumber(1);
-        pageable.setOrderBy("ASC");
+        pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id").ascending());
     }
 
     @Test
@@ -52,7 +47,7 @@ public class RoleDaoImplTests {
         Role newRole = new Role();
         newRole.setName("ROLE_TEMP");
 
-        Role createdRole = roleDao.create(newRole);
+        Role createdRole = roleDao.save(newRole);
 
         assertThat(createdRole).isNotNull();
         assertThat(createdRole.getId()).isNotNull();
@@ -81,7 +76,7 @@ public class RoleDaoImplTests {
         Role updatedRole = optionalRole.get();
         updatedRole.setName("Update role");
 
-        updatedRole = roleDao.update(updatedRole);
+        updatedRole = roleDao.save(updatedRole);
 
         assertThat(updatedRole).isNotNull();
         assertThat(updatedRole.getId()).isEqualTo(2L);
@@ -111,7 +106,7 @@ public class RoleDaoImplTests {
         RoleFilter filter = new RoleFilter();
         filter.setUserId(3L);
 
-        Page<Role> rolesPage = roleDao.findAll(filter, pageable);
+        Page<Role> rolesPage = roleDao.findAll(RoleSpecification.filterBy(filter), pageable);
 
         assertThat(rolesPage.getContent()).isNotEmpty().hasSize(1);
     }

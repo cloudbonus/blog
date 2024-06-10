@@ -1,21 +1,20 @@
 package com.github.blog.repository;
 
-import com.github.blog.config.DataSourceProperties;
-import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.config.RepositoryTestConfig;
-import com.github.blog.config.WebTestConfig;
+import com.github.blog.config.ContainerConfig;
 import com.github.blog.model.Tag;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.TagFilter;
+import com.github.blog.repository.filter.TagFilter;
+import com.github.blog.repository.specification.TagSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -26,22 +25,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Raman Haurylau
  */
 @Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
-@SpringJUnitConfig(classes = {WebTestConfig.class, RepositoryTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
 public class TagDaoImplTests {
 
     @Autowired
-    private TagDao tagDao;
+    private TagRepository tagRepository;
 
     private static Pageable pageable;
 
     @BeforeAll
     public static void setUp() {
-        pageable = new Pageable();
-        pageable.setPageSize(Integer.MAX_VALUE);
-        pageable.setPageNumber(1);
-        pageable.setOrderBy("ASC");
+        pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id").ascending());
     }
 
     @Test
@@ -51,7 +46,7 @@ public class TagDaoImplTests {
         Tag newTag = new Tag();
         newTag.setName("New Tag");
 
-        Tag createdTag = tagDao.create(newTag);
+        Tag createdTag = tagRepository.save(newTag);
 
         assertThat(createdTag).isNotNull();
         assertThat(createdTag.getId()).isNotNull();
@@ -61,7 +56,7 @@ public class TagDaoImplTests {
     @Test
     @DisplayName("tag dao: find by id")
     void findById_returnsTag_whenIdIsValid() {
-        Optional<Tag> foundTag = tagDao.findById(4L);
+        Optional<Tag> foundTag = tagRepository.findById(4L);
 
         assertThat(foundTag).isPresent();
         assertThat(foundTag.get().getId()).isEqualTo(4L);
@@ -72,14 +67,14 @@ public class TagDaoImplTests {
     @Rollback
     @DisplayName("tag dao: update")
     void update_returnsUpdatedTag_whenDataIsValid() {
-        Optional<Tag> optionalTag = tagDao.findById(4L);
+        Optional<Tag> optionalTag = tagRepository.findById(4L);
 
         assertThat(optionalTag).isPresent();
 
         Tag updatedTag = optionalTag.get();
         updatedTag.setName("Updated Tag");
 
-        updatedTag = tagDao.update(updatedTag);
+        updatedTag = tagRepository.save(updatedTag);
 
         assertThat(updatedTag).isNotNull();
         assertThat(updatedTag.getId()).isEqualTo(4L);
@@ -90,15 +85,15 @@ public class TagDaoImplTests {
     @Rollback
     @DisplayName("tag dao: delete")
     void delete_deletesTag_whenIdIsValid() {
-        Optional<Tag> optionalTag = tagDao.findById(1L);
+        Optional<Tag> optionalTag = tagRepository.findById(1L);
 
         assertThat(optionalTag).isPresent();
 
         Tag deletedTag = optionalTag.get();
 
-        tagDao.delete(deletedTag);
+        tagRepository.delete(deletedTag);
 
-        assertThat(tagDao.findAll()).isNotEmpty().hasSize(3);
+        assertThat(tagRepository.findAll()).isNotEmpty().hasSize(3);
     }
 
     @Test
@@ -108,7 +103,7 @@ public class TagDaoImplTests {
         TagFilter filter = new TagFilter();
         filter.setPostId(1L);
 
-        Page<Tag> tagsPage = tagDao.findAll(filter, pageable);
+        Page<Tag> tagsPage = tagRepository.findAll(TagSpecification.filterBy(filter), pageable);
 
         assertThat(tagsPage.getContent()).isNotEmpty().hasSize(1);
     }

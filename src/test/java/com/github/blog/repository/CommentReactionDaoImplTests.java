@@ -1,24 +1,23 @@
 package com.github.blog.repository;
 
-import com.github.blog.config.DataSourceProperties;
-import com.github.blog.config.PersistenceJPAConfig;
-import com.github.blog.config.RepositoryTestConfig;
-import com.github.blog.config.WebTestConfig;
+import com.github.blog.config.ContainerConfig;
 import com.github.blog.model.Comment;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.model.Reaction;
 import com.github.blog.model.User;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.CommentReactionFilter;
+import com.github.blog.repository.filter.CommentReactionFilter;
+import com.github.blog.repository.specification.CommentReactionSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -29,43 +28,39 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Raman Haurylau
  */
 @Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
-@SpringJUnitConfig(classes = {WebTestConfig.class, RepositoryTestConfig.class, PersistenceJPAConfig.class, DataSourceProperties.class})
+@SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql", "/db/insert-test-data-into-comment_reaction-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
 public class CommentReactionDaoImplTests {
 
     @Autowired
-    private CommentReactionDao commentReactionDao;
+    private CommentReactionRepository commentReactionRepository;
 
     @Autowired
-    private CommentDao commentDao;
+    private CommentRepository commentRepository;
 
     @Autowired
-    private ReactionDao reactionDao;
+    private ReactionRepository reactionRepository;
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userDao;
 
     private static Pageable pageable;
 
     @BeforeAll
     public static void setUp() {
-        pageable = new Pageable();
-        pageable.setPageSize(Integer.MAX_VALUE);
-        pageable.setPageNumber(1);
-        pageable.setOrderBy("ASC");
+        pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id").ascending());
     }
 
     @Test
-    @DisplayName("comment reaction dao: create")
     @Rollback
+    @DisplayName("comment reaction dao: create")
     void create_returnsCommentReaction_whenDataIsValid() {
-        Optional<Comment> optionalComment = commentDao.findById(1L);
+        Optional<Comment> optionalComment = commentRepository.findById(1L);
         assertThat(optionalComment).isPresent();
         Comment comment = optionalComment.get();
 
-        Optional<Reaction> optionalReaction = reactionDao.findById(2L);
+        Optional<Reaction> optionalReaction = reactionRepository.findById(2L);
         assertThat(optionalReaction).isPresent();
         Reaction reaction = optionalReaction.get();
 
@@ -78,7 +73,7 @@ public class CommentReactionDaoImplTests {
         newCommentReaction.setReaction(reaction);
         newCommentReaction.setUser(user);
 
-        CommentReaction createdCommentReaction = commentReactionDao.create(newCommentReaction);
+        CommentReaction createdCommentReaction = commentReactionRepository.save(newCommentReaction);
 
         assertThat(createdCommentReaction).isNotNull();
         assertThat(createdCommentReaction.getId()).isNotNull();
@@ -90,7 +85,7 @@ public class CommentReactionDaoImplTests {
     @Test
     @DisplayName("comment reaction dao: find by id")
     void findById_returnsCommentReaction_whenIdIsValid() {
-        Optional<CommentReaction> foundCommentReaction = commentReactionDao.findById(1L);
+        Optional<CommentReaction> foundCommentReaction = commentReactionRepository.findById(1L);
 
         assertThat(foundCommentReaction).isPresent();
         assertThat(foundCommentReaction.get().getId()).isEqualTo(1L);
@@ -100,17 +95,17 @@ public class CommentReactionDaoImplTests {
     @DisplayName("comment reaction dao: update")
     @Rollback
     void update_returnsUpdatedCommentReaction_whenDataIsValid() {
-        Optional<CommentReaction> optionalCommentReaction = commentReactionDao.findById(1L);
+        Optional<CommentReaction> optionalCommentReaction = commentReactionRepository.findById(1L);
         assertThat(optionalCommentReaction).isPresent();
         CommentReaction updatedCommentReaction = optionalCommentReaction.get();
 
-        Optional<Reaction> optionalReaction = reactionDao.findById(2L);
+        Optional<Reaction> optionalReaction = reactionRepository.findById(2L);
         assertThat(optionalReaction).isPresent();
         Reaction updatedReaction = optionalReaction.get();
 
         updatedCommentReaction.setReaction(updatedReaction);
 
-        updatedCommentReaction = commentReactionDao.update(updatedCommentReaction);
+        updatedCommentReaction = commentReactionRepository.save(updatedCommentReaction);
 
         assertThat(updatedCommentReaction).isNotNull();
         assertThat(updatedCommentReaction.getReaction().getId()).isEqualTo(2L);
@@ -120,15 +115,15 @@ public class CommentReactionDaoImplTests {
     @DisplayName("comment reaction dao: delete")
     @Rollback
     void delete_deletesCommentReaction_whenIdIsValid() {
-        Optional<CommentReaction> optionalCommentReaction = commentReactionDao.findById(1L);
+        Optional<CommentReaction> optionalCommentReaction = commentReactionRepository.findById(1L);
 
         assertThat(optionalCommentReaction).isPresent();
 
         CommentReaction deletedCommentReaction = optionalCommentReaction.get();
 
-        commentReactionDao.delete(deletedCommentReaction);
+        commentReactionRepository.delete(deletedCommentReaction);
 
-        assertThat(commentReactionDao.findById(1L)).isNotPresent();
+        assertThat(commentReactionRepository.findById(1L)).isNotPresent();
     }
 
     @Test
@@ -137,7 +132,8 @@ public class CommentReactionDaoImplTests {
         CommentReactionFilter filter = new CommentReactionFilter();
         filter.setUsername("student");
 
-        Page<CommentReaction> commentReactionsPage = commentReactionDao.findAll(filter, pageable);
+        Page<CommentReaction> commentReactionsPage = commentReactionRepository
+                .findAll(CommentReactionSpecification.filterBy(filter), pageable);
 
         assertThat(commentReactionsPage.getContent()).isNotEmpty();
     }

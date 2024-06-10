@@ -5,23 +5,19 @@ import com.github.blog.controller.dto.request.CommentReactionRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.filter.CommentReactionFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.controller.dto.response.PageableResponse;
 import com.github.blog.model.Comment;
 import com.github.blog.model.CommentReaction;
 import com.github.blog.model.Reaction;
 import com.github.blog.model.User;
-import com.github.blog.repository.CommentDao;
-import com.github.blog.repository.CommentReactionDao;
-import com.github.blog.repository.ReactionDao;
-import com.github.blog.repository.UserDao;
-import com.github.blog.repository.dto.common.Page;
-import com.github.blog.repository.dto.common.Pageable;
-import com.github.blog.repository.dto.filter.CommentReactionFilter;
+import com.github.blog.repository.CommentReactionRepository;
+import com.github.blog.repository.CommentRepository;
+import com.github.blog.repository.ReactionRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.filter.CommentReactionFilter;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.impl.CommentReactionServiceImpl;
 import com.github.blog.service.mapper.CommentReactionMapper;
-import com.github.blog.service.mapper.PageableMapper;
 import com.github.blog.service.util.UserAccessHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +26,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -49,22 +50,19 @@ import static org.mockito.Mockito.when;
 public class CommentReactionServiceImplTests {
 
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Mock
-    private CommentReactionDao commentReactionDao;
+    private CommentReactionRepository commentReactionRepository;
 
     @Mock
-    private CommentDao commentDao;
+    private CommentRepository commentRepository;
 
     @Mock
-    private ReactionDao reactionDao;
+    private ReactionRepository reactionRepository;
 
     @Mock
     private CommentReactionMapper commentReactionMapper;
-
-    @Mock
-    private PageableMapper pageableMapper;
 
     @Mock
     private UserAccessHandler userAccessHandler;
@@ -83,10 +81,8 @@ public class CommentReactionServiceImplTests {
     private final Long commentId = 1L;
     private final Long reactionId = 1L;
 
-    private final PageableRequest pageableRequest = new PageableRequest(null, null, null);
-    private final Pageable pageable = new Pageable();
+    private final PageableRequest pageableRequest = new PageableRequest(10, null, "asc");
     private final CommentReactionFilterRequest commentReactionFilterRequest = new CommentReactionFilterRequest(null, null, null);
-    private final PageableResponse pageableResponse = new PageableResponse(0, 0, null);
 
     @BeforeEach
     void setUp() {
@@ -112,24 +108,24 @@ public class CommentReactionServiceImplTests {
         Long userId = 1L;
 
         when(commentReactionMapper.toEntity(request)).thenReturn(commentReaction);
-        when(commentDao.findById(commentId)).thenReturn(Optional.of(comment));
-        when(reactionDao.findById(reactionId)).thenReturn(Optional.of(reaction));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(reactionRepository.findById(reactionId)).thenReturn(Optional.of(reaction));
         when(userAccessHandler.getUserId()).thenReturn(userId);
-        when(userDao.findById(userId)).thenReturn(Optional.of(user));
-        when(commentReactionDao.create(commentReaction)).thenReturn(commentReaction);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(commentReactionRepository.save(commentReaction)).thenReturn(commentReaction);
         when(commentReactionMapper.toDto(commentReaction)).thenReturn(returnedCommentReactionDto);
 
         CommentReactionDto createdCommentReactionDto = commentReactionService.create(request);
 
         assertNotNull(createdCommentReactionDto);
         assertEquals(id, createdCommentReactionDto.id());
-        verify(commentReactionDao, times(1)).create(commentReaction);
+        verify(commentReactionRepository, times(1)).save(commentReaction);
     }
 
     @Test
     @DisplayName("comment reaction service: find by id")
     void findById_returnsCommentReactionDto_whenIdIsValid() {
-        when(commentReactionDao.findById(id)).thenReturn(Optional.of(commentReaction));
+        when(commentReactionRepository.findById(id)).thenReturn(Optional.of(commentReaction));
         when(commentReactionMapper.toDto(commentReaction)).thenReturn(returnedCommentReactionDto);
 
         CommentReactionDto foundCommentReactionDto = commentReactionService.findById(id);
@@ -141,7 +137,7 @@ public class CommentReactionServiceImplTests {
     @Test
     @DisplayName("comment reaction service: find by id - not found exception")
     void findById_throwsException_whenIdIsInvalid() {
-        when(commentReactionDao.findById(id)).thenReturn(Optional.empty());
+        when(commentReactionRepository.findById(id)).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> commentReactionService.findById(id));
 
@@ -149,16 +145,17 @@ public class CommentReactionServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("comment reaction service: find all")
     void findAll_returnsPageResponse_whenDataIsValid() {
         CommentReactionFilter filter = new CommentReactionFilter();
 
-        Page<CommentReaction> page = new Page<>(Collections.singletonList(commentReaction), pageable, 1L);
-        PageResponse<CommentReactionDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedCommentReactionDto), pageableResponse, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<CommentReaction> page = new PageImpl<>(Collections.singletonList(commentReaction), pageable, 0);
+        PageResponse<CommentReactionDto> pageResponse = new PageResponse<>(Collections.singletonList(returnedCommentReactionDto), 1, 1, 0, 1);
 
         when(commentReactionMapper.toEntity(any(CommentReactionFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(commentReactionDao.findAll(filter, pageable)).thenReturn(page);
+        when(commentReactionRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(commentReactionMapper.toDto(page)).thenReturn(pageResponse);
 
         PageResponse<CommentReactionDto> foundCommentReactions = commentReactionService.findAll(commentReactionFilterRequest, pageableRequest);
@@ -169,15 +166,16 @@ public class CommentReactionServiceImplTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("comment reaction service: find all - not found exception")
     void findAll_throwsException_whenNoCommentReactionsFound() {
         CommentReactionFilter filter = new CommentReactionFilter();
 
-        Page<CommentReaction> page = new Page<>(Collections.emptyList(), pageable, 1L);
+        Pageable pageable = PageRequest.of(pageableRequest.pageNumber(), pageableRequest.pageSize(), pageableRequest.getSort());
+        Page<CommentReaction> page = new PageImpl<>(Collections.emptyList(), pageable, 0);
 
         when(commentReactionMapper.toEntity(any(CommentReactionFilterRequest.class))).thenReturn(filter);
-        when(pageableMapper.toEntity(any(PageableRequest.class))).thenReturn(pageable);
-        when(commentReactionDao.findAll(filter, pageable)).thenReturn(page);
+        when(commentReactionRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
         CustomException exception = assertThrows(CustomException.class, () -> commentReactionService.findAll(commentReactionFilterRequest, pageableRequest));
 
@@ -187,8 +185,8 @@ public class CommentReactionServiceImplTests {
     @Test
     @DisplayName("comment reaction service: update")
     void update_updatesCommentReaction_whenDataIsValid() {
-        when(commentReactionDao.findById(id)).thenReturn(Optional.of(commentReaction));
-        when(reactionDao.findById(reactionId)).thenReturn(Optional.of(reaction));
+        when(commentReactionRepository.findById(id)).thenReturn(Optional.of(commentReaction));
+        when(reactionRepository.findById(reactionId)).thenReturn(Optional.of(reaction));
         when(commentReactionMapper.toDto(commentReaction)).thenReturn(returnedCommentReactionDto);
 
         CommentReactionDto updatedCommentReactionDto = commentReactionService.update(id, request);
@@ -200,13 +198,13 @@ public class CommentReactionServiceImplTests {
     @Test
     @DisplayName("comment reaction service: delete")
     void delete_deletesCommentReaction_whenIdIsValid() {
-        when(commentReactionDao.findById(id)).thenReturn(Optional.of(commentReaction));
+        when(commentReactionRepository.findById(id)).thenReturn(Optional.of(commentReaction));
         when(commentReactionMapper.toDto(commentReaction)).thenReturn(returnedCommentReactionDto);
 
         CommentReactionDto deletedCommentReactionDto = commentReactionService.delete(id);
 
         assertNotNull(deletedCommentReactionDto);
         assertEquals(id, deletedCommentReactionDto.id());
-        verify(commentReactionDao, times(1)).delete(commentReaction);
+        verify(commentReactionRepository, times(1)).delete(commentReaction);
     }
 }
