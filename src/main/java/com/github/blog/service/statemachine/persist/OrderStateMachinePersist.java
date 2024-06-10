@@ -4,7 +4,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.github.blog.model.Order;
-import com.github.blog.repository.OrderDao;
+import com.github.blog.repository.OrderRepository;
 import com.github.blog.service.statemachine.event.OrderEvent;
 import com.github.blog.service.statemachine.state.OrderState;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class OrderStateMachinePersist implements StateMachinePersist<OrderState, OrderEvent, String> {
-    private final OrderDao dao;
+    private final OrderRepository repository;
 
     private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
@@ -42,7 +42,7 @@ public class OrderStateMachinePersist implements StateMachinePersist<OrderState,
 
     @Override
     public void write(StateMachineContext<OrderState, OrderEvent> context, String contextObj) {
-        Order order = dao.findById(Long.valueOf(contextObj)).orElse(null);
+        Order order = repository.findById(Long.valueOf(contextObj)).orElse(null);
 
         if (order == null) {
             log.error("Order not found, unable to update status.");
@@ -51,12 +51,12 @@ public class OrderStateMachinePersist implements StateMachinePersist<OrderState,
 
         order.setState(context.getState().name());
         order.setStateContext(serialize(context));
-        dao.update(order);
+        repository.save(order);
     }
 
     @Override
     public StateMachineContext<OrderState, OrderEvent> read(String contextObj) {
-        return dao.findById(Long.valueOf(contextObj)).map(order -> deserialize(order.getStateContext())).orElse(null);
+        return repository.findById(Long.valueOf(contextObj)).map(order -> deserialize(order.getStateContext())).orElse(null);
     }
 
     private String serialize(StateMachineContext<OrderState, OrderEvent> context) {

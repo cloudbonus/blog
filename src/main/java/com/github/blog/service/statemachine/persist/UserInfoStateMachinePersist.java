@@ -4,7 +4,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.github.blog.model.UserInfo;
-import com.github.blog.repository.UserInfoDao;
+import com.github.blog.repository.UserInfoRepository;
 import com.github.blog.service.statemachine.event.UserInfoEvent;
 import com.github.blog.service.statemachine.state.UserInfoState;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class UserInfoStateMachinePersist implements StateMachinePersist<UserInfoState, UserInfoEvent, String> {
-    private final UserInfoDao dao;
+    private final UserInfoRepository repository;
 
     private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
@@ -42,7 +42,7 @@ public class UserInfoStateMachinePersist implements StateMachinePersist<UserInfo
 
     @Override
     public void write(StateMachineContext<UserInfoState, UserInfoEvent> context, String contextObj) {
-        UserInfo userInfo = dao.findById(Long.valueOf(contextObj)).orElse(null);
+        UserInfo userInfo = repository.findById(Long.valueOf(contextObj)).orElse(null);
 
         if (userInfo == null) {
             log.error("User info not found, unable to update status.");
@@ -51,12 +51,12 @@ public class UserInfoStateMachinePersist implements StateMachinePersist<UserInfo
 
         userInfo.setState(context.getState().name());
         userInfo.setStateContext(serialize(context));
-        dao.update(userInfo);
+        repository.save(userInfo);
     }
 
     @Override
     public StateMachineContext<UserInfoState, UserInfoEvent> read(String contextObj) {
-        return dao.findById(Long.valueOf(contextObj)).map(order -> deserialize(order.getStateContext())).orElse(null);
+        return repository.findById(Long.valueOf(contextObj)).map(order -> deserialize(order.getStateContext())).orElse(null);
     }
 
     private String serialize(StateMachineContext<UserInfoState, UserInfoEvent> context) {

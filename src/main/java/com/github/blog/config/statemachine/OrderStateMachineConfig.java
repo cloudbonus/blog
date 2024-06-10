@@ -18,8 +18,8 @@ import java.util.EnumSet;
  * @author Raman Haurylau
  */
 @Configuration
-@EnableStateMachineFactory(name = "orderStateMachineFactory")
 @RequiredArgsConstructor
+@EnableStateMachineFactory(name = "orderStateMachineFactory")
 public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderState, OrderEvent> {
 
     private final StateMachineRuntimePersister<OrderState, OrderEvent, String> stateMachinePersister;
