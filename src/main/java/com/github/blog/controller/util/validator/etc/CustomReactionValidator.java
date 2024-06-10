@@ -2,7 +2,7 @@ package com.github.blog.controller.util.validator.etc;
 
 import com.github.blog.controller.annotation.etc.UniqueReaction;
 import com.github.blog.controller.dto.request.ReactionRequest;
-import com.github.blog.repository.ReactionDao;
+import com.github.blog.repository.ReactionRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomReactionValidator implements ConstraintValidator<UniqueReaction, ReactionRequest> {
 
-    private final ReactionDao reactionDao;
+    private final ReactionRepository reactionRepository;
 
     @Override
     public boolean isValid(ReactionRequest request, ConstraintValidatorContext context) {
-        return reactionDao.findByName(request.name()).isEmpty();
+        return reactionRepository.findByNameIgnoreCase(request.name()).isEmpty();
     }
 }

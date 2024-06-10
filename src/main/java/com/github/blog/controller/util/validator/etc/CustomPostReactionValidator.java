@@ -2,7 +2,7 @@ package com.github.blog.controller.util.validator.etc;
 
 import com.github.blog.controller.annotation.etc.UniquePostReaction;
 import com.github.blog.controller.dto.request.PostReactionRequest;
-import com.github.blog.repository.PostReactionDao;
+import com.github.blog.repository.PostReactionRepository;
 import com.github.blog.service.util.UserAccessHandler;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomPostReactionValidator implements ConstraintValidator<UniquePostReaction, PostReactionRequest> {
 
-    private final PostReactionDao postReactionDao;
+    private final PostReactionRepository postReactionRepository;
 
     private final UserAccessHandler userAccessHandler;
 
@@ -23,7 +23,7 @@ public class CustomPostReactionValidator implements ConstraintValidator<UniquePo
         if (request.postId() == null) {
             return true;
         } else {
-            return postReactionDao.findByPostIdAndUserId(request.postId(), userAccessHandler.getUserId()).isEmpty();
+            return postReactionRepository.findByPostIdAndUserId(request.postId(), userAccessHandler.getUserId()).isEmpty();
         }
     }
 }
