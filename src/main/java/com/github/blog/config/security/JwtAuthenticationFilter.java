@@ -1,4 +1,4 @@
-package com.github.blog.config.security.jwt;
+package com.github.blog.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.controller.advice.ErrorResponse;
