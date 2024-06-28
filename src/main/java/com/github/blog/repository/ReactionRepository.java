@@ -1,6 +1,6 @@
 package com.github.blog.repository;
 
-import com.github.blog.model.Reaction;
+import com.github.blog.repository.entity.Reaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;

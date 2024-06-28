@@ -1,6 +1,6 @@
 package com.github.blog.repository;
 
-import com.github.blog.model.Tag;
+import com.github.blog.repository.entity.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

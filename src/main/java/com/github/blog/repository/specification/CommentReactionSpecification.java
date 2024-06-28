@@ -1,11 +1,11 @@
 package com.github.blog.repository.specification;
 
-import com.github.blog.model.CommentReaction;
-import com.github.blog.model.CommentReaction_;
-import com.github.blog.model.Comment_;
-import com.github.blog.model.Reaction_;
-import com.github.blog.model.User;
-import com.github.blog.model.User_;
+import com.github.blog.repository.entity.CommentReaction;
+import com.github.blog.repository.entity.CommentReaction_;
+import com.github.blog.repository.entity.Comment_;
+import com.github.blog.repository.entity.Reaction_;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.User_;
 import com.github.blog.repository.filter.CommentReactionFilter;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;

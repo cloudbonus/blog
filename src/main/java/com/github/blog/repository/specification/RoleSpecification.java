@@ -1,9 +1,9 @@
 package com.github.blog.repository.specification;
 
-import com.github.blog.model.Role;
-import com.github.blog.model.Role_;
-import com.github.blog.model.User;
-import com.github.blog.model.User_;
+import com.github.blog.repository.entity.Role;
+import com.github.blog.repository.entity.Role_;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.User_;
 import com.github.blog.repository.filter.RoleFilter;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;

@@ -1,10 +1,10 @@
 package com.github.blog.repository.specification;
 
-import com.github.blog.model.Order;
-import com.github.blog.model.Order_;
-import com.github.blog.model.Post_;
-import com.github.blog.model.User;
-import com.github.blog.model.User_;
+import com.github.blog.repository.entity.Order;
+import com.github.blog.repository.entity.Order_;
+import com.github.blog.repository.entity.Post_;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.User_;
 import com.github.blog.repository.filter.OrderFilter;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
