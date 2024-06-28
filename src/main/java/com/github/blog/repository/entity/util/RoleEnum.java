@@ -1,4 +1,4 @@
-package com.github.blog.model.util;
+package com.github.blog.repository.entity.util;
 
 /**
  * @author Raman Haurylau

@@ -1,23 +1,23 @@
-package com.github.blog.model;
+package com.github.blog.repository.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * @author Raman Haurylau
- */
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
-@Table(name = "reaction", schema = "blog")
-public class Reaction {
+@Table(name = "role", schema = "blog")
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +27,6 @@ public class Reaction {
     @Column(nullable = false, length = Integer.MAX_VALUE)
     private String name;
 
-    @OneToOne(mappedBy = "reaction")
-    private CommentReaction commentReaction;
-
-    @OneToOne(mappedBy = "reaction")
-    private PostReaction postReactionReaction;
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users = new HashSet<>();
 }

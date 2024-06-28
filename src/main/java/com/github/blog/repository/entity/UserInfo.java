@@ -1,8 +1,11 @@
-package com.github.blog.model;
+package com.github.blog.repository.entity;
 
+import com.github.blog.repository.entity.util.UserInfoState;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -48,8 +51,6 @@ public class UserInfo {
     private String job;
 
     @Column(nullable = false)
-    private String state;
-
-    @Column(length = Integer.MAX_VALUE)
-    private String stateContext;
+    @Enumerated(EnumType.STRING)
+    private UserInfoState state;
 }

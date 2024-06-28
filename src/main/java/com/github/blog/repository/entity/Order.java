@@ -1,7 +1,10 @@
-package com.github.blog.model;
+package com.github.blog.repository.entity;
 
+import com.github.blog.repository.entity.util.OrderState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,10 +45,8 @@ public class Order {
     private OffsetDateTime createdAt;
 
     @Column(nullable = false)
-    private String state;
-
-    @Column(length = Integer.MAX_VALUE)
-    private String stateContext;
+    @Enumerated(EnumType.STRING)
+    private OrderState state;
 
     @PrePersist
     private void prePersist() {

@@ -1,4 +1,4 @@
-package com.github.blog.model;
+package com.github.blog.repository.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,8 +17,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
-@Table(name = "post_reaction", schema = "blog")
-public class PostReaction {
+@Table(name = "comment_reaction", schema = "blog")
+public class CommentReaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +27,8 @@ public class PostReaction {
 
     @OneToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @JoinColumn(name = "comment_id", nullable = false)
+    private Comment comment;
 
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.SET_NULL)

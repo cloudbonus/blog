@@ -1,4 +1,4 @@
-package com.github.blog.model;
+package com.github.blog.repository.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
