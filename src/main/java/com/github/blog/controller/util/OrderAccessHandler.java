@@ -1,10 +1,10 @@
 package com.github.blog.controller.util;
 
 import com.github.blog.controller.dto.common.OrderDto;
+import com.github.blog.repository.entity.util.OrderState;
 import com.github.blog.service.OrderService;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.security.AuthenticatedUserService;
-import com.github.blog.service.statemachine.state.OrderState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class OrderAccessHandler {
     public boolean isOrderCompleted(Long id) {
         try {
             OrderDto orderDto = orderService.findByPostId(id);
-            return orderDto.state().equals(OrderState.COMPLETED.name());
+            return orderDto.state().equals(OrderState.COMMITED.name());
         } catch (CustomException e) {
             return true;
         }

@@ -1,6 +1,6 @@
 package com.github.blog.controller.dto.request.filter;
 
-import com.github.blog.service.statemachine.state.OrderState;
+import com.github.blog.repository.entity.util.OrderState;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 
@@ -14,6 +14,6 @@ public record PostFilterRequest(
 
     @Override
     public String state() {
-        return state == null ? OrderState.COMPLETED.name() : state;
+        return state == null ? OrderState.COMMITED.name() : state;
     }
 }

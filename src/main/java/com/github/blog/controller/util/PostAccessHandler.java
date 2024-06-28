@@ -3,11 +3,11 @@ package com.github.blog.controller.util;
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.common.PostDto;
 import com.github.blog.controller.dto.request.filter.PostFilterRequest;
+import com.github.blog.repository.entity.util.OrderState;
 import com.github.blog.service.OrderService;
 import com.github.blog.service.PostService;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.security.AuthenticatedUserService;
-import com.github.blog.service.statemachine.state.OrderState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +45,7 @@ public class PostAccessHandler {
     }
 
     public boolean canFilter(PostFilterRequest requestFilter) {
-        if (!requestFilter.state().equals(OrderState.COMPLETED.name()) && requestFilter.username() != null) {
+        if (!requestFilter.state().equals(OrderState.COMMITED.name()) && requestFilter.username() != null) {
             return requestFilter.username().equals(authenticatedUserService.getAuthenticatedUser().getUsername());
         }
         return true;
