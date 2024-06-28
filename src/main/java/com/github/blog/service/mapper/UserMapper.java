@@ -3,7 +3,7 @@ package com.github.blog.service.mapper;
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.request.filter.UserFilterRequest;
-import com.github.blog.model.User;
+import com.github.blog.repository.entity.User;
 import com.github.blog.repository.filter.UserFilter;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

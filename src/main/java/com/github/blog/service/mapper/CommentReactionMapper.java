@@ -3,7 +3,7 @@ package com.github.blog.service.mapper;
 import com.github.blog.controller.dto.common.CommentReactionDto;
 import com.github.blog.controller.dto.request.CommentReactionRequest;
 import com.github.blog.controller.dto.request.filter.CommentReactionFilterRequest;
-import com.github.blog.model.CommentReaction;
+import com.github.blog.repository.entity.CommentReaction;
 import com.github.blog.repository.filter.CommentReactionFilter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

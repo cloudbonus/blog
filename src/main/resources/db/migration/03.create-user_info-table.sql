@@ -6,6 +6,5 @@ CREATE TABLE IF NOT EXISTS blog.user_info (
     major         text,
     company       text,
     job           text,
-    state         text,
-    state_context text
+    state         text
 );
