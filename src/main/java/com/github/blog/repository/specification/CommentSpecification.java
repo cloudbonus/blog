@@ -1,9 +1,9 @@
 package com.github.blog.repository.specification;
 
-import com.github.blog.model.Comment;
-import com.github.blog.model.Comment_;
-import com.github.blog.model.User;
-import com.github.blog.model.User_;
+import com.github.blog.repository.entity.Comment;
+import com.github.blog.repository.entity.Comment_;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.User_;
 import com.github.blog.repository.filter.CommentFilter;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;

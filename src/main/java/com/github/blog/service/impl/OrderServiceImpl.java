@@ -3,39 +3,35 @@ package com.github.blog.service.impl;
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.PaymentCancelRequest;
+import com.github.blog.controller.dto.request.PaymentDto;
+import com.github.blog.controller.dto.request.PaymentProcessRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.model.Order;
-import com.github.blog.model.Post;
-import com.github.blog.model.User;
 import com.github.blog.repository.OrderRepository;
 import com.github.blog.repository.PostRepository;
 import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.entity.Order;
+import com.github.blog.repository.entity.Post;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.UserInfo;
 import com.github.blog.repository.filter.OrderFilter;
 import com.github.blog.repository.specification.OrderSpecification;
 import com.github.blog.service.OrderService;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.OrderMapper;
-import com.github.blog.service.statemachine.event.OrderEvent;
-import com.github.blog.service.statemachine.state.OrderState;
+import com.github.blog.service.util.PaymentRequestProducer;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.StateMachineEventResult;
-import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Raman Haurylau
@@ -48,63 +44,30 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final PostRepository postRepository;
-
+    private final PaymentRequestProducer paymentRequestProducer;
     private final OrderMapper orderMapper;
 
-    private final StateMachineService<OrderState, OrderEvent> stateMachineService;
-
     @Override
-    public OrderDto reserve(Long id) {
-        log.debug("Reserving order with ID: {}", id);
+    public PaymentCancelRequest cancel(Long id) {
         Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
-        StateMachine<OrderState, OrderEvent> sm = stateMachineService.acquireStateMachine(order.getId().toString());
-        StateMachineEventResult<OrderState, OrderEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(OrderEvent.RESERVE).build())).blockFirst());
-
-        if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
-        }
-
-        log.debug("Order reserved with ID: {}", id);
-        return orderMapper.toDto(order);
+        return paymentRequestProducer.sendMessage(new PaymentCancelRequest(order.getId()));
     }
 
     @Override
-    public OrderDto cancel(Long id) {
-        log.debug("Cancelling order with ID: {}", id);
+    @SneakyThrows
+    public PaymentProcessRequest process(Long id) {
         Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
-        StateMachine<OrderState, OrderEvent> sm = stateMachineService.acquireStateMachine(order.getId().toString());
-        StateMachineEventResult<OrderState, OrderEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(OrderEvent.CANCEL).build())).blockFirst());
+        UserInfo userInfo = order.getUser().getUserInfo();
 
-        if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
-        }
+        String fullName = String.format("%s %s", userInfo.getFirstname(), userInfo.getSurname());
 
-        log.debug("Order cancelled with ID: {}", id);
-        return orderMapper.toDto(order);
-    }
-
-    @Override
-    public OrderDto buy(Long id) {
-        log.debug("Buying order with ID: {}", id);
-        Order order = orderRepository
-                .findById(id)
-                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
-
-        StateMachine<OrderState, OrderEvent> sm = stateMachineService.acquireStateMachine(order.getId().toString());
-        StateMachineEventResult<OrderState, OrderEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(OrderEvent.BUY).build())).blockFirst());
-
-        if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
-        }
-
-        log.debug("Order bought with ID: {}", id);
-        return orderMapper.toDto(order);
+        return paymentRequestProducer.sendMessage(new PaymentProcessRequest(order.getId(), fullName));
     }
 
     @Override
@@ -159,16 +122,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toDto(order);
     }
 
-    @Scheduled(fixedRate = 150000)
-    private void deleteInactiveOrders() {
-        log.debug("Deleting inactive orders");
-        List<Order> orders = orderRepository.findAllInactiveOrders();
-        orders.forEach(order -> {
-            orderRepository.delete(order);
-            log.debug("Deleted inactive order with ID: {}", order.getId());
-        });
-    }
-
     @Override
     @Transactional(readOnly = true)
     public OrderDto findByPostId(Long id) {
@@ -179,6 +132,15 @@ public class OrderServiceImpl implements OrderService {
 
         log.debug("Order found with ID: {}", id);
         return orderMapper.toDto(order);
+    }
+
+    @Override
+    public void updateState(PaymentDto paymentDto) {
+        Order order = orderRepository
+                .findById(paymentDto.paymentId())
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
+
+        order.setState(paymentDto.state());
     }
 
     @Override

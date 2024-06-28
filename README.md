@@ -27,7 +27,7 @@ http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2orderBy=asc
     
 ## Schema
 
-![schema](blog-schema.jpg)
+![schema](../utils/blog-schema.jpg)
 
 ## Running the Application
 
@@ -36,16 +36,18 @@ http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2orderBy=asc
     git clone https://github.com/cloudbonus/senla-course.git 
     ```
 2. **Run the scripts**
-   - Execute `docker-compose.yaml` to set up the PostgreSQL database and Tomcat server.
-   - Execute gradlew bootRun (or gradle) and then go to localhost:8080 `http://localhost:8080/blog-1.0/auth/sign-up`.
+   - In progress
+   - Execute `docker-compose.yaml` to set up PostgreSQL and Kafka.
    - (OPTIONAL) Execute `init-db.sql` in the resources folder to initialize the database with starter data.
 
 ## To-Do
 
 - [ ] Refactor the code.
-- [ ] Make the state machine operate at its full potential.
-- [ ] Migrate to Spring Boot and Spring Data JPA.
+- [X] Move state machine to another service. 
+- [X] Migrate to Spring Boot and Spring Data JPA.
 - [ ] Fix bugs (I'm sure they exist).
+- [ ] Fix tests
+- [ ] Update the database schema.
 
 ## Contributing
 

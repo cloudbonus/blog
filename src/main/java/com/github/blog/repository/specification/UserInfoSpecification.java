@@ -1,7 +1,7 @@
 package com.github.blog.repository.specification;
 
-import com.github.blog.model.UserInfo;
-import com.github.blog.model.UserInfo_;
+import com.github.blog.repository.entity.UserInfo;
+import com.github.blog.repository.entity.UserInfo_;
 import com.github.blog.repository.filter.UserInfoFilter;
 import org.springframework.data.jpa.domain.Specification;
 

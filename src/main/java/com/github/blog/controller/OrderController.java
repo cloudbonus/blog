@@ -3,11 +3,14 @@ package com.github.blog.controller;
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.PaymentCancelRequest;
+import com.github.blog.controller.dto.request.PaymentProcessRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.service.OrderService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
@@ -30,22 +33,17 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping("{id}/reserve")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('COMPANY') and @orderAccess.verifyOwnership(#id))")
-    public OrderDto reserve(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
-        return orderService.reserve(id);
-    }
-
     @GetMapping("{id}/cancel")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('COMPANY') and @orderAccess.verifyOwnership(#id))")
-    public OrderDto cancel(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
+    public PaymentCancelRequest cancel(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
         return orderService.cancel(id);
     }
 
-    @GetMapping("{id}/buy")
+    @GetMapping("{id}/process")
+    @SneakyThrows
     @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY') and @orderAccess.verifyOwnership(#id)")
-    public OrderDto buy(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
-        return orderService.buy(id);
+    public PaymentProcessRequest process(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
+        return orderService.process(id);
     }
 
     @GetMapping("{id}")

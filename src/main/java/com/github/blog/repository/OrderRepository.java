@@ -1,6 +1,6 @@
 package com.github.blog.repository;
 
-import com.github.blog.model.Order;
+import com.github.blog.repository.entity.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,6 +23,6 @@ public interface OrderRepository extends CrudRepository<Order, Long>, JpaSpecifi
 
     Optional<Order> findByPostId(Long postId);
 
-    @Query("SELECT o FROM Order o WHERE o.state = 'NEW' OR o.state = 'CANCELED'")
-    List<Order> findAllInactiveOrders();
+    @Query("SELECT o FROM Order o WHERE o.state = 'CANCELED'")
+    List<Order> findAllCanceledOrders();
 }

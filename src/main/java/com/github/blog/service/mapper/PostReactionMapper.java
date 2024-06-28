@@ -3,7 +3,7 @@ package com.github.blog.service.mapper;
 import com.github.blog.controller.dto.common.PostReactionDto;
 import com.github.blog.controller.dto.request.PostReactionRequest;
 import com.github.blog.controller.dto.request.filter.PostReactionFilterRequest;
-import com.github.blog.model.PostReaction;
+import com.github.blog.repository.entity.PostReaction;
 import com.github.blog.repository.filter.PostReactionFilter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

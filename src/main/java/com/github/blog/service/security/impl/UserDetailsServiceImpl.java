@@ -1,7 +1,7 @@
 package com.github.blog.service.security.impl;
 
-import com.github.blog.model.User;
 import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.entity.User;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import lombok.RequiredArgsConstructor;

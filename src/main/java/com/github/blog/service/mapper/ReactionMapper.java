@@ -2,7 +2,7 @@ package com.github.blog.service.mapper;
 
 import com.github.blog.controller.dto.common.ReactionDto;
 import com.github.blog.controller.dto.request.ReactionRequest;
-import com.github.blog.model.Reaction;
+import com.github.blog.repository.entity.Reaction;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;

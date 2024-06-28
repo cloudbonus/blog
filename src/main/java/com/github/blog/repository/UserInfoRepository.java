@@ -1,6 +1,7 @@
 package com.github.blog.repository;
 
-import com.github.blog.model.UserInfo;
+import com.github.blog.repository.entity.UserInfo;
+import com.github.blog.repository.entity.util.UserInfoState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,5 +20,5 @@ public interface UserInfoRepository extends CrudRepository<UserInfo, Long>, JpaS
     @NonNull
     Page<UserInfo> findAll(@Nullable Specification<UserInfo> spec, @NonNull Pageable pageable);
 
-    List<UserInfo> findByState(String stateOne);
+    List<UserInfo> findByState(UserInfoState stateOne);
 }

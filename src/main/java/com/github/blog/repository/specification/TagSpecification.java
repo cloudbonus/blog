@@ -1,9 +1,9 @@
 package com.github.blog.repository.specification;
 
-import com.github.blog.model.Post;
-import com.github.blog.model.Post_;
-import com.github.blog.model.Tag;
-import com.github.blog.model.Tag_;
+import com.github.blog.repository.entity.Post;
+import com.github.blog.repository.entity.Post_;
+import com.github.blog.repository.entity.Tag;
+import com.github.blog.repository.entity.Tag_;
 import com.github.blog.repository.filter.TagFilter;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
