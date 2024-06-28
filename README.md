@@ -19,25 +19,29 @@ It also supports pagination, making it easy to navigate through large amounts of
 ### Pagination and Sorting examples
    
 ```console  
-http://localhost:8080/blog-1.0/user
-http://localhost:8080/blog-1.0/user?pageSize=2
-http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2
-http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2orderBy=asc
+http://localhost:8080/user
+http://localhost:8080/user?pageSize=2
+http://localhost:8080/user?pageSize=2&pageNumber=2
+http://localhost:8080/user?pageSize=2&pageNumber=2orderBy=asc
 ```
     
 ## Schema
 
-![schema](../utils/blog-schema.jpg)
+![schema](media/blog-schema.jpg)
 
 ## Running the Application
 
 1. **Clone the repository**
     ```console  
-    git clone https://github.com/cloudbonus/senla-course.git 
+    git clone https://github.com/cloudbonus/blog.git 
     ```
-2. **Run the scripts**
-   - In progress
-   - Execute `docker-compose.yaml` to set up PostgreSQL and Kafka.
+2. **Clone the epay repository**
+   ```console  
+   git clone https://github.com/cloudbonus/epay.git
+    ```
+3. **Setup**
+   - Move content from the util folder to the parent directory.
+   - Execute `docker-compose.yaml` to set up Apps, PostgreSQL and Kafka.
    - (OPTIONAL) Execute `init-db.sql` in the resources folder to initialize the database with starter data.
 
 ## To-Do
