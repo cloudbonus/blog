@@ -1,4 +1,4 @@
-package com.github.blog.controller;
+package com.github.blog.integration;
 
 import com.github.blog.config.ContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Transactional
 @SpringBootTest(classes = ContainerConfig.class)
-@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql"})
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-comment-table.sql", "/db/insert-test-data-into-comment_reaction-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class RoleControllerTests {
+public class CommentReactionControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
@@ -40,14 +40,15 @@ public class RoleControllerTests {
 
     @Test
     @Rollback
-    @WithUserDetails("admin")
-    @DisplayName("role controller: create")
-    void create_returnsCreatedRoleDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(post("/roles")
+    @WithUserDetails
+    @DisplayName("comment reaction controller: create")
+    void create_returnsCreatedCommentReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(post("/comment-reactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "name": "TEST"
+                                "commentId": 2,
+                                "reactionId": 1
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -55,14 +56,15 @@ public class RoleControllerTests {
     }
 
     @Test
-    @WithUserDetails
-    @DisplayName("role controller: create - bad request exception")
-    void create_throwsExceptionForbidden_whenUserDoesntHaveRightRole() throws Exception {
-        mockMvc.perform(post("/roles")
+    @WithUserDetails("kvossing0")
+    @DisplayName("comment reaction controller: create - validation exception")
+    void create_throwsExceptionForbidden_whenReactionAlreadyExists() throws Exception {
+        mockMvc.perform(post("/comment-reactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "name": "TEST"
+                                "commentId": 1,
+                                "reactionId": 1
                                 }
                                 """))
                 .andExpect(status().isBadRequest());
@@ -70,45 +72,45 @@ public class RoleControllerTests {
 
     @Test
     @Rollback
-    @WithUserDetails("admin")
-    @DisplayName("role controller: update")
-    void update_returnsUpdatedRoleDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(put("/roles/{id}", 1)
+    @WithUserDetails("kvossing0")
+    @DisplayName("comment reaction controller: update")
+    void update_returnsUpdatedCommentReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(put("/comment-reactions/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "name": "NEW"
+                                "reactionId": 2
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.reactionId").value(2));
     }
 
     @Test
     @Rollback
-    @WithUserDetails("admin")
-    @DisplayName("role controller: delete")
-    void delete_returnsDeletedRoleDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(delete("/roles/{id}", 1))
+    @WithUserDetails("kvossing0")
+    @DisplayName("comment reaction controller: delete")
+    void delete_returnsDeletedCommentReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(delete("/comment-reactions/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    @WithUserDetails("admin")
-    @DisplayName("role controller: find by id")
-    void find_findsRoleById_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/roles/{id}", 1))
+    @WithUserDetails
+    @DisplayName("comment reaction controller: find by id")
+    void find_findsCommentReactionById_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/comment-reactions/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    @WithUserDetails("admin")
-    @DisplayName("role controller: find all")
-    void find_findsAllRolesByUserId_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/roles").param("userId", "6"))
+    @WithUserDetails
+    @DisplayName("comment reaction controller: find all")
+    void find_findsAllCommentReactions_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/comment-reactions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1));
+                .andExpect(jsonPath("$.content.length()").value(2));
     }
 }

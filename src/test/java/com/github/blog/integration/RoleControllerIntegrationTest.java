@@ -1,4 +1,4 @@
-package com.github.blog.controller;
+package com.github.blog.integration;
 
 import com.github.blog.config.ContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class TagControllerTests {
+public class RoleControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
@@ -41,9 +41,9 @@ public class TagControllerTests {
     @Test
     @Rollback
     @WithUserDetails("admin")
-    @DisplayName("tag controller: create")
-    void create_returnsCreatedTagDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(post("/tags")
+    @DisplayName("role controller: create")
+    void create_returnsCreatedRoleDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(post("/roles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -56,9 +56,9 @@ public class TagControllerTests {
 
     @Test
     @WithUserDetails
-    @DisplayName("tag controller: create - bad request exception")
+    @DisplayName("role controller: create - bad request exception")
     void create_throwsExceptionForbidden_whenUserDoesntHaveRightRole() throws Exception {
-        mockMvc.perform(post("/tags")
+        mockMvc.perform(post("/roles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -71,13 +71,13 @@ public class TagControllerTests {
     @Test
     @Rollback
     @WithUserDetails("admin")
-    @DisplayName("tag controller: update")
-    void update_returnsUpdatedTagDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(put("/tags/{id}", 1)
+    @DisplayName("role controller: update")
+    void update_returnsUpdatedRoleDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(put("/roles/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "name": "TEST"
+                                "name": "NEW"
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -87,28 +87,27 @@ public class TagControllerTests {
     @Test
     @Rollback
     @WithUserDetails("admin")
-    @DisplayName("tag controller: delete")
-    void delete_returnsDeletedTagDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(delete("/tags/{id}", 1))
+    @DisplayName("role controller: delete")
+    void delete_returnsDeletedRoleDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(delete("/roles/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     @WithUserDetails("admin")
-    @DisplayName("tag controller: find by id")
-    void find_findsTagById_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/tags/{id}", 2))
+    @DisplayName("role controller: find by id")
+    void find_findsRoleById_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/roles/{id}", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2));
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     @WithUserDetails("admin")
-    @DisplayName("tag controller: find all")
-    @Sql({"/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_tag-table.sql"})
-    void find_findsAllTagsByPostId_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/tags").param("postId", "1"))
+    @DisplayName("role controller: find all")
+    void find_findsAllRolesByUserId_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/roles").param("userId", "6"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1));
     }

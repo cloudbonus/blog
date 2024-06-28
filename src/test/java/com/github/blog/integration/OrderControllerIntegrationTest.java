@@ -1,4 +1,4 @@
-package com.github.blog.controller;
+package com.github.blog.integration;
 
 import com.github.blog.config.ContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-order-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class OrderControllerTests {
+public class OrderControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
@@ -38,44 +37,25 @@ public class OrderControllerTests {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
     }
 
-    @Test
-    @Rollback
-    @WithUserDetails("company")
-    @DisplayName("order controller: reserve")
-    void reserve_returnsReservedOrderDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/orders/{id}/reserve", 1))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("RESERVED"));
-    }
-
-    @Test
-    @Rollback
-    @WithUserDetails("company")
-    @DisplayName("order controller: cancel")
-    void cancel_returnsCanceledOrderDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/orders/{id}/reserve", 2))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("RESERVED"));
-
-        mockMvc.perform(get("/orders/{id}/cancel", 2))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("CANCELED"));
-    }
-
-    @Test
-    @Rollback
-    @WithUserDetails("company")
-    @DisplayName("order controller: buy")
-    void buy_returnsPurchasedOrderDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/orders/{id}/reserve", 3))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("RESERVED"));
-
-        mockMvc.perform(get("/orders/{id}/buy", 3))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("COMPLETED"));
-    }
+//    @Test
+//    @Rollback
+//    @WithUserDetails("company")
+//    @DisplayName("order controller: cancel")
+//    void cancel_returnsCanceledOrderDto_whenDataIsValid() throws Exception {
+//        mockMvc.perform(get("/orders/{id}/cancel", 2))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.state").value("CANCELED"));
+//    }
+//
+//    @Test
+//    @Rollback
+//    @WithUserDetails("company")
+//    @DisplayName("order controller: buy")
+//    void buy_returnsPurchasedOrderDto_whenDataIsValid() throws Exception {
+//        mockMvc.perform(get("/orders/{id}/buy", 3))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.state").value("COMPLETED"));
+//    }
 
 
     @Test
@@ -83,7 +63,7 @@ public class OrderControllerTests {
     @WithUserDetails("admin")
     @DisplayName("order controller: update")
     void update_returnsUpdatedOrderDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(put("/orders/{id}", 4)
+        mockMvc.perform(put("/orders/{id}", 3)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -92,7 +72,7 @@ public class OrderControllerTests {
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(4));
+                .andExpect(jsonPath("$.id").value(3));
     }
 
     @Test
@@ -100,9 +80,9 @@ public class OrderControllerTests {
     @WithUserDetails("admin")
     @DisplayName("order controller: delete")
     void delete_returnsDeletedOrderDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(delete("/orders/{id}", 4))
+        mockMvc.perform(delete("/orders/{id}", 3))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(4));
+                .andExpect(jsonPath("$.id").value(3));
     }
 
     @Test

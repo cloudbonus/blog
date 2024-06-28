@@ -1,8 +1,8 @@
-package com.github.blog.controller;
+package com.github.blog.integration;
 
 import com.github.blog.config.ContainerConfig;
+import com.github.blog.repository.entity.util.UserInfoState;
 import com.github.blog.service.security.impl.UserDetailsImpl;
-import com.github.blog.service.statemachine.state.UserInfoState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_info-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class UserInfoControllerTests {
+public class UserInfoControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
@@ -90,9 +90,8 @@ public class UserInfoControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty());
 
-        mockMvc.perform(get("/user-info/{id}/verify", 1).param("roleId", "3")
+        mockMvc.perform(get("/user-info/{id}/verify", 4).param("roleId", "3")
                         .with(user(admin)))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value(UserInfoState.VERIFIED.name()));
     }
@@ -117,7 +116,7 @@ public class UserInfoControllerTests {
     @WithUserDetails("admin")
     @DisplayName("user info controller: update")
     void update_returnsUpdatedUserInfoDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(put("/user-info/{id}", 1)
+        mockMvc.perform(put("/user-info/{id}", 5)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -126,7 +125,7 @@ public class UserInfoControllerTests {
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(5));
     }
 
     @Test
@@ -151,9 +150,9 @@ public class UserInfoControllerTests {
     @WithUserDetails("admin")
     @DisplayName("user info controller: delete")
     void delete_deletesUserInfo_whenDataIsValid() throws Exception {
-        mockMvc.perform(delete("/user-info/{id}", 1))
+        mockMvc.perform(delete("/user-info/{id}", 5))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(5));
     }
 
 
@@ -166,12 +165,12 @@ public class UserInfoControllerTests {
     }
 
     @Test
-    @WithUserDetails("kvossing0")
+    @WithUserDetails("student")
     @DisplayName("user info controller: find by id")
     void findById_findsUserInfoById_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/user-info/{id}", 1))
+        mockMvc.perform(get("/user-info/{id}", 6))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(6));
     }
 
     @Test

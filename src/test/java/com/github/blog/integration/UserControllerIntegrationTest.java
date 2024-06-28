@@ -1,4 +1,4 @@
-package com.github.blog.controller;
+package com.github.blog.integration;
 
 import com.github.blog.config.ContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_info-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class UserControllerTests {
+public class UserControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
@@ -112,7 +112,7 @@ public class UserControllerTests {
         mockMvc.perform(get("/users").param("job", "ai researcher"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].username").value("gmaccook1"));
+                .andExpect(jsonPath("$.content[0].username").value("student"));
     }
 
     @Test
@@ -130,6 +130,6 @@ public class UserControllerTests {
         mockMvc.perform(get("/users").param("university", "mit"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content.[0].username").value("gmaccook1"));
+                .andExpect(jsonPath("$.content.[0].username").value("student"));
     }
 }

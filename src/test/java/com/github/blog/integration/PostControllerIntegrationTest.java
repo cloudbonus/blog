@@ -1,4 +1,4 @@
-package com.github.blog.controller;
+package com.github.blog.integration;
 
 import com.github.blog.config.ContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = ContainerConfig.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-user_info-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-order-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class PostControllerTests {
+public class PostControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
@@ -182,7 +182,7 @@ public class PostControllerTests {
     @DisplayName("post controller: find by tag")
     @Sql("/db/insert-test-data-into-post_tag-table.sql")
     void find_findsAllPostsByTag_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/posts").param("tagId", "4"))
+        mockMvc.perform(get("/posts").param("tagId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(3))
                 .andExpect(jsonPath("$.content[0].title").value("1 post"))

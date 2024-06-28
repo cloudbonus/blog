@@ -1,4 +1,4 @@
-package com.github.blog.controller;
+package com.github.blog.integration;
 
 import com.github.blog.config.ContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Transactional
 @SpringBootTest(classes = ContainerConfig.class)
-@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql", "/db/insert-test-data-into-post-table.sql", "/db/insert-test-data-into-post_reaction-table.sql"})
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, scripts = {"/db/insert-test-data-into-user-table.sql"})
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS, scripts = "/db/clean-test-data.sql")
-public class PostReactionControllerTests {
+public class ReactionControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
@@ -40,15 +40,14 @@ public class PostReactionControllerTests {
 
     @Test
     @Rollback
-    @WithUserDetails
-    @DisplayName("post reaction controller: create")
-    void create_returnsCreatedPostReactionDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(post("/post-reactions")
+    @WithUserDetails("admin")
+    @DisplayName("reaction controller: create")
+    void create_returnsCreatedReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(post("/reactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "postId": 2,
-                                "reactionId": 2
+                                "name": "TEST"
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -57,14 +56,13 @@ public class PostReactionControllerTests {
 
     @Test
     @WithUserDetails
-    @DisplayName("post reaction controller: create - validation exception")
-    void create_throwsExceptionForbidden_whenReactionAlreadyExists() throws Exception {
-        mockMvc.perform(post("/post-reactions")
+    @DisplayName("reaction controller: create - bad request exception")
+    void create_throwsExceptionForbidden_whenUserDoesntHaveRightRole() throws Exception {
+        mockMvc.perform(post("/reactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "postId": 1,
-                                "reactionId": 1
+                                "name": "TEST"
                                 }
                                 """))
                 .andExpect(status().isBadRequest());
@@ -72,45 +70,45 @@ public class PostReactionControllerTests {
 
     @Test
     @Rollback
-    @WithUserDetails
-    @DisplayName("post reaction controller: update")
-    void update_returnsUpdatedPostReactionDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(put("/post-reactions/{id}", 1)
+    @WithUserDetails("admin")
+    @DisplayName("reaction controller: update")
+    void update_returnsUpdatedReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(put("/reactions/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "reactionId": 2
+                                "name": "TEST"
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.reactionId").value(2));
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     @Rollback
-    @WithUserDetails
-    @DisplayName("post reaction controller: delete")
-    void delete_returnsDeletedPostReactionDto_whenDataIsValid() throws Exception {
-        mockMvc.perform(delete("/post-reactions/{id}", 1))
+    @WithUserDetails("admin")
+    @DisplayName("reaction controller: delete")
+    void delete_returnsDeletedReactionDto_whenDataIsValid() throws Exception {
+        mockMvc.perform(delete("/reactions/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    @WithUserDetails
-    @DisplayName("post reaction controller: find by id")
-    void find_findsPostReactionById_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/post-reactions/{id}", 1))
+    @WithUserDetails("admin")
+    @DisplayName("reaction controller: find by id")
+    void find_findsReactionById_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/reactions/{id}", 2))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(2));
     }
 
     @Test
-    @WithUserDetails
-    @DisplayName("post reaction controller: find all")
-    void find_findsAllPostReactions_whenDataIsValid() throws Exception {
-        mockMvc.perform(get("/post-reactions"))
+    @WithUserDetails("admin")
+    @DisplayName("reaction controller: find all")
+    void find_findsAllReactionsByPageSizeAndPageNumber_whenDataIsValid() throws Exception {
+        mockMvc.perform(get("/reactions").param("pageSize", "1").param("pageNumber", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(2));
+                .andExpect(jsonPath("$.content.length()").value(1));
     }
 }
