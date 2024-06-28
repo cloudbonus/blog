@@ -1,8 +1,12 @@
 package com.github.blog.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
+import com.github.blog.controller.dto.request.PaymentCancelRequest;
+import com.github.blog.controller.dto.request.PaymentDto;
+import com.github.blog.controller.dto.request.PaymentProcessRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 
@@ -13,11 +17,9 @@ import com.github.blog.controller.dto.response.PageResponse;
 public interface OrderService {
     PageResponse<OrderDto> findAll(OrderFilterRequest requestFilter, PageableRequest pageableRequest);
 
-    OrderDto reserve(Long id);
+    PaymentCancelRequest cancel(Long id);
 
-    OrderDto cancel(Long id);
-
-    OrderDto buy(Long id);
+    PaymentProcessRequest process(Long id) throws JsonProcessingException;
 
     OrderDto findById(Long id);
 
@@ -26,4 +28,6 @@ public interface OrderService {
     OrderDto delete(Long id);
 
     OrderDto findByPostId(Long id);
+
+    void updateState(PaymentDto paymentDto);
 }

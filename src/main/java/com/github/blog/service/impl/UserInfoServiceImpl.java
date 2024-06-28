@@ -5,20 +5,19 @@ import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.UserInfoRequest;
 import com.github.blog.controller.dto.request.filter.UserInfoFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.model.Role;
-import com.github.blog.model.User;
-import com.github.blog.model.UserInfo;
 import com.github.blog.repository.RoleRepository;
 import com.github.blog.repository.UserInfoRepository;
 import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.entity.Role;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.UserInfo;
+import com.github.blog.repository.entity.util.UserInfoState;
 import com.github.blog.repository.filter.UserInfoFilter;
 import com.github.blog.repository.specification.UserInfoSpecification;
 import com.github.blog.service.UserInfoService;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.UserInfoMapper;
-import com.github.blog.service.statemachine.event.UserInfoEvent;
-import com.github.blog.service.statemachine.state.UserInfoState;
 import com.github.blog.service.util.UserAccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,17 +25,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.StateMachineEventResult;
-import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Raman Haurylau
@@ -53,7 +46,6 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final UserInfoMapper userInfoMapper;
 
     private final UserAccessHandler userAccessHandler;
-    private final StateMachineService<UserInfoState, UserInfoEvent> stateMachineService;
 
     @Override
     public UserInfoDto create(UserInfoRequest request) {
@@ -66,7 +58,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         userInfo.setUser(user);
         userInfo.setId(user.getId());
-        userInfo.setState(UserInfoState.RESERVED.name());
+        userInfo.setState(UserInfoState.RESERVED);
 
         userInfo = userInfoRepository.save(userInfo);
         log.debug("User info created successfully with ID: {}", userInfo.getId());
@@ -80,12 +72,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
 
-        StateMachine<UserInfoState, UserInfoEvent> sm = stateMachineService.acquireStateMachine(userInfo.getId().toString());
-        StateMachineEventResult<UserInfoState, UserInfoEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(UserInfoEvent.CANCEL).build())).blockFirst());
-
-        if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
-        }
+        userInfo.setState(UserInfoState.CANCELED);
 
         log.debug("User info cancelled successfully with ID: {}", id);
         return userInfoMapper.toDto(userInfo);
@@ -106,14 +93,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .findById(roleId)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
+        userInfo.setState(UserInfoState.VERIFIED);
         user.getRoles().add(role);
-
-        StateMachine<UserInfoState, UserInfoEvent> sm = stateMachineService.acquireStateMachine(userInfo.getId().toString());
-        StateMachineEventResult<UserInfoState, UserInfoEvent> smResult = Objects.requireNonNull(sm.sendEvent(Mono.just(MessageBuilder.withPayload(UserInfoEvent.VERIFY).build())).blockFirst());
-
-        if (smResult.getResultType().equals(StateMachineEventResult.ResultType.DENIED)) {
-            throw new CustomException(ExceptionEnum.STATE_TRANSITION_EXCEPTION);
-        }
 
         log.debug("User info verified successfully with ID: {}", id);
         return userInfoMapper.toDto(userInfo);
@@ -175,9 +156,9 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Scheduled(fixedRate = 150000)
-    private void deleteCanceledUserInfo() {
+    protected void deleteCanceledUserInfo() {
         log.debug("Deleting canceled user infos");
-        List<UserInfo> info = userInfoRepository.findByState(UserInfoState.CANCELED.name());
+        List<UserInfo> info = userInfoRepository.findByState(UserInfoState.CANCELED);
         info.forEach(userInfo -> {
             userInfoRepository.delete(userInfo);
             log.debug("Deleted canceled user info with ID: {}", userInfo.getId());

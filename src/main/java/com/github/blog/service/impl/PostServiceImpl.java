@@ -5,19 +5,19 @@ import com.github.blog.controller.dto.request.PageableRequest;
 import com.github.blog.controller.dto.request.PostRequest;
 import com.github.blog.controller.dto.request.filter.PostFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
-import com.github.blog.model.Order;
-import com.github.blog.model.Post;
-import com.github.blog.model.User;
 import com.github.blog.repository.OrderRepository;
 import com.github.blog.repository.PostRepository;
 import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.entity.Order;
+import com.github.blog.repository.entity.Post;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.util.OrderState;
 import com.github.blog.repository.filter.PostFilter;
 import com.github.blog.repository.specification.PostSpecification;
 import com.github.blog.service.PostService;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.PostMapper;
-import com.github.blog.service.statemachine.state.OrderState;
 import com.github.blog.service.util.UserAccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,8 +25,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author Raman Haurylau
@@ -62,7 +65,7 @@ public class PostServiceImpl implements PostService {
             Order order = new Order();
             order.setPost(post);
             order.setUser(post.getUser());
-            order.setState(OrderState.NEW.name());
+            order.setState(OrderState.NEW);
 
             orderRepository.save(order);
             log.debug("Created a new order for post: {}", post.getId());
@@ -124,6 +127,17 @@ public class PostServiceImpl implements PostService {
         postRepository.delete(post);
         log.debug("Post deleted successfully with ID: {}", id);
         return postMapper.toDto(post);
+    }
+
+    @Scheduled(fixedRate = 150000)
+    protected void deleteInactivePosts() {
+        log.debug("Deleting inactive posts");
+        List<Order> orders = orderRepository.findAllCanceledOrders();
+        orders.forEach(order -> {
+            postRepository.delete(order.getPost());
+            orderRepository.delete(order);
+            log.debug("Deleted inactive post with order ID: {}", order.getId());
+        });
     }
 }
 
