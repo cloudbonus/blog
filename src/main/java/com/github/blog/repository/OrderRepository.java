@@ -1,14 +1,17 @@
 package com.github.blog.repository;
 
 import com.github.blog.repository.entity.Order;
+import com.github.blog.repository.entity.util.UserInfoState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +26,9 @@ public interface OrderRepository extends CrudRepository<Order, Long>, JpaSpecifi
 
     Optional<Order> findByPostId(Long postId);
 
-    @Query("SELECT o FROM Order o WHERE o.state = 'CANCELED'")
-    List<Order> findAllCanceledOrders();
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Order o WHERE o.state = 'CANCELED'")
+    void deleteCanceledOrders();
+
 }

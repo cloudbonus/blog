@@ -13,11 +13,26 @@ spring:
     bootstrap-servers: kafka:29092
     consumer:
       group-id: "default"
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            value:
+              default:
+                type: "com.github.blog.controller.dto.request.PaymentDto"
+            type:
+              mapping: "com.github.epay.domain.dto.common.PaymentDto:com.github.blog.controller.dto.request.PaymentDto"
+            trusted:
+              packages: "com.github.epay.domain.dto.common.PaymentDto"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 topic:
   names:
-    CANCEL: t.cancel
     PROCESS: t.process
+    CANCEL: t.cancel
     UPDATE: t.update
 
 com:

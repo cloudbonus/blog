@@ -1,12 +1,9 @@
 package com.github.blog.service.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.blog.config.kafka.KafkaTopicProperties;
-import com.github.blog.controller.dto.request.PaymentCancelRequest;
-import com.github.blog.controller.dto.request.PaymentProcessRequest;
-import com.github.blog.repository.entity.util.EpayKafkaTopic;
+import com.github.blog.controller.dto.request.PaymentRequest;
+import com.github.blog.repository.entity.util.KafkaTopic;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -19,27 +16,18 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentRequestProducer {
 
-    private final ObjectMapper objectMapper;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, PaymentRequest> kafkaTemplate;
     private final KafkaTopicProperties kafkaTopicProperties;
 
-    @SneakyThrows
-    public PaymentProcessRequest sendMessage(PaymentProcessRequest paymentProcessRequest) {
-        String requestAsMessage = objectMapper.writeValueAsString(paymentProcessRequest);
-        kafkaTemplate.send(kafkaTopicProperties.getTopic(EpayKafkaTopic.PROCESS), requestAsMessage);
-
-        log.info("Payment request produced {}", requestAsMessage);
-
-        return paymentProcessRequest;
+    public PaymentRequest sendCancelPaymentRequest(PaymentRequest paymentRequest) {
+        kafkaTemplate.send(kafkaTopicProperties.getTopic(KafkaTopic.CANCEL), paymentRequest);
+        log.info("Payment request produced {}", paymentRequest);
+        return paymentRequest;
     }
 
-    @SneakyThrows
-    public PaymentCancelRequest sendMessage(PaymentCancelRequest paymentCancelRequest) {
-        String requestAsMessage = objectMapper.writeValueAsString(paymentCancelRequest);
-        kafkaTemplate.send(kafkaTopicProperties.getTopic(EpayKafkaTopic.CANCEL), requestAsMessage);
-
-        log.info("Payment request canceled {}", requestAsMessage);
-
-        return paymentCancelRequest;
+    public PaymentRequest sendProcessPaymentRequest(PaymentRequest paymentRequest) {
+        kafkaTemplate.send(kafkaTopicProperties.getTopic(KafkaTopic.PROCESS), paymentRequest);
+        log.info("Payment request produced {}", paymentRequest);
+        return paymentRequest;
     }
 }

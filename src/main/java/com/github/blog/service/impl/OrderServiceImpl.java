@@ -3,9 +3,8 @@ package com.github.blog.service.impl;
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.PaymentCancelRequest;
 import com.github.blog.controller.dto.request.PaymentDto;
-import com.github.blog.controller.dto.request.PaymentProcessRequest;
+import com.github.blog.controller.dto.request.PaymentRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.repository.OrderRepository;
@@ -48,17 +47,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
 
     @Override
-    public PaymentCancelRequest cancel(Long id) {
-        Order order = orderRepository
-                .findById(id)
-                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
-
-        return paymentRequestProducer.sendMessage(new PaymentCancelRequest(order.getId()));
-    }
-
-    @Override
-    @SneakyThrows
-    public PaymentProcessRequest process(Long id) {
+    public PaymentRequest cancel(Long id) {
         Order order = orderRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
@@ -67,7 +56,21 @@ public class OrderServiceImpl implements OrderService {
 
         String fullName = String.format("%s %s", userInfo.getFirstname(), userInfo.getSurname());
 
-        return paymentRequestProducer.sendMessage(new PaymentProcessRequest(order.getId(), fullName));
+        return paymentRequestProducer.sendCancelPaymentRequest(new PaymentRequest(order.getId(), fullName));
+    }
+
+    @Override
+    @SneakyThrows
+    public PaymentRequest process(Long id) {
+        Order order = orderRepository
+                .findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORDER_NOT_FOUND));
+
+        UserInfo userInfo = order.getUser().getUserInfo();
+
+        String fullName = String.format("%s %s", userInfo.getFirstname(), userInfo.getSurname());
+
+        return paymentRequestProducer.sendProcessPaymentRequest(new PaymentRequest(order.getId(), fullName));
     }
 
     @Override

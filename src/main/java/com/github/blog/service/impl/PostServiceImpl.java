@@ -132,12 +132,9 @@ public class PostServiceImpl implements PostService {
     @Scheduled(fixedRate = 150000)
     protected void deleteInactivePosts() {
         log.debug("Deleting inactive posts");
-        List<Order> orders = orderRepository.findAllCanceledOrders();
-        orders.forEach(order -> {
-            postRepository.delete(order.getPost());
-            orderRepository.delete(order);
-            log.debug("Deleted inactive post with order ID: {}", order.getId());
-        });
+        postRepository.deletePostsByCanceledOrders();
+        orderRepository.deleteCanceledOrders();
+        log.debug("Successfully deleted canceled posts");
     }
 }
 

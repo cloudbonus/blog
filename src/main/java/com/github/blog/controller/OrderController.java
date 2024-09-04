@@ -3,8 +3,7 @@ package com.github.blog.controller;
 import com.github.blog.controller.dto.common.OrderDto;
 import com.github.blog.controller.dto.request.OrderRequest;
 import com.github.blog.controller.dto.request.PageableRequest;
-import com.github.blog.controller.dto.request.PaymentCancelRequest;
-import com.github.blog.controller.dto.request.PaymentProcessRequest;
+import com.github.blog.controller.dto.request.PaymentRequest;
 import com.github.blog.controller.dto.request.filter.OrderFilterRequest;
 import com.github.blog.controller.dto.response.PageResponse;
 import com.github.blog.service.OrderService;
@@ -33,16 +32,16 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping("{id}/cancel")
+    @GetMapping("cancel/{id}")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('COMPANY') and @orderAccess.verifyOwnership(#id))")
-    public PaymentCancelRequest cancel(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
+    public PaymentRequest cancel(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
         return orderService.cancel(id);
     }
 
-    @GetMapping("{id}/process")
+    @GetMapping("process/{id}")
     @SneakyThrows
     @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY') and @orderAccess.verifyOwnership(#id)")
-    public PaymentProcessRequest process(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
+    public PaymentRequest process(@PathVariable("id") @P("id") @Positive(message = "ID must be greater than 0") Long id) {
         return orderService.process(id);
     }
 

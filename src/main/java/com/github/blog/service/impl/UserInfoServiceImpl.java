@@ -158,10 +158,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Scheduled(fixedRate = 150000)
     protected void deleteCanceledUserInfo() {
         log.debug("Deleting canceled user infos");
-        List<UserInfo> info = userInfoRepository.findByState(UserInfoState.CANCELED);
-        info.forEach(userInfo -> {
-            userInfoRepository.delete(userInfo);
-            log.debug("Deleted canceled user info with ID: {}", userInfo.getId());
-        });
+        userInfoRepository.deleteByState(UserInfoState.CANCELED);
+        log.debug("Successfully deleted canceled user infos");
     }
 }

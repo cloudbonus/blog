@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS blog.tag (
+   CREATE TABLE IF NOT EXISTS blog.tag (
     id   bigserial PRIMARY KEY,
     name text NOT NULL
 );
