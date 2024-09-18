@@ -19,33 +19,39 @@ It also supports pagination, making it easy to navigate through large amounts of
 ### Pagination and Sorting examples
    
 ```console  
-http://localhost:8080/blog-1.0/user
-http://localhost:8080/blog-1.0/user?pageSize=2
-http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2
-http://localhost:8080/blog-1.0/user?pageSize=2&pageNumber=2orderBy=asc
+http://localhost:8080/user
+http://localhost:8080/user?pageSize=2
+http://localhost:8080/user?pageSize=2&pageNumber=2
+http://localhost:8080/user?pageSize=2&pageNumber=2orderBy=asc
 ```
     
 ## Schema
 
-![schema](blog-schema.jpg)
+![schema](media/blog-schema.jpg)
 
 ## Running the Application
 
 1. **Clone the repository**
     ```console  
-    git clone https://github.com/cloudbonus/senla-course.git 
+    git clone https://github.com/cloudbonus/blog.git 
     ```
-2. **Run the scripts**
-   - Execute `docker-compose.yaml` to set up the PostgreSQL database and Tomcat server.
-   - Execute gradlew bootRun (or gradle) and then go to localhost:8080 `http://localhost:8080/blog-1.0/auth/sign-up`.
+2. **Clone the epay repository**
+   ```console  
+   git clone https://github.com/cloudbonus/epay.git
+    ```
+3. **Setup**
+   - Move content from the util folder to the parent directory.
+   - Execute `docker-compose.yaml` to set up Apps, PostgreSQL and Kafka.
    - (OPTIONAL) Execute `init-db.sql` in the resources folder to initialize the database with starter data.
 
 ## To-Do
 
 - [ ] Refactor the code.
-- [ ] Make the state machine operate at its full potential.
-- [ ] Migrate to Spring Boot and Spring Data JPA.
+- [X] Move state machine to another service. 
+- [X] Migrate to Spring Boot and Spring Data JPA.
 - [ ] Fix bugs (I'm sure they exist).
+- [ ] Fix tests
+- [ ] Update the database schema.
 
 ## Contributing
 

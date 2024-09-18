@@ -3,11 +3,11 @@ package com.github.blog.service.security.impl;
 import com.github.blog.controller.dto.common.UserDto;
 import com.github.blog.controller.dto.request.UserRequest;
 import com.github.blog.controller.dto.response.JwtResponse;
-import com.github.blog.model.Role;
-import com.github.blog.model.User;
-import com.github.blog.model.util.RoleEnum;
-import com.github.blog.repository.RoleDao;
-import com.github.blog.repository.UserDao;
+import com.github.blog.repository.RoleRepository;
+import com.github.blog.repository.UserRepository;
+import com.github.blog.repository.entity.Role;
+import com.github.blog.repository.entity.User;
+import com.github.blog.repository.entity.util.RoleEnum;
 import com.github.blog.service.exception.ExceptionEnum;
 import com.github.blog.service.exception.impl.CustomException;
 import com.github.blog.service.mapper.UserMapper;
@@ -32,8 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
-    private final UserDao userDao;
-    private final RoleDao roleDao;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -47,15 +47,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.debug("Signing up user with username: {}", request.username());
         User user = userMapper.toEntity(request);
 
-        Role role = roleDao
-                .findByName(RoleEnum.ROLE_USER.name())
+        Role role = roleRepository
+                .findByNameIgnoreCase(RoleEnum.ROLE_USER.name())
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ROLE_NOT_FOUND));
 
         user.getRoles().add(role);
 
         user.setPassword(passwordEncoder.encode(request.password()));
 
-        userDao.create(user);
+        userRepository.save(user);
         log.debug("User signed up successfully with username: {}", request.username());
         return userMapper.toDto(user);
     }
@@ -82,7 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserDto update(Long id, UserRequest request) {
         log.debug("Updating user with ID: {}", id);
 
-        User user = userDao
+        User user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.USER_NOT_FOUND));
 

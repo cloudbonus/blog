@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+  kafka:
+    bootstrap-servers: kafka:29092
+    consumer:
+      group-id: "default"
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            value:
+              default:
+                type: "com.github.blog.controller.dto.request.PaymentDto"
+            type:
+              mapping: "com.github.epay.domain.dto.common.PaymentDto:com.github.blog.controller.dto.request.PaymentDto"
+            trusted:
+              packages: "com.github.epay.domain.dto.common.PaymentDto"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+topic:
+  names:
+    PROCESS: t.process
+    CANCEL: t.cancel
+    UPDATE: t.update
+
+com:
+  github:
+    blog:
+      jwtSecret: 5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
+      jwtExpirationMs: 1800000

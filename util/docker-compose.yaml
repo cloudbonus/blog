@@ -1,0 +1,107 @@
+services:
+  postgres:
+    image: postgres:16.3
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./util/postgres:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_MULTIPLE_DATABASES=$POSTGRES_DBS
+    ports:
+      - $POSTGRES_LOCAL_PORT:$POSTGRES_DOCKER_PORT
+    networks:
+      - kafka-net
+
+  epay:
+    container_name: epay
+    depends_on:
+      - postgres
+    build:
+      context: ./epay
+      dockerfile: ./epay/Dockerfile
+    restart: on-failure
+    env_file: .env
+    environment:
+      - SPRING_DATASOURCE_URL=$EPAY_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME=$POSTGRES_USER
+      - SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+    ports:
+      - $EPAY_LOCAL_PORT:$EPAY_DOCKER_PORT
+    networks:
+      - kafka-net
+
+  blog:
+    container_name: blog
+    depends_on:
+      - postgres
+    build:
+      context: ./blog
+      dockerfile: ./blog/Dockerfile
+    restart: on-failure
+    env_file: .env
+    environment:
+      - SPRING_DATASOURCE_URL=$BLOG_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME=$POSTGRES_USER
+      - SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+    ports:
+      - $BLOG_LOCAL_PORT:$BLOG_DOCKER_PORT
+    networks:
+      - kafka-net
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    restart: no
+    env_file: .env
+    ports:
+      - $ZOOKEEPER_LOCAL_PORT:$ZOOKEEPER_DOCKER_PORT
+    networks:
+      - kafka-net
+
+  kafka:
+    image: obsidiandynamics/kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    restart: no
+    env_file: .env
+    environment:
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: DOCKER_INTERNAL://:29092,DOCKER_EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: DOCKER_INTERNAL://kafka:29092,DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:$ZOOKEEPER_DOCKER_PORT
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "t.request:1:1,t.update:1:1"
+    ports:
+      - $KAFKA_LOCAL_PORT:$KAFKA_DOCKER_PORT
+    networks:
+      - kafka-net
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    depends_on:
+      - kafka
+    restart: no
+    env_file: .env
+    environment:
+      KAFKA_BROKERCONNECT: kafka:29092
+    ports:
+      - $KAFDROP_LOCAL_PORT:$KAFDROP_DOCKER_PORT
+    networks:
+      - kafka-net
+
+volumes:
+  pgdata:
+
+networks:
+  kafka-net:
+    name: kafka-net
+    driver: bridge

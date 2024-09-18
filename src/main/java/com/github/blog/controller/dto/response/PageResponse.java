@@ -5,8 +5,5 @@ import java.util.List;
 /**
  * @author Raman Haurylau
  */
-public record PageResponse<T>(List<T> content, PageableResponse pageable, Long totalNumberOfEntities) {
-    public int getTotalNumberOfPages() {
-        return (int) Math.ceil((double) totalNumberOfEntities / pageable.pageSize());
-    }
+public record PageResponse<T>(List<T> content, int size, long totalElements, int page, int totalPages) {
 }

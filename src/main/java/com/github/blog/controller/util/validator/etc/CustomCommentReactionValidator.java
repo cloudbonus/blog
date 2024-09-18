@@ -2,7 +2,7 @@ package com.github.blog.controller.util.validator.etc;
 
 import com.github.blog.controller.annotation.etc.UniqueCommentReaction;
 import com.github.blog.controller.dto.request.CommentReactionRequest;
-import com.github.blog.repository.CommentReactionDao;
+import com.github.blog.repository.CommentReactionRepository;
 import com.github.blog.service.util.UserAccessHandler;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomCommentReactionValidator implements ConstraintValidator<UniqueCommentReaction, CommentReactionRequest> {
 
-    private final CommentReactionDao commentReactionDao;
+    private final CommentReactionRepository commentReactionRepository;
 
     private final UserAccessHandler userAccessHandler;
 
@@ -23,7 +23,7 @@ public class CustomCommentReactionValidator implements ConstraintValidator<Uniqu
         if (commentId.commentId() == null) {
             return true;
         } else {
-            return commentReactionDao.findByCommentIdAndUserId(commentId.commentId(), userAccessHandler.getUserId()).isEmpty();
+            return commentReactionRepository.findByCommentIdAndUserId(commentId.commentId(), userAccessHandler.getUserId()).isEmpty();
         }
     }
 }
