@@ -21,6 +21,10 @@ import com.github.blog.service.mapper.PostMapper;
 import com.github.blog.service.util.UserAccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +33,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 /**
  * @author Raman Haurylau
  */
@@ -38,6 +40,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "posts")
 public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -50,6 +53,7 @@ public class PostServiceImpl implements PostService {
     private static final String ROLE_COMPANY = "ROLE_COMPANY";
 
     @Override
+    @Cacheable
     public PostDto create(PostRequest request) {
         log.debug("Creating a new post with request: {}", request);
         Post post = postMapper.toEntity(request);
@@ -76,6 +80,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Cacheable(key = "#id")
     @Transactional(readOnly = true)
     public PostDto findById(Long id) {
         log.debug("Finding post by ID: {}", id);
@@ -88,6 +93,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Cacheable
     @Transactional(readOnly = true)
     public PageResponse<PostDto> findAll(PostFilterRequest requestFilter, PageableRequest pageableRequest) {
         log.debug("Finding all posts with filter: {} and pageable: {}", requestFilter, pageableRequest);
@@ -106,6 +112,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @CachePut(key = "#id")
     public PostDto update(Long id, PostRequest request) {
         log.debug("Updating post with ID: {} and request: {}", id, request);
         Post post = postRepository
@@ -118,6 +125,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @CacheEvict(key = "#id")
     public PostDto delete(Long id) {
         log.debug("Deleting post with ID: {}", id);
         Post post = postRepository
@@ -130,6 +138,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Scheduled(fixedRate = 150000)
+    @CacheEvict(value = "posts", allEntries = true)
     protected void deleteInactivePosts() {
         log.debug("Deleting inactive posts");
         postRepository.deletePostsByCanceledOrders();
