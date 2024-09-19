@@ -28,6 +28,20 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  redis:
+    host: redis
+    timeout: 2000
+  cache:
+    redis:
+      time-to-live: 100000
+  data:
+    redis:
+      repositories:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 topic:
   names:
@@ -40,3 +54,5 @@ com:
     blog:
       jwtSecret: 5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
       jwtExpirationMs: 1800000
+
+
