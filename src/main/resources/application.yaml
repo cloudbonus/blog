@@ -37,6 +37,9 @@ spring:
   cache:
     redis:
       time-to-live: 1m
+logging:
+  logstash:
+    server: "logstash:9999"
 
 topic:
   names:
