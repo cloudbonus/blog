@@ -28,20 +28,15 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-  redis:
-    host: redis
-    timeout: 2000
-  cache:
-    redis:
-      time-to-live: 100000
   data:
     redis:
-      repositories:
-        enabled: false
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      database: 0
+      host: redis
+      port: 6379
+      timeout: 2000
+  cache:
+    redis:
+      time-to-live: 1m
 
 topic:
   names:

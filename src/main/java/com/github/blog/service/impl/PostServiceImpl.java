@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = "posts")
+@CacheConfig(cacheNames = "post")
 public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
