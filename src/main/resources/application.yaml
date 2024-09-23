@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: blog
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
@@ -37,9 +39,10 @@ spring:
   cache:
     redis:
       time-to-live: 1m
-logging:
+elk:
   logstash:
-    server: "logstash:9999"
+    port: 5000
+    server: logstash
 
 topic:
   names:
