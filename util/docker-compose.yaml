@@ -1,5 +1,6 @@
 services:
   postgres:
+    container_name: postgres
     image: postgres:16.3
     restart: unless-stopped
     env_file: .env
@@ -11,9 +12,16 @@ services:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - POSTGRES_MULTIPLE_DATABASES=$POSTGRES_DBS
     ports:
-      - $POSTGRES_LOCAL_PORT:$POSTGRES_DOCKER_PORT
+      - ${POSTGRES_LOCAL_PORT}:${POSTGRES_DOCKER_PORT}
     networks:
       - kafka-net
+
+  redis:
+    container_name: redis
+    image: redis:7.4.0
+    ports:
+      - ${REDIS_LOCAL_PORT}:${REDIS_DOCKER_PORT}
+    restart: always
 
   epay:
     container_name: epay
@@ -30,7 +38,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
     ports:
-      - $EPAY_LOCAL_PORT:$EPAY_DOCKER_PORT
+      - ${EPAY_LOCAL_PORT}:${EPAY_DOCKER_PORT}
     networks:
       - kafka-net
 
@@ -38,6 +46,7 @@ services:
     container_name: blog
     depends_on:
       - postgres
+      -
     build:
       context: ./blog
       dockerfile: ./blog/Dockerfile
@@ -49,7 +58,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
     ports:
-      - $BLOG_LOCAL_PORT:$BLOG_DOCKER_PORT
+      - ${BLOG_LOCAL_PORT}:${BLOG_DOCKER_PORT}
     networks:
       - kafka-net
 
@@ -59,7 +68,7 @@ services:
     restart: no
     env_file: .env
     ports:
-      - $ZOOKEEPER_LOCAL_PORT:$ZOOKEEPER_DOCKER_PORT
+      - ${ZOOKEEPER_LOCAL_PORT}:${ZOOKEEPER_DOCKER_PORT}
     networks:
       - kafka-net
 
@@ -80,11 +89,11 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "t.request:1:1,t.update:1:1"
     ports:
-      - $KAFKA_LOCAL_PORT:$KAFKA_DOCKER_PORT
+      - ${KAFKA_LOCAL_PORT}:${KAFKA_DOCKER_PORT}
     networks:
       - kafka-net
 
-  kafdrop:
+  kafkadrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
     depends_on:
@@ -94,7 +103,7 @@ services:
     environment:
       KAFKA_BROKERCONNECT: kafka:29092
     ports:
-      - $KAFDROP_LOCAL_PORT:$KAFDROP_DOCKER_PORT
+      - ${KAFDROP_LOCAL_PORT}:${KAFDROP_DOCKER_PORT}
     networks:
       - kafka-net
 

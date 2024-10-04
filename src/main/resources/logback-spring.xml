@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <springProperty scope="context" name="logstash.host" source="elk.logstash.server"/>
+    <springProperty scope="context" name="logstash.port" source="elk.logstash.port"/>
+    <springProperty scope="context" name="application.name" source="spring.application.name"/>
+
+    <contextName>${application.name}</contextName>
+
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <param name="Encoding" value="UTF-8"/>
+        <destination>${logstash.host}:${logstash.port}</destination>
+        <connectionTimeout>15 seconds</connectionTimeout>
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service_name":"${application.name}", "tags":"SMS"}</customFields>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="logstash" />
+    </root>
+</configuration>

@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: blog
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
@@ -28,6 +30,19 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  data:
+    redis:
+      database: 0
+      host: redis
+      port: 6379
+      timeout: 2000
+  cache:
+    redis:
+      time-to-live: 1m
+elk:
+  logstash:
+    port: 5000
+    server: logstash
 
 topic:
   names:
@@ -40,3 +55,5 @@ com:
     blog:
       jwtSecret: 5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
       jwtExpirationMs: 1800000
+
+
