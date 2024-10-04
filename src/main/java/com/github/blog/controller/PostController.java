@@ -9,6 +9,7 @@ import com.github.blog.controller.util.marker.BaseMarker;
 import com.github.blog.service.PostService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Raman Haurylau
  */
+@Log4j2
 @Validated
 @RestController
 @RequestMapping("posts")
@@ -47,7 +49,11 @@ public class PostController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or @postAccess.canFilter(#request)")
     public PageResponse<PostDto> findAll(@P("request") @Validated PostFilterRequest requestFilter, @Validated PageableRequest pageableRequest) {
-        return postService.findAll(requestFilter, pageableRequest);
+        long startTime = System.currentTimeMillis();
+        PageResponse<PostDto> response = postService.findAll(requestFilter, pageableRequest);
+        long endTime = System.currentTimeMillis() - startTime;
+        log.info("Duration = {}", endTime);
+        return response;
     }
 
     @PutMapping("{id}")
