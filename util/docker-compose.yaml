@@ -5,7 +5,7 @@ services:
     env_file: .env
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - .postgres:/docker-entrypoint-initdb.d
+      - ./util/postgres:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
@@ -20,8 +20,8 @@ services:
     depends_on:
       - postgres
     build:
-      context: epay
-      dockerfile: epay/Dockerfile
+      context: ./epay
+      dockerfile: ./epay/Dockerfile
     restart: on-failure
     env_file: .env
     environment:
@@ -39,8 +39,8 @@ services:
     depends_on:
       - postgres
     build:
-      context: blog
-      dockerfile: blog/Dockerfile
+      context: ./blog
+      dockerfile: ./blog/Dockerfile
     restart: on-failure
     env_file: .env
     environment:
@@ -78,7 +78,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:$ZOOKEEPER_DOCKER_PORT
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "t.cancel:1:1,t.process:1:1,t.update:1:1"
+      KAFKA_CREATE_TOPICS: "t.request:1:1,t.update:1:1"
     ports:
       - $KAFKA_LOCAL_PORT:$KAFKA_DOCKER_PORT
     networks:
